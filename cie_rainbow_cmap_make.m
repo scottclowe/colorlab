@@ -1,27 +1,27 @@
-function cmap = cie_rainbow_cmap_make(n, attr, func, verbose)
+function cmap = cie_rainbow_cmap_make(n, attr, func, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
-if nargin<1 || isempty(n)
-    n = size(get(gcf,'colormap'),1);
-end
-if nargin<2
-    attr = 'smooth';
+if nargin<4 || isempty(dbg)
+    dbg = 0; % Whether to output information and figures
 end
 if nargin<3
-    func = [];
+    func = []; % function to map from cielab to srgb
 end
-if nargin<4
-    verbose = false;
+if nargin<2 || isempty(attr)
+    attr = 'greenmid'; % Colormap type option
+end
+if nargin<1 || isempty(n)
+    n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
 end
 
 % -------------------------------------------------------------------------
 % Main function body
 switch lower(attr)
     case 'smooth'
-        cmap = cie_rainbow_cmap_make_smooth(n, func, verbose);
+        cmap = cie_rainbow_cmap_make_smooth(n, func, dbg);
     case 'greenmid'
-        cmap = cie_rainbow_cmap_make_greenmid(n, func, verbose);
+        cmap = cie_rainbow_cmap_make_greenmid(n, func, dbg);
     otherwise
         error('Unfamiliar colormap attribute: %s',attr);
 end
@@ -46,47 +46,6 @@ params.t_end   = 2.3;          % Good end point
 
 end
 
-function rgb = my_lab2rgb(Lab, func)
-% Utility for converting from CIELab to sRGB
-% Uses 'func' if provided ...
-% If not, uses ImageProcessingToolbox if available ...
-% If not, uses colorspace (which is a function available on FEX) ...
-% If not, recommends download of colorspace (using suggestFEXpackage)
-
-if nargin<2
-    func = [];
-end
-
-if ~isempty(func)
-    rgb = func(Lab);
-elseif license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    rgb = applycform(Lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-%     warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-%         ['Could not checkout the Image Processing Toolbox. ' ...
-%          'Using colorspace function.']);
-    rgb = colorspace('Lab->RGB',Lab);
-else
-    % Use colorspace
-     if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,...
-            ['Since the Image Processing Toolbox is unavailable, '...
-             'you may wish to download the colorspace package.\n' ...
-             'This package will allow you to convert between different '...
-             'colorspaces without the MATLAB toolbox' ...
-            ]);
-     end
-    error('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function. ' ...
-         ]);
-end
-
-end
 
 function [btsp_t_srt, btsp_t_end] = find_ellipse_ends()
 % Finds the limiting points which are only just inside the ellipse
@@ -111,7 +70,7 @@ btsp_t_end = t(find(TF,1,'last')-1);
 
 end
 
-function ciebow_cmap = cie_rainbow_cmap_make_smooth(n_target, func, verbose)
+function ciebow_cmap = cie_rainbow_cmap_make_smooth(n_target, func, dbg)
 
 params = get_rainbow_ellipse_params();
 rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face');
@@ -130,7 +89,7 @@ Lab = [z' x' y'];
 TF = isingamut(Lab,rgbgamut,'Lab');
 
 % Check all points are now inside
-% if verbose;
+% if dbg;
 %     fprintf('This need to be equal %d = %d\t%d\n',sum(TF),length(TF),(sum(TF)/length(TF)));
 % end
 if sum(TF)~=length(TF)
@@ -174,10 +133,10 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = my_lab2rgb(Lab, func);
+ciebow_cmap = gd_lab2rgb(Lab, func);
 
 % debugging figures
-if verbose;
+if dbg;
     img = repmat(ciebow_cmap,[1 1 20]);
     img = permute(img,[1 3 2]);
 
@@ -201,7 +160,7 @@ end
 
 end
 
-function ciebow_cmap = cie_rainbow_cmap_make_greenmid(n_target, func, verbose)
+function ciebow_cmap = cie_rainbow_cmap_make_greenmid(n_target, func, dbg)
 % Option to have same amount of red as blue
 % This is a very simple method used where the curve is split in two and
 % there are different Delta E values between colours in each.
@@ -232,7 +191,7 @@ Lab2 = [z2' x2' y2'];
 
 % Check all points are now inside
 TF = isingamut([Lab1;Lab2],rgbgamut,'Lab');
-% if verbose;
+% if dbg;
 %     fprintf('This need to be equal %d = %d\t%d\n',sum(TF),length(TF),(sum(TF)/length(TF)));
 % end
 if sum(TF)~=length(TF)
@@ -292,10 +251,10 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = my_lab2rgb(Lab, func);
+ciebow_cmap = gd_lab2rgb(Lab, func);
 
 % debugging figures
-if verbose;
+if dbg;
     img = repmat(ciebow_cmap,[1 1 20]);
     img = permute(img,[1 3 2]);
 

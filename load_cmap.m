@@ -1,4 +1,4 @@
-function cmap = cie_rainbow_cmap(n, attr, func, dbg)
+function cmap = load_cmap(n, makefun, attr, spacefun, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
@@ -6,32 +6,31 @@ if nargin<4 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
 end
 if nargin<3
-    func = []; % function to map from cielab to srgb
+    spacefun = []; % function to map from cielab to srgb
 end
 if nargin<2 || isempty(attr)
-    attr = 'greenmid'; % Colormap type option
-end
-if nargin<1 || isempty(n)
-    n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
+    attr = []; % Colormap type option
 end
 
 % -------------------------------------------------------------------------
 % Parameters
-n_file = 256; % Number of colours in saved cmap. 256 for smooth, 257 for greenmid.
+n_file = 256; % Number of colours in saved cmap. (will be odd for divergent)
 interp_method = 'linear'; % Interpolation method used to go from saved cmap to output
+cmap_foldername = 'cmaps';
 
 % -------------------------------------------------------------------------
-% Define filename for pre-parsed csv file
-switch lower(attr)
-    case 'smooth'
-        fname = 'ciebow_cmap_smooth.tsv';
-    case 'greenmid'
-        fname = 'ciebow_cmap_greenmid.tsv';
-    otherwise
-        error('Unfamiliar colormap attribute: %s',attr);
-end
 
 dirname = fileparts(mfilename('fullpath')); % Folder containing this .m file
+dirname = fullfile(dirname, cmap_foldername); % Folder designated for stored cmaps
+
+funname = func2str(makefun);
+if strncmp(funname(end-4:end),'_make',5); funname = funname(1:end-5); end
+if isempty(attr)
+    fname = [funname '.tsv'];
+else
+    fname = [funname '_' attr '.tsv'];
+end
+
 file = fullfile(dirname,fname);
 
 % Try to load the pre-parsed colormap from file
@@ -42,8 +41,13 @@ end
 % Check this is ok
 if ~exist(file,'file') || size(raw_cmap,1)<n_file
     if dbg; disp('Parsing a colormap to store for future use'); end;
+    
+    % Make directory if non-existent
+    if ~exist(dirname,'dir'); mkdir(dirname); end
+    
     % Make a highly sampled colormap to store for future use
-    raw_cmap = cie_rainbow_cmap_make(n_file, attr, func, dbg);
+    raw_cmap = makefun(n_file, attr, spacefun, dbg);
+    
     % Save it as a tab deliminated file
     dlmwrite(file,raw_cmap,'delimiter','\t','precision','%.6f');
 end

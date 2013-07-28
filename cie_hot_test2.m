@@ -1,8 +1,12 @@
 
-debug = 1;
-if debug; close all; end;
+dbg = 1;
+if dbg;
+%     close all;
+    clear all;
+    dbg = true;
+end;
 
-method = 25;
+method = 12;
 
 g = fetch_cielchab_gamut();
 
@@ -14,6 +18,7 @@ L_off = 0;
 maxc = [];
 L0 = 0;
 Lmax = 100;
+c0 = 0;
 
 % Best: method 1
 % Would be great if method 5 worked correctly
@@ -142,7 +147,7 @@ switch method
         L_off = 0;
         L0   = 2;
         Lmax = 98;
-        maxc = 74.25; %75.6;
+        maxc = 73.9; % 75.6 -> 74.25 -> 73.9
         
         h_per_L = (hmax-h0)/100;
         
@@ -165,7 +170,7 @@ switch method
         L_off = 0;
         L0   = 3;
         Lmax = 97;
-        maxc = [];
+        maxc = 73; %[];
         
         h_per_L = (hmax-h0)/100;
         
@@ -176,7 +181,7 @@ switch method
         L_off = 5;
         L0   = 3;
         Lmax = 97;
-        maxc = [];
+        maxc = 67.8; %[];
         
         h_per_L = (hmax-h0)/100;
         
@@ -187,7 +192,7 @@ switch method
         L_off = 5;
         L0   = 3;
         Lmax = 97;
-        maxc = [];
+        maxc = 71; %[];
         
         h_per_L = (hmax-h0)/100;
         
@@ -198,7 +203,7 @@ switch method
         L_off = 5;
         L0   = 3;
         Lmax = 97;
-        maxc = [];
+        maxc = 67.7; %[];
         
         h_per_L = (hmax-h0)/100;
         
@@ -220,20 +225,20 @@ h = h0 + h_per_L * ((L-L0) + L_off - (L-Lmid).^2 * L_off/(Lmax-Lmid)^2);
 % sf = 1/cos(theta);
 
 
-if isempty(maxc) || debug
+if isempty(maxc) || dbg
 h1 = round(h);
 c1 = nan(size(L));
 for i=1:length(L)
-    tmp = g.lch(g.lch(:,1)==L(i),:);
-    [ignore,I] = min(abs(tmp(:,3)-h1(i)));
+    tmp = g.lch(g.lch(:,1)==L(i),:); % Find gamut points at this L value
+    [ignore,I] = min(abs(tmp(:,3)-h1(i))); % Find the gamut point closest in hue
     c1(i) = tmp(I,2);
 end
 end
 if isempty(maxc)
-maxc = min(c1(round(length(L)/2)+(-5:5)))
+maxc = min(c1(round(length(L)/2)+(-5:5))) % Min chroma of middle 10 values
 end
 
-c = maxc - abs(((L-Lmid)*(min(Lmid-0,100-Lmid)/min(Lmax-Lmid,Lmid-L0))).^expnt) * maxc / abs(Lmid.^expnt);
+c = maxc - abs(((L-Lmid)*(min(Lmid-0,100-Lmid)/min(Lmax-Lmid,Lmid-L0))).^expnt) * (maxc-c0) / abs(Lmid.^expnt);
 
 % Go from cylindrical Lch co-ords to cartesian Lab
 a = c.*cos(h/360*(2*pi));
@@ -256,7 +261,7 @@ maxc2 = min(P2C(round(length(L)/2)+(-5:5)))
 % Lab(~TF,:) = P2(~TF,:);
 
 % Plot map and its derivation
-if debug
+if dbg
 img = repmat(rgb,[1 1 20]);
 img = permute(img,[1 3 2]);
 
@@ -268,7 +273,7 @@ title(sprintf('expnt = %.3f; h0 = %.3f; h/L = %.3f; L.off = %.3f',...
 
 figure;
 hold on;
-plot(c1, L, 'g');
+plot(c1, L, 'Color', [0 .8 0]);
 plot(c , L, 'k');
 plot(sqrt(P2(:,2).^2+P2(:,3).^2), P2(:,1), 'r');
 title(sprintf('expnt = %.3f; h0 = %.3f; h/L = %.3f; L.off = %.3f',...
@@ -285,6 +290,8 @@ title(sprintf('expnt = %.3f; h0 = %.3f; h/L = %.3f; L.off = %.3f',...
 xlabel('Lightness');
 legend('chroma','hue','Location','NorthWest')
 
+return;
+
 figure;
 scatter3(Lab(:,2), Lab(:,3), Lab(:,1), 20, rgb, 'filled');
 set(gca,'Color',[0.4663 0.4663 0.4663]);
@@ -295,7 +302,7 @@ zlabel('L');
 figure;
 hold on;
 plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'bx')
-plot3(P2(:,2) , P2(:,3) , P2(:,1) , 'r-')
+plot3(P2(1:end-1,2) , P2(1:end-1,3) , P2(1:end-1,1) , 'r-') % Last point is grey so P has hue 0
 xlabel('a');
 ylabel('b');
 zlabel('L');

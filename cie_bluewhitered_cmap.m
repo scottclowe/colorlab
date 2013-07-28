@@ -1,5 +1,7 @@
 function cmap = cie_bluewhitered_cmap(n, func, verbose)
 
+% -------------------------------------------------------------------------
+% Default inputs
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1);
 end
@@ -10,12 +12,16 @@ if nargin<3
     verbose = false;
 end
 
+% -------------------------------------------------------------------------
+% Parameters
+
 % CIELCH      [  L*    c    h]
   lchblue   = [  39,  83, 292];
 % lchbluew  = [ 100,   0, 292];
   lchred    = [  39,  83,  40];
 % lchredw   = [ 100,   0,  36];
 
+% -------------------------------------------------------------------------
 
 % % Finding the right values
 % h = 36; %292;
@@ -81,32 +87,12 @@ switch mod(n,2)
 %         Lab2 = Lab2;
 end
 
+% Convert from Lab to srgb
 Lab  = [Lab1;Lab2];
-
-if ~isempty(func)
-    cmap = func(Lab);
-elseif license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    cmap = applycform(Lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-%     warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-%         ['Could not checkout the Image Processing Toolbox. ' ...
-%          'Using colorspace function.']);
-    cmap = colorspace('Lab->RGB',Lab);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,'You may wish to download the colorspace package.');
-     end
-end
+cmap = failsafe_lab2rgb(Lab,func);
 
 
+% If verbose, output figures showing colormap construction
 if verbose
 % Finding the right values
 h = 36; %292;

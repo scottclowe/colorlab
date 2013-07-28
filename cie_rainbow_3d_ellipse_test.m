@@ -220,6 +220,7 @@ close all;
 % %   [  x  y  z ]
 % %   [  a  b  L ]
 
+% Working under more accurate gamut & included in cmap builder
 a = 400;
 b = 106;
 theta = -25.5/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
