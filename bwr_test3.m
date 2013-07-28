@@ -4,11 +4,11 @@ close all;
 
 %% Find seperation distance for a set of different hues
 
-hue_b = 292;
-hue_r =  40;
+handpicked_bwr_hue_b = 290; 
+handpicked_bwr_hue_r = 41;
 
 
-via_black = 1;
+via_black = 0;
 
 
 g = fetch_cielchab_gamut('srgb');
@@ -47,7 +47,7 @@ switch via_black
         error('Bad via colour');
 end
 
-% figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 % plot(ghb(:,1),ghb(:,2),'b-');
 % plot(ghr(:,1),ghr(:,2),'r-');
 % % plot(jointL,jointC,'kx');
@@ -66,7 +66,7 @@ best_sep_m = [];
 best_C_sep = 0;
 best_C_m = [];
 
-% figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 % plot(jointL,jointC,'k-');
 
 for i=1:length(m_list)
@@ -111,7 +111,7 @@ for i=1:length(m_list)
     Lstart = jointL(I_start);
     Cstart = moveC(I_start);
     
-% %     figure(2);hold on;set(gca,'Color',[.48 .48 .48]);box on;
+% %     figure(2);hold on;set(gca,'Color',[.467 .467 .467]);box on;
 % %     plot(jointL,jointC,'k-');
 %     plot(initL,initC,'r-');
 %     plot(Lend,0,'ro');
@@ -198,7 +198,7 @@ end
 initL = jointL(valid_I);
 
 % Plot the blue and red chroma curves to see how well they match
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(ghb(:,1),ghb(:,2),'b-');
 plot(ghr(:,1),ghr(:,2),'r-');
 % plot(jointL,jointC,'kx');
@@ -250,7 +250,7 @@ title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
     
 
 % Plot derivation of map
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(jointL,jointC,'k-');
 plot(initL,initC,'y-');
 plot(Lend,0,'yo');
@@ -285,8 +285,8 @@ title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
 %%
 
 % Handpicked from the matrix of values.
-hue_b = 289; 
-hue_r = 41;
+hue_b = handpicked_bwr_hue_b; 
+hue_r = handpicked_bwr_hue_r;
 
 ib = find(hue_b_range==hue_b,1);
 ir = find(hue_r_range==hue_r,1);
@@ -316,7 +316,7 @@ end
 initL = jointL(valid_I);
 
 % Plot the blue and red chroma curves to see how well they match
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(ghb(:,1),ghb(:,2),'b-');
 plot(ghr(:,1),ghr(:,2),'r-');
 % plot(jointL,jointC,'kx');
@@ -369,7 +369,7 @@ title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r))
     
 
 % Plot derivation of map
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(jointL,jointC,'k-');
 plot(initL,initC,'y-');
 plot(Lend,0,'yo');
@@ -434,7 +434,7 @@ end
 initL = jointL(valid_I);
 
 % Plot the blue and red chroma curves to see how well they match
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(ghb(:,1),ghb(:,2),'b-');
 plot(ghr(:,1),ghr(:,2),'r-');
 % plot(jointL,jointC,'kx');
@@ -483,7 +483,7 @@ title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue_b,hue_r));
 
 
 % Plot derivation of map
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(jointL,jointC,'k-');
 plot(initL,initC,'y-');
 plot(Lend,0,'yo');

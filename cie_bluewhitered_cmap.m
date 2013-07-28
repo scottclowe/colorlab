@@ -1,4 +1,4 @@
-function cmap = cie_bluewhitered_cmap(n, func, debug)
+function cmap = cie_bluewhitered_cmap(n, func, verbose)
 
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1);
@@ -7,7 +7,7 @@ if nargin<2
     func = [];
 end
 if nargin<3
-    debug = false;
+    verbose = false;
 end
 
 % CIELCH      [  L*    c    h]
@@ -107,7 +107,7 @@ else
 end
 
 
-if debug
+if verbose
 % Finding the right values
 h = 36; %292;
 g = fetch_cielchab_gamut('srgb');

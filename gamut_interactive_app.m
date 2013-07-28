@@ -52,7 +52,8 @@ function gamut_interactive_app_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to gamut_interactive_app (see VARARGIN)
 
-handles.rgbgamut = fetch_cielchab_gamut('srgb',256,'face');
+% handles.rgbgamut = fetch_cielchab_gamut('srgb',256,'face');
+handles.rgbgamut = fetch_cielchab_gamut('srgb');
 
 if ~isfield(handles.rgbgamut,'lch_chr')
     lch_chr = find_gamut_chr(handles.rgbgamut);

@@ -1,4 +1,4 @@
-% Makes things okay to make a meshgrid
+% Makes things okay to make a meshgrid, on which we can interpolate
 function gmesh = make_gamut_mesh(g)
 
 % First, eliminate any lightness values near the edges for which we have

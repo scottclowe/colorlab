@@ -10,25 +10,10 @@ if nargin<2
     N = []; 
 end
 if nargin<3
-    point_method = 'face';
-end
-if isempty(N)
-    switch lower(point_method)
-        case {'cube','point'}
-            N = 256;  % 8-bit filled cube
-        case {'face'}
-            N = 1024; % 64-bit open cube
-        otherwise
-            error('Unknown point method');
-    end
+    point_method = 'face-plus';
 end
 
 % - INPUT SWITCHING -
-Lprec = ceil(N/1024);
-Lintv = 1/Lprec;
-Lprec = Lprec/2;
-hprec = ceil(N/2048);
-hintv = 1;
 switch lower(space)
     case {'srgb','rgb'}
         space = 'srgb'; % Canonical
@@ -36,20 +21,82 @@ switch lower(space)
         error('Script undefined for space %s. Only sRGB currently supported.',...
             space);
 end
-
+switch lower(point_method)
+    case {'cube','point'}
+        point_method = 'cube'; % Canonical
+    case {'face','faces'}
+        point_method = 'face'; % Canonical
+    case {'face-plus'}
+        point_method = 'face-plus'; % Canonical
+    otherwise
+        error('Unknown point picking method');
+end
+if isempty(N)
+    switch lower(point_method)
+        case 'cube'
+            N = 256;  % 8-bit filled cube
+        case 'face'
+            N = 1024; % 64-bit open cube
+        case 'face-plus'
+            N = 1024;
+        otherwise
+            error('Unknown point method');
+    end
+end
 % Would use this for CMYK, but not yet set up
 % Have to go CMYK->RGB->LAB
 % kform = makecform('cmyk2srgb', 'RenderingIntent', 'RelativeColorimetric');
 
+% Make the main gamut object
+gamut = make_gamut_lh(space, N, point_method);
+
+% Have to compute again to find a format for the gamut which lets us browse
+% by chroma
+gamut.lch_chr = make_gamut_chr(gamut);
+
+% Make a mesh we can interpolate on
+gamut.lchmesh = make_gamut_mesh(gamut);
+
+end
+
+
+% Make a gamut indexed by lightness and hue
+function gamut = make_gamut_lh(space, N, point_method)
+
+% Don't want these to be 3,6,7,9,11,...
+% Only products of 2 and 5 which divide 10 nicely
 switch lower(point_method)
-    case {'cube','point'}
-        point_method = 'cube'; % Canonical
+    
+    case 'cube' % Canonical
+        Lintv = 1;
+        Lprec = 1;
+        hintv = 1;
+        hprec = 1;
+        
+    case 'face' % Canonical
+        Lintv = 1/ceil(N/1024);
+        Lprec = 1/ceil(N/1024);
+        hintv = 1/ceil(N/4096);
+        hprec = 1/ceil(N/4096);
+        
+    case 'face-plus'
+        Lintv = 1/ceil(N/1024);
+        Lprec = 1/ceil(N/512 );
+        hintv = 1/ceil(N/4096);
+        hprec = 1/ceil(N/1024);
+        
+end
+
+switch lower(point_method)
+    
+    case 'cube' % Canonical
+        warning('Cube is inefficient');
         x = linspace(0,1,N);
         [X,Y,Z] = meshgrid(x,x,x);
         rgb = [X(:) Y(:) Z(:)];
         Ntot = N.^3;
-    case {'face','faces'}
-        point_method = 'face'; % Canonical
+        
+    case 'face' % Canonical
         Ntot = 6*N.^2;
         rgb = nan(Ntot,3);
         x = linspace(0,1,N);
@@ -62,6 +109,60 @@ switch lower(point_method)
             j = i*2+1;
             rgb(j*N.^2+1:(j+1)*N.^2, :) = circshift(rgb1,[0 i]);
         end
+        
+    case 'face-plus'
+        % Add bonus points for hard-to-reach parts near 0 and 100 lightness
+        top_cut1 = 0.04;
+        top_cut2 = 0.01;
+        ntop = round(N/5);
+        nmid = N;
+        % Middle
+        Nmid = 6*nmid.^2;
+        rgbmid = nan(Nmid,3);
+        x = linspace(0,1,nmid);
+        [X,Y] = meshgrid(x,x);
+        rgb0 = [X(:) Y(:) zeros(nmid.^2,1)];
+        rgb1 = [X(:) Y(:)  ones(nmid.^2,1)];
+        for i=0:2
+            j = i*2;
+            rgbmid(j*nmid.^2+1:(j+1)*nmid.^2, :) = circshift(rgb0,[0 i]);
+            j = i*2+1;
+            rgbmid(j*nmid.^2+1:(j+1)*nmid.^2, :) = circshift(rgb1,[0 i]);
+        end
+        % Top and Bottom 4%
+        Ntop = 6*ntop.^2;
+        rgbtop1 = nan(Ntop,3);
+        x = linspace(0,top_cut1,ntop);
+        [X,Y] = meshgrid(x,x);
+        rgb0 = [X(:) Y(:) zeros(ntop.^2,1)];
+        x = linspace(1-top_cut1,1,ntop);
+        [X,Y] = meshgrid(x,x);
+        rgb1 = [X(:) Y(:)  ones(ntop.^2,1)];
+        for i=0:2
+            j = i*2;
+            rgbtop1(j*ntop.^2+1:(j+1)*ntop.^2, :) = circshift(rgb0,[0 i]);
+            j = i*2+1;
+            rgbtop1(j*ntop.^2+1:(j+1)*ntop.^2, :) = circshift(rgb1,[0 i]);
+        end
+        % Top and Bottom 1%
+        Ntop = 6*ntop.^2;
+        rgbtop2 = nan(Ntop,3);
+        x = linspace(Lprec,top_cut2,ntop);
+        [X,Y] = meshgrid(x,x);
+        rgb0 = [X(:) Y(:) zeros(ntop.^2,1)];
+        x = linspace(1-top_cut2,1-Lprec,ntop);
+        [X,Y] = meshgrid(x,x);
+        rgb1 = [X(:) Y(:)  ones(ntop.^2,1)];
+        for i=0:2
+            j = i*2;
+            rgbtop2(j*ntop.^2+1:(j+1)*ntop.^2, :) = circshift(rgb0,[0 i]);
+            j = i*2+1;
+            rgbtop2(j*ntop.^2+1:(j+1)*ntop.^2, :) = circshift(rgb1,[0 i]);
+        end
+        % Concatenate
+        rgb = [rgbmid; rgbtop1; rgbtop2];
+        Ntot = size(rgb,1);
+        
     otherwise
         error('Unknown point picking method');
 end
@@ -115,8 +216,8 @@ c = (a.^2 + b.^2).^(1/2);
 h = mod(atan2(b,a)/pi*180,360);
 
 % Round to nearest (integer/Lprec) for lightness and to nearest degree for hue
-L = round(L*Lprec)/Lprec;
-h = round(h*hprec)/hprec;
+L = round(L/Lprec)*Lprec;
+h = round(h/hprec)*hprec;
 
 % Slice the space into layers of different lightness
 % For each slice, find the maximum chroma at each angle of hue
@@ -178,21 +279,19 @@ gamut.lab           = lab_gamut;
 gamut.rgb           = rgb_gamut;
 gamut.space         = space;
 gamut.N             = N;
+gamut.Ntot          = Ntot;
 gamut.point_method  = point_method;
 gamut.Lprec         = Lprec;
 gamut.Lintv         = Lintv;
 gamut.hprec         = hprec;
 gamut.hintv         = hintv;
 
-
-% Have to compute again to find a format for the gamut which lets us browse
-% by chroma
-gamut.lch_chr = find_gamut_chr(gamut);
-
 end
 
 
-function [lch_chr] = find_gamut_chr(g)
+% Make a gamut indexed by chroma
+function [lch_chr] = make_gamut_chr(g)
+
 max_c = max(g.lch(:,3));
 hues = unique(g.lch(:,3));
 Lmin.lch = nan((max_c+1)*length(hues),3);

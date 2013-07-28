@@ -1,5 +1,7 @@
-function cmap = cie_bluewhitered_cmap2(n, func, debug)
+function cmap = cie_bluewhitered_cmap2(n, func, verbose)
 
+% -------------------------------------------------------------------------
+% Default inputs
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1);
 end
@@ -7,14 +9,18 @@ if nargin<2
     func = [];
 end
 if nargin<3
-    debug = false;
+    verbose = false;
 end
 
-% CIELCH      [  L*    c    h]
-  lchblue   = [ 44.25,  91.70, 292]; % 289
-  lchred    = [ 44.25,  91.70,  41];
-  wp        = [ 99.25,   0   ,   0];
+% -------------------------------------------------------------------------
+% Parameters
 
+% CIELCH      [  L*    c    h]
+  lchblue   = [ 44.25,  91, 290]; % 289
+  lchred    = [ 44.25,  91,  41];
+  wp        = [ 99.00,   0,   0];
+
+% -------------------------------------------------------------------------
 % CIELab    [  L*   a*   b*]
 labblue   = [lchblue(1), lchblue(2)*cosd(lchblue(3)), lchblue(2)*sind(lchblue(3))];
 labred    = [lchred(1) ,  lchred(2)*cosd(lchred(3)) ,  lchred(2)*sind(lchred(3)) ];
@@ -70,63 +76,25 @@ else
 end
 
 
-if debug
-    
-g = fetch_cielchab_gamut('srgb');
+if verbose
+    g = fetch_cielchab_gamut('srgb');
 
-% Finding the right values
-% h = lchred(3); %292;
-% li = g.lch(:,3)==h;
-% gh = g.lch(li,:);
-% 
-% figure; hold on; set(gca,'Color',[.48 .48 .48]);
-% scatter(gh(:,2),gh(:,1),20,g.rgb(li,:));
-% M = (100-gh(end-6,1))/(0-gh(end-6,2));
-% C = 100; Y = 100:-1:40; X = (Y-C)/M;
-% plot(X,Y,'k-');
+    ghb = g.lch(g.lch(:,3)==lchblue(3),:);
+    ghr = g.lch(g.lch(:,3)==lchred(3),:);
+
+    figure; set(gca,'Color',[.467 .467 .467]); hold on; box on;
+    plot(ghb(:,2),ghb(:,1),'b-');
+    plot([labwp(2) lchblue(2)],[labwp(1) lchblue(1)],'k-');
+    plot(ghr(:,2),ghr(:,1),'r-');
+    plot([labwp(2) lchred(2)],[labwp(1) lchred(1)],'ko');
 
 
-% Checking right values
+    % Plot the colormap
+    img = repmat(cmap,[1 1 20]);
+    img = permute(img,[1 3 2]);
+    figure;
+    imagesc(img);
+    axis xy;
+end
 
-% li = g.lch(:,3)==lchblue(3);
-% gh = g.lch(li,:);
-% figure; 
-% hold on;
-% subplot(1,2,1);
-% % scatter(gh(:,2),gh(:,1),20,g.rgb(li,:));
-% plot(gh(:,2),gh(:,1),'b-');
-% set(gca,'Color',[.48 .48 .48]);
-% plot([0 lchblue(2)],[100 lchblue(1)],'o-k');
-% box on;
-% 
-% li = g.lch(:,3)==lchred(3);
-% gh = g.lch(li,:);
-% subplot(1,2,2);
-% % scatter(gh(:,2),gh(:,1),20,g.rgb(li,:));
-% plot(gh(:,2),gh(:,1),'r-');
-% set(gca,'Color',[.48 .48 .48]);
-% hold on;
-% plot([0 lchred(2)],[100 lchred(1)],'o-k');
-% box on;
-
-
-ghb = g.lch(g.lch(:,3)==lchblue(3),:);
-ghr = g.lch(g.lch(:,3)==lchred(3),:);
-
-figure; set(gca,'Color',[.48 .48 .48]); hold on; box on;
-plot(ghb(:,2),ghb(:,1),'b-');
-plot([labwp(2) lchblue(2)],[labwp(1) lchblue(1)],'k-');
-plot(ghr(:,2),ghr(:,1),'r-');
-plot([labwp(2) lchred(2)],[labwp(1) lchred(1)],'ko');
-
-
-% Plot the colormap
-img = repmat(cmap,[1 1 20]);
-img = permute(img,[1 3 2]);
-figure;
-imagesc(img);
-axis xy;
-% figure;
-% imagesc(img(1:4:end,:,:));
-% axis xy;
 end

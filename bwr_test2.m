@@ -34,7 +34,7 @@ jointC = min(ghb(:,2),ghr(:,2));
 [Cmax,I_Cmax] = max(jointC);
 L_Cmax = ghr(I_Cmax,1);
 
-% figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 % plot(ghb(:,1),ghb(:,2),'b-');
 % plot(ghr(:,1),ghr(:,2),'r-');
 % % plot(jointL,jointC,'kx');
@@ -53,7 +53,7 @@ best_sep_m = [];
 best_C_sep = 0;
 best_C_m = [];
 
-% figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 % plot(jointL,jointC,'k-');
 
 for i=1:length(m_list)
@@ -85,7 +85,7 @@ for i=1:length(m_list)
     Lstart = jointL(I_start);
     Cstart = moveC(I_start);
     
-% %     figure(2);hold on;set(gca,'Color',[.48 .48 .48]);box on;
+% %     figure(2);hold on;set(gca,'Color',[.467 .467 .467]);box on;
 % %     plot(jointL,jointC,'k-');
 %     plot(initL,initC,'r-');
 %     plot(Lend,0,'ro');
@@ -164,7 +164,7 @@ L_Cmax = ghr(I_Cmax,1);
 initL = jointL(I_Cmax:end);
 
 % Plot the blue and red chroma curves to see how well they match
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(ghb(:,1),ghb(:,2),'b-');
 plot(ghr(:,1),ghr(:,2),'r-');
 % plot(jointL,jointC,'kx');
@@ -202,7 +202,7 @@ title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
     
 
 % Plot derivation of map
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(jointL,jointC,'k-');
 plot(initL,initC,'y-');
 plot(Lend,0,'yo');
@@ -259,7 +259,7 @@ L_Cmax = ghr(I_Cmax,1);
 initL = jointL(I_Cmax:end);
 
 % Plot the blue and red chroma curves to see how well they match
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(ghb(:,1),ghb(:,2),'b-');
 plot(ghr(:,1),ghr(:,2),'r-');
 % plot(jointL,jointC,'kx');
@@ -298,7 +298,7 @@ title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r))
     
 
 % Plot derivation of map
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(jointL,jointC,'k-');
 plot(initL,initC,'y-');
 plot(Lend,0,'yo');
@@ -354,7 +354,7 @@ L_Cmax = ghr(I_Cmax,1);
 initL = jointL(I_Cmax:end);
 
 % Plot the blue and red chroma curves to see how well they match
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(ghb(:,1),ghb(:,2),'b-');
 plot(ghr(:,1),ghr(:,2),'r-');
 % plot(jointL,jointC,'kx');
@@ -389,7 +389,7 @@ title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue_b,hue_r));
 
 
 % Plot derivation of map
-figure;hold on;set(gca,'Color',[.48 .48 .48]);box on;
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
 plot(jointL,jointC,'k-');
 plot(initL,initC,'y-');
 plot(Lend,0,'yo');

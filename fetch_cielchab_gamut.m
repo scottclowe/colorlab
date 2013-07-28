@@ -1,6 +1,6 @@
 function [gamut] = fetch_cielchab_gamut(space, N, point_method)
 
-verbose = 1;
+verbose = 0;
 
 % - INPUT HANDLING -
 if nargin<1
@@ -23,12 +23,14 @@ switch lower(point_method)
         point_method = 'cube'; % Canonical
     case {'face','faces'}
         point_method = 'face'; % Canonical
+    case {'face-plus','face-cap'}
+        point_method = 'face-plus'; % Canonical
 end
 
 % Check to see if matfile exists
 matname = [space 'gamut.mat'];
-dir = fileparts(which('fetch_cielchab_gamut.m'));
-fname = fullfile(dir,matname);
+dirname = fileparts(mfilename('fullpath')); % Folder containing this .m file
+fname   = fullfile(dirname,matname);
 
 % If it doesn't, run script and save
 if ~exist(fname,'file')
@@ -47,7 +49,8 @@ if nargin<2; return; end
 
 % If inputs were given, check options are okay and resolution is at least
 % as good as requested
-if strcmp(gamut.point_method, point_method)
+if strcmp(gamut.point_method, point_method) || ...
+    (strcmp(gamut.point_method,'face-plus') && strcmp(point_method,'face'))
     if  gamut.N==N
         return;
     elseif gamut.N>N

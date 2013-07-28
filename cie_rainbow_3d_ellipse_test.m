@@ -206,19 +206,31 @@ close all;
 % t_start = 4.31;
 % t_end = 2.20;
 % P = [-60 49 88];
+% 
+% Working under less accurate gamut
+% a = 300;
+% b = 93.5;
+% theta = -25/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
+% % phi = 0; %atan(47/180);
+% phi = -17.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/a);
+% psi = 1.7/180*pi; %5/180*pi; % atan(30/2/b); %pi/4;
+% t_start = 4.31;
+% t_end = 2.20;
+% P = [-60 49 88];
+% %   [  x  y  z ]
+% %   [  a  b  L ]
 
-a = 300;
-b = 93.5;
-theta = -25/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
+a = 400;
+b = 106;
+theta = -25.5/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
 % phi = 0; %atan(47/180);
 phi = -17.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/a);
 psi = 1.7/180*pi; %5/180*pi; % atan(30/2/b); %pi/4;
-t_start = 4.31;
-t_end = 2.20;
+t_start = 4.2;
+t_end = 2.30;
 P = [-60 49 88];
 %   [  x  y  z ]
 %   [  a  b  L ]
-
 
 % U and V are the major and minor axes respectively
 % theta is the angle of rotation in the x-y plane
@@ -313,14 +325,14 @@ figure;
 imagesc(img);
 axis xy;
 
-%%
+%
 % Project onto the plane of the ellipse
 % Plot chr value for each of the L and h values
 % This will allow me to see how to get it to fit more easily (hopefully)
 
 [TF,P2] = isingamut(Lab,g,'Lab');
 
-disp(sum(TF)/length(TF))
+% disp(sum(TF)/length(TF));
 
 figure;
 hold on;

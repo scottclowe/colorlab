@@ -2,7 +2,7 @@
 debug = 1;
 if debug; close all; end;
 
-method = 12;
+method = 25;
 
 g = fetch_cielchab_gamut();
 
