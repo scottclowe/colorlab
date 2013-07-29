@@ -345,6 +345,62 @@ zlabel('L');
 view(0,90);
 
 
+figure;
+hold on;
+plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
+
+% Get a mesh version of the gamut
+if ~isfield(g,'lchmesh')
+    g.lchmesh = make_gamut_mesh(g);
+end
+
+L = g.lchmesh.Lgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+c = g.lchmesh.cgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+h = g.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end])/180*pi;
+a = c.*cos(h);
+b = c.*sin(h);
+
+cform = makecform('lab2srgb');
+CMAP = applycform([L(:) a(:) b(:)], cform);
+
+hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
+set(hs,'FaceColor','none');
+
+set(gca,'Color',[0.4663 0.4663 0.4663]);
+set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+xlabel('a*')
+ylabel('b*')
+zlabel('L*')
+
+
+figure;
+hold on;
+plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
+
+% Get a mesh version of the gamut
+if ~isfield(g,'lchmesh')
+    g.lchmesh = make_gamut_mesh(g);
+end
+
+L = g.lchmesh.Lgrid([1:end 1],:);
+c = g.lchmesh.cgrid([1:end 1],:);
+h = g.lchmesh.hgrid([1:end 1],:)/180*pi;
+a = c.*cos(h);
+b = c.*sin(h);
+
+cform = makecform('lab2srgb');
+CMAP = applycform([L(:) a(:) b(:)], cform);
+
+hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
+set(hs,'EdgeColor','none');
+set(hs,'FaceAlpha',0.75);
+
+set(gca,'Color',[0.4663 0.4663 0.4663]);
+set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+xlabel('a*')
+ylabel('b*')
+zlabel('L*')
+
 %%
 % Ideas for parametrising ellipse by arc length:
 %

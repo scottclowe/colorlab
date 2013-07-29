@@ -189,7 +189,7 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 % Have to manually set this as the GUIDE causes there to be new lines in
 % the middle of the names
-contents = {'Hue','Lightness (LCHab)','Lightness (Lab)','Chroma','Surface'};
+contents = {'Hue','Lightness (LCHab)','Lightness (Lab)','Chroma','Surface','Mesh', 'Surface (LCh)'};
 set(hObject,'String',char(contents));
 
 
@@ -212,13 +212,17 @@ switch lower(dim_name)
     case 'hue'
         setup_h_plot(handles)
     case {'lightness','lightness (lab)','lightness (lchab)','lightness (lch)'}
-        setup_lig_Lab_plot(handles,dim_name);
+        setup_lig_Lab_plot(handles, dim_name);
     case {'lightness (lch)'}
         setup_lig_Lch_plot(handles);
     case 'chroma'
         setup_c_plot(handles);
-    case 'surface'
-        plot_surface2(handles);
+    case {'surface','surface (lab)'}
+        plot_surface(handles);
+    case {'mesh','mesh (lab)'}
+        plot_mesh(handles);
+    case {'surface lch','surface (lch)'}
+        plot_surface_LCh(handles);
     otherwise
         error('Unknown dimension setting: %s',dim_name);
 end
@@ -631,7 +635,7 @@ guidata(hObject, handles);
 % --------------------------- Surface plot ---------------------------
 % -------------------------------------------------------------------------
 
-function plot_surface(handles)
+function plot_mesh_old(handles)
 % Pick resolution which doesn't divide 360 for good coverage
 switch handles.rgbgamut.Lprec
     case 1
@@ -674,8 +678,7 @@ zlabel('L*')
 % -------------------------------------------------------------------------
 % --------------------------- Surface plot v2 ---------------------------
 % -------------------------------------------------------------------------
-function plot_surface2(handles)
-% Pick resolution which doesn't divide 360 for good coverage
+function plot_surface(handles)
 
 cla reset;
 set(handles.hue_panel,'Visible','off');
@@ -686,22 +689,89 @@ if ~isfield(handles.rgbgamut,'lchmesh')
     handles.rgbgamut.lchmesh = make_gamut_mesh(handles.rgbgamut);
 end
 
-L = handles.rgbgamut.lchmesh.Lgrid;
-c = handles.rgbgamut.lchmesh.cgrid;
-h = handles.rgbgamut.lchmesh.hgrid/180*pi;
+L = handles.rgbgamut.lchmesh.Lgrid([1:end 1],:);
+c = handles.rgbgamut.lchmesh.cgrid([1:end 1],:);
+h = handles.rgbgamut.lchmesh.hgrid([1:end 1],:)/180*pi;
 a = c.*cos(h);
 b = c.*sin(h);
 
 cform = makecform('lab2srgb');
 CMAP = applycform([L(:) a(:) b(:)], cform);
-chart = 1:size(CMAP,1);
-chart = reshape(chart,size(L));
 
-mesh(a,b,L,chart);
-colormap(CMAP);
+hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
+set(hs,'EdgeColor','none');
+% set(hs,'FaceAlpha',0.75);
 
 set(handles.main_axes,'Color',[0.4663 0.4663 0.4663]);
 set(handles.main_axes,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
 xlabel('a*')
 ylabel('b*')
 zlabel('L*')
+
+% -------------------------------------------------------------------------
+% --------------------------- Mesh plot -----------------------------------
+% -------------------------------------------------------------------------
+function plot_mesh(handles)
+
+cla reset;
+set(handles.hue_panel,'Visible','off');
+set(handles.lig_panel,'Visible','off');
+
+% Get a mesh version of the gamut
+if ~isfield(handles.rgbgamut,'lchmesh')
+    handles.rgbgamut.lchmesh = make_gamut_mesh(handles.rgbgamut);
+end
+
+L = handles.rgbgamut.lchmesh.Lgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+c = handles.rgbgamut.lchmesh.cgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+h = handles.rgbgamut.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end])/180*pi;
+a = c.*cos(h);
+b = c.*sin(h);
+
+cform = makecform('lab2srgb');
+CMAP = applycform([L(:) a(:) b(:)], cform);
+
+hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
+set(hs,'FaceColor','none');
+
+set(handles.main_axes,'Color',[0.4663 0.4663 0.4663]);
+set(handles.main_axes,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+xlabel('a*')
+ylabel('b*')
+zlabel('L*')
+
+
+% -------------------------------------------------------------------------
+% --------------------------- Surface plot v2 ---------------------------
+% -------------------------------------------------------------------------
+function plot_surface_lch(handles)
+
+cla reset;
+set(handles.hue_panel,'Visible','off');
+set(handles.lig_panel,'Visible','off');
+
+% Get a mesh version of the gamut
+if ~isfield(handles.rgbgamut,'lchmesh')
+    handles.rgbgamut.lchmesh = make_gamut_mesh(handles.rgbgamut);
+end
+
+L = handles.rgbgamut.lchmesh.Lgrid([1:end 1],:);
+c = handles.rgbgamut.lchmesh.cgrid([1:end 1],:);
+h = handles.rgbgamut.lchmesh.hgrid([1:end 1],:);
+a = c.*cosd(h);
+b = c.*sind(h);
+
+cform = makecform('lab2srgb');
+CMAP = applycform([L(:) a(:) b(:)], cform);
+
+h(end,:) = h(end,:) + 360;
+
+hs = surf(h,L,c,reshape(CMAP,[size(L) 3]));
+set(hs,'EdgeColor','none');
+% set(hs,'FaceAlpha',0.75);
+
+set(handles.main_axes,'Color',[0.4663 0.4663 0.4663]);
+set(handles.main_axes,'XLim',[0 360],'YLim',[0 100],'ZLim',[0 150]);
+xlabel('h')
+ylabel('L')
+zlabel('C')

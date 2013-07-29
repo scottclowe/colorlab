@@ -1,49 +1,43 @@
-function cmap = cie_blueyellow_cmap(n, func)
+function cmap = cie_blueyellow_cmap(n, attr, func, dbg)
 
-if nargin<1
-    n = size(get(gcf,'colormap'),1);
+% -------------------------------------------------------------------------
+% Default inputs
+if nargin<4 || isempty(dbg)
+    dbg = 0; % Whether to output information and figures
 end
-if nargin<2
-    func = [];
+if nargin<3
+    func = []; % function to map from cielab to srgb
+end
+if nargin<2 || isempty(attr)
+    attr = []; % Colormap type option
+end
+if nargin<1 || isempty(n)
+    n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
 end
 
-% CIE       [  L*   a*   b*]
+% -------------------------------------------------------------------------
+% CIE  [  L*   a*   b*]
+lab1 = [  58   0   -65];
+lab2 = [  89   0    87];
 
-% rgbblue   = [  32   79 -108];
-% rgbyellow = [  97  -22   94];
+% -------------------------------------------------------------------------
+L = linspace(lab1(1), lab2(1), n);
+a = linspace(lab1(2), lab2(2), n);
+b = linspace(lab1(3), lab2(3), n);
 
-% ciestart = rgbblue;
-% cieend = rgbyellow;
+Lab = [L' a' b'];
 
-ciestart   = [  58   0   -65];
-cieend     = [  89   0    87];
+cmap = gd_lab2rgb(Lab, func);
 
+% -------------------------------------------------------------------------
+% If dbg mode, display a figure of the outputted colormap
+if dbg;
+    img = repmat(cmap,[1 1 20]);
+    img = permute(img,[1 3 2]);
+    figure;
+    imagesc(img);
+    axis xy;
+    title('Output colormap');
+end
 
-Ls = linspace(ciestart(1),cieend(1),n);
-as = linspace(ciestart(2),cieend(2),n);
-bs = linspace(ciestart(3),cieend(3),n);
-
-Lab = [Ls' as' bs'];
-
-if ~isempty(func)
-    cmap = func(Lab);
-elseif license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    cmap = applycform(Lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Using colorspace function, but output not guaranteed correct.']);
-    cmap = colorspace('Lab->RGB',Lab);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,'You may wish to download the colorspace package.');
-     end
 end

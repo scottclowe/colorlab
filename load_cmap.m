@@ -19,7 +19,7 @@ interp_method = 'linear'; % Interpolation method used to go from saved cmap to o
 cmap_foldername = 'cmaps';
 
 % -------------------------------------------------------------------------
-
+% Folder and filenames
 dirname = fileparts(mfilename('fullpath')); % Folder containing this .m file
 dirname = fullfile(dirname, cmap_foldername); % Folder designated for stored cmaps
 
@@ -33,12 +33,13 @@ end
 
 file = fullfile(dirname,fname);
 
+% -------------------------------------------------------------------------
 % Try to load the pre-parsed colormap from file
 if exist(file,'file')
     raw_cmap = load(file);
 end
 
-% Check this is ok
+% Check this is ok. If not, (re)make cmap
 if ~exist(file,'file') || size(raw_cmap,1)<n_file
     if dbg; disp('Parsing a colormap to store for future use'); end;
     
@@ -52,11 +53,13 @@ if ~exist(file,'file') || size(raw_cmap,1)<n_file
     dlmwrite(file,raw_cmap,'delimiter','\t','precision','%.6f');
 end
 
+% -------------------------------------------------------------------------
 % Interpolate the colormap for desired n
 x  = 1:size(raw_cmap,1);
 xi = linspace(1,size(raw_cmap,1),n);
 cmap = interp1(x,raw_cmap,xi,interp_method);
 
+% -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap
 if dbg;
     img = repmat(cmap,[1 1 20]);

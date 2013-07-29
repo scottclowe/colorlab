@@ -1,20 +1,28 @@
-function cmap = cie_hot_make(n, method, func, dbg)
+function cmap = cie_hot_make(n, attr, spacefun, dbg)
 
-if nargin<4
-    dbg = 0;
+% -------------------------------------------------------------------------
+% Default inputs
+if nargin<4 || isempty(dbg)
+    dbg = 0; % Whether to output information and figures
 end
 if nargin<3
-    func = [];
+    spacefun = []; % spacefuntion to map from cielab to srgb
 end
-if nargin<2
-    method = '1';
+if nargin<2 || isempty(attr)
+    attr = '1'; % Colormap type option
+end
+if nargin<1 || isempty(n)
+    n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
 end
 
-if isnumeric(method); method = num2str(method); end
+if isnumeric(attr); attr = num2str(attr); end
 
+% -------------------------------------------------------------------------
 % Get params
-params = get_params(method);
+params = get_params(attr);
 
+% -------------------------------------------------------------------------
+% Construct points in LCh space
 L = linspace(params.L0,params.Lmax,n);
 Lmid = (params.L0+params.Lmax)/2;
 h = params.h0 + params.h_per_L * ((L-params.L0) + params.L_off - (L-Lmid).^2 * params.L_off/(params.Lmax-Lmid)^2);
@@ -26,8 +34,9 @@ b = c.*sin(h/360*(2*pi));
 
 % Turn Lab into sRGB values
 Lab = [L' a' b'];
-cmap = gd_lab2rgb(Lab, func);
+cmap = gd_lab2rgb(Lab, spacefun);
 
+% -------------------------------------------------------------------------
 if dbg
     % Plot the colormap
     img = repmat(cmap,[1 1 20]);
@@ -35,11 +44,37 @@ if dbg
     figure;
     imagesc(img);
     axis xy;
+    
+    % Plot changes in c and h vs L
+    figure;
+    hold on;
+    plot(L,c,'k');
+    plot(L,h,'r');
+    title(sprintf('expnt = %.3f; h0 = %.3f; h/L = %.3f; L.off = %.3f',...
+        params.expnt, params.h0, params.h_per_L, params.L_off));
+    xlabel('Lightness');
+    legend('chroma','hue','Location','NorthWest')
+    
+    % Check for points out of gamut
+    g = fetch_cielchab_gamut();
+    [TF,P2] = isingamut(Lab,g,'Lab');
+    fprintf('attr #%s has %d of %d in gamut.\n',attr,sum(TF),length(TF));
+    
+    % Plot c vs maxc in gamut
+    figure;
+    hold on;
+%     plot(c1, L, 'Color', [0 .8 0]);
+    plot(c , L, 'k');
+    plot(sqrt(P2(:,2).^2+P2(:,3).^2), P2(:,1), 'r');
+    title(sprintf('expnt = %.3f; h0 = %.3f; h/L = %.3f; L.off = %.3f',...
+        params.expnt, params.h0, params.h_per_L, params.L_off));
+    xlabel('chroma');
+    ylabel('Lightness');
 end
 
 end
 
-function params = get_params(method)
+function params = get_params(attr)
 
 % Initial values
 params.expnt    = 2;
@@ -51,7 +86,7 @@ params.L0       = 0;
 params.Lmax     = 100;
 params.c0       = 0;
 
-switch method
+switch attr
     case '1' %25
         % Based on Set#5
         params.expnt = 2;
@@ -109,7 +144,7 @@ switch method
         params.h_per_L = (params.hmax-params.h0)/100;
         
     otherwise
-        error('Unfamiliar method');
+        error('Unfamiliar attribute');
 
 end
 

@@ -156,6 +156,64 @@ if dbg;
     ylabel('b');
     zlabel('L');
     view(0,90);
+    title('Rotate to see L');
+    
+    
+    figure;
+    hold on;
+    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
+    
+    % Get a mesh version of the gamut
+    if ~isfield(rgbgamut,'lchmesh')
+        rgbgamut.lchmesh = make_gamut_mesh(rgbgamut);
+    end
+
+    L = rgbgamut.lchmesh.Lgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+    c = rgbgamut.lchmesh.cgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+    h = rgbgamut.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end])/180*pi;
+    a = c.*cos(h);
+    b = c.*sin(h);
+
+    cform = makecform('lab2srgb');
+    CMAP = applycform([L(:) a(:) b(:)], cform);
+
+    hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
+    set(hs,'FaceColor','none');
+
+    set(gca,'Color',[0.4663 0.4663 0.4663]);
+    set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+    xlabel('a*')
+    ylabel('b*')
+    zlabel('L*')
+    
+    
+    figure;
+    hold on;
+    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
+    
+    % Get a mesh version of the gamut
+    if ~isfield(rgbgamut,'lchmesh')
+        rgbgamut.lchmesh = make_gamut_mesh(rgbgamut);
+    end
+
+    L = rgbgamut.lchmesh.Lgrid([1:end 1],:);
+    c = rgbgamut.lchmesh.cgrid([1:end 1],:);
+    h = rgbgamut.lchmesh.hgrid([1:end 1],:)/180*pi;
+    a = c.*cos(h);
+    b = c.*sin(h);
+
+    cform = makecform('lab2srgb');
+    CMAP = applycform([L(:) a(:) b(:)], cform);
+
+    hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
+    set(hs,'EdgeColor','none');
+    set(hs,'FaceAlpha',0.75);
+
+    set(gca,'Color',[0.4663 0.4663 0.4663]);
+    set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+    xlabel('a*')
+    ylabel('b*')
+    zlabel('L*')
 end
 
 end
@@ -268,12 +326,70 @@ if dbg;
 
     figure;
     hold on;
-    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'bx')
+    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx')
     plot3(P2(:,2) , P2(:,3) , P2(:,1) , 'r-')
     xlabel('a');
     ylabel('b');
     zlabel('L');
     view(0,90);
+    title('Rotate to see L')
+    
+    
+    figure;
+    hold on;
+    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
+    
+    % Get a mesh version of the gamut
+    if ~isfield(rgbgamut,'lchmesh')
+        rgbgamut.lchmesh = make_gamut_mesh(rgbgamut);
+    end
+
+    L = rgbgamut.lchmesh.Lgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+    c = rgbgamut.lchmesh.cgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+    h = rgbgamut.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end])/180*pi;
+    a = c.*cos(h);
+    b = c.*sin(h);
+
+    cform = makecform('lab2srgb');
+    CMAP = applycform([L(:) a(:) b(:)], cform);
+
+    hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
+    set(hs,'FaceColor','none');
+
+    set(gca,'Color',[0.4663 0.4663 0.4663]);
+    set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+    xlabel('a*')
+    ylabel('b*')
+    zlabel('L*')
+    
+    
+    figure;
+    hold on;
+    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
+    
+    % Get a mesh version of the gamut
+    if ~isfield(rgbgamut,'lchmesh')
+        rgbgamut.lchmesh = make_gamut_mesh(rgbgamut);
+    end
+
+    L = rgbgamut.lchmesh.Lgrid([1:end 1],:);
+    c = rgbgamut.lchmesh.cgrid([1:end 1],:);
+    h = rgbgamut.lchmesh.hgrid([1:end 1],:)/180*pi;
+    a = c.*cos(h);
+    b = c.*sin(h);
+
+    cform = makecform('lab2srgb');
+    CMAP = applycform([L(:) a(:) b(:)], cform);
+
+    hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
+    set(hs,'EdgeColor','none');
+    set(hs,'FaceAlpha',0.75);
+
+    set(gca,'Color',[0.4663 0.4663 0.4663]);
+    set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+    xlabel('a*')
+    ylabel('b*')
+    zlabel('L*')
 end
 
 end
