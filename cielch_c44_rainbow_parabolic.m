@@ -16,6 +16,8 @@ if nargin<3
     debug = 0;
 end
 
+use_uplab = false;
+
 chr = 44; % Lhc chroma of 44
 
 % Curve co-ordinates in Lch space for constant chroma
@@ -122,28 +124,7 @@ b = c.*sin(h/360*(2*pi));
 Lab = [L' a' b'];
 
 % Move from Lab into rgb
-if ~isempty(func)
-    rgb = func(Lab);
-elseif license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    rgb = applycform(Lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Using colorspace function.']);
-    rgb = colorspace('Lab->RGB',Lab);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,'You may wish to download the colorspace package.');
-     end
-end
+rgb = gd_lab2rgb(Lab, use_uplab, func);
 
 % -- Plot for debug ---
 if debug

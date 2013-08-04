@@ -44,6 +44,7 @@ function params = get_rainbow_ellipse_params(paramset)
 
 switch paramset
     case '1'
+        params.use_uplab = false;
         params.P       = [-60 49 88];                       % Green point
         params.C       = [301.0341 -123.2044  -32.2823];    % Centre
         params.a       = 400;                               % Major axis coef
@@ -57,6 +58,7 @@ switch paramset
         params.t_end   = 2.3;          % Good end point
 
     case '2'
+        params.use_uplab = false;
         params.P       = [-41 37 91];
         params.C       = [131.8926  -41.7917   15.2377];
         params.a       = 190;
@@ -169,7 +171,7 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = gd_lab2rgb(Lab, spacefun);
+ciebow_cmap = gd_lab2rgb(Lab, params.use_uplab, spacefun);
 
 % debugging figures
 if dbg;
@@ -209,9 +211,8 @@ if dbg;
     h = rgbgamut.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end])/180*pi;
     a = c.*cos(h);
     b = c.*sin(h);
-
-    cform = makecform('lab2srgb');
-    CMAP = applycform([L(:) a(:) b(:)], cform);
+    
+    CMAP = gd_lab2rgb([L(:) a(:) b(:)], use_uplab);
 
     hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
     set(hs,'FaceColor','none');
@@ -320,7 +321,7 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = gd_lab2rgb(Lab, spacefun);
+ciebow_cmap = gd_lab2rgb(Lab, params.use_uplab, spacefun);
 
 % debugging figures
 if dbg;
@@ -361,8 +362,7 @@ if dbg;
     a = c.*cos(h);
     b = c.*sin(h);
 
-    cform = makecform('lab2srgb');
-    CMAP = applycform([L(:) a(:) b(:)], cform);
+    CMAP = gd_lab2rgb([L(:) a(:) b(:)], use_uplab);
 
     hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
     set(hs,'FaceColor','none');

@@ -34,7 +34,7 @@ b = c.*sin(h/360*(2*pi));
 
 % Turn Lab into sRGB values
 Lab = [L' a' b'];
-cmap = gd_lab2rgb(Lab, spacefun);
+cmap = gd_lab2rgb(Lab, params.use_uplab, spacefun);
 
 % -------------------------------------------------------------------------
 if dbg
@@ -80,6 +80,7 @@ end
 function params = get_params(attr)
 
 % Initial values
+params.use_uplab = false;
 params.expnt    = 2;
 params.h0       = 0;
 params.h_per_L  = 1;

@@ -4,6 +4,8 @@ close all;
 
 %% Find seperation distance for a set of different hues
 
+use_uplab = false;
+
 hue_b = 292;
 hue_r =  40;
 
@@ -224,8 +226,7 @@ b2 = linspace(   0, Cstart*sind(hue_r), neach);
 Lab1 = [L1' a1' b1'];
 Lab2 = [L2' a2' b2'];
 Lab  = [Lab1;Lab2];
-cform = makecform('lab2srgb');
-cmap = applycform(Lab, cform);
+cmap = gd_lab2rgb(Lab, use_uplab);
 
 img = repmat(cmap,[1 1 20]);
 img = permute(img,[1 3 2]);
@@ -320,8 +321,7 @@ b2 = linspace(   0, Cstart*sind(hue_r), neach);
 Lab1 = [L1' a1' b1'];
 Lab2 = [L2' a2' b2'];
 Lab  = [Lab1;Lab2];
-cform = makecform('lab2srgb');
-cmap = applycform(Lab, cform);
+cmap = gd_lab2rgb(Lab, use_uplab);
 
 img = repmat(cmap,[1 1 20]);
 img = permute(img,[1 3 2]);
@@ -411,8 +411,7 @@ b2 = linspace(   0, Cstart*sind(hue_r), neach);
 Lab1 = [L1' a1' b1'];
 Lab2 = [L2' a2' b2'];
 Lab  = [Lab1;Lab2];
-cform = makecform('lab2srgb');
-cmap = applycform(Lab, cform);
+cmap = gd_lab2rgb(Lab, use_uplab);
 
 img = repmat(cmap,[1 1 20]);
 img = permute(img,[1 3 2]);

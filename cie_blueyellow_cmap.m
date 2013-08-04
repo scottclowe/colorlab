@@ -16,6 +16,8 @@ if nargin<1 || isempty(n)
 end
 
 % -------------------------------------------------------------------------
+use_uplab = false;
+
 switch attributes
     case 'a0'
         % CIE  [  L*    a*  b*]
@@ -52,7 +54,7 @@ b = linspace(lab1(3), lab2(3), n);
 
 Lab = [L' a' b'];
 
-cmap = gd_lab2rgb(Lab, spacefun);
+cmap = gd_lab2rgb(Lab, use_uplab, spacefun);
 
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap

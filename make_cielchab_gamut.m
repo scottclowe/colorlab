@@ -171,7 +171,7 @@ switch lower(point_method)
 end
 
 % Swap between spaces. Use whichever function is available
-Lab = my_srgb2lab(rgb, use_uplab);
+Lab = gd_rgb2lab(rgb, use_uplab);
 
 % Seperate Lab components
 L = Lab(:,1);
@@ -239,7 +239,7 @@ gb = lch_gamut(:,2).*sin(lch_gamut(:,3)/360*(2*pi));
 lab_gamut = [lch_gamut(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-rgb_gamut = my_lab2srgb(lab_gamut, use_uplab);
+rgb_gamut = gd_lab2rgb(lab_gamut, use_uplab);
 
 gamut.lch           = lch_gamut;
 gamut.lab           = lab_gamut;
@@ -289,55 +289,11 @@ gb = Lmax.lch(:,2).*sin(Lmax.lch(:,3)/360*(2*pi));
 Lmax.lab = [Lmax.lch(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-Lmin.rgb = my_lab2srgb(Lmin.lab, use_uplab);
-Lmax.rgb = my_lab2srgb(Lmax.lab, use_uplab);
+Lmin.rgb = gd_lab2rgb(Lmin.lab, use_uplab);
+Lmax.rgb = gd_lab2rgb(Lmax.lab, use_uplab);
 
 
 lch_chr.Lmin = Lmin;
 lch_chr.Lmax = Lmax;
-
-end
-
-function Lab = my_srgb2lab(rgb, use_uplab)
-
-if license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    Lab = applycform(rgb, makecform('srgb2lab'));
-elseif exist('colorspace','file')
-    % Use colorspace
-    Lab = colorspace('RGB->Lab',rgb);
-else
-    if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,...
-            ['Since the Image Processing Toolbox is unavailable, '...
-             'you may wish to download the colorspace package.\n' ...
-             'This package will allow you to convert between different '...
-             'colorspaces without the MATLAB toolbox' ...
-            ]);
-    end
-    error('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-end
-
-if use_uplab;
-    P = iccread('CIELab_to_UPLab.icc');
-    cform = makecform('CLUT', P, 'BToA0');
-    Lab = [applycform(Lab(1:floor(length(Lab)/2),:), cform); ...
-        applycform(Lab(floor(length(Lab)/2):end,:), cform)];
-end
-
-end
-
-function rgb = my_lab2srgb(Lab, use_uplab)
-
-if use_uplab;
-    P = iccread('CIELab_to_UPLab.icc');
-    cform = makecform('CLUT', P, 'AToB0');
-    Lab = [applycform(Lab(1:floor(length(Lab)/2),:), cform); ...
-        applycform(Lab(floor(length(Lab)/2):end,:), cform)];
-end
-rgb = gd_lab2rgb(Lab);
 
 end

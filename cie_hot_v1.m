@@ -7,6 +7,8 @@ if nargin<2
     func = [];
 end
 
+use_uplab = false;
+
 h0 = -15;
 h_per_L = 1.2;
 maxc = 85.66;
@@ -27,28 +29,7 @@ Lab(~TF,:) = P2(~TF,:);
 
 sum(TF)/n
 
-if ~isempty(func)
-    cmap = func(Lab);
-elseif license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    cmap = applycform(Lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Using colorspace function.']);
-    cmap = colorspace('Lab->RGB',Lab);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,'You may wish to download the colorspace package.');
-     end
-end
+cmap = gd_lab2rgb(Lab, use_uplab, func);
 
 end
 
@@ -105,8 +86,7 @@ a = c.*cos(h/360*(2*pi));
 b = c.*sin(h/360*(2*pi));
 
 Lab = [L' a' b'];
-cform = makecform('lab2srgb');
-rgb = applycform(Lab, cform);
+rgb = gd_lab2rgb(Lab);
 
 clrs = repmat(rgb,[1 1 20]);
 clrs = permute(clrs,[1 3 2]);

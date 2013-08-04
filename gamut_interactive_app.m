@@ -53,7 +53,7 @@ function gamut_interactive_app_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to gamut_interactive_app (see VARARGIN)
 
 % Need to make a dial for this
-handles.use_uplab = false;
+handles.use_uplab = true;
 
 handles.rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face-plus', handles.use_uplab);
 
@@ -453,8 +453,8 @@ gb = Lmax.lch(:,2).*sin(Lmax.lch(:,3)/360*(2*pi));
 Lmax.lab = [Lmax.lch(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-Lmin.rgb = my_lab2srgb(Lmin.lab);
-Lmax.rgb = my_lab2srgb(Lmax.lab);
+Lmin.rgb = gd_lab2rgb(Lmin.lab, handles.use_uplab);
+Lmax.rgb = gd_lab2rgb(Lmax.lab, handles.use_uplab);
 
 lch_chr.Lmin = Lmin;
 lch_chr.Lmax = Lmax;
@@ -560,7 +560,7 @@ b = c.*sin(h/360*(2*pi));
 
 Lab = [L' a' b'];
 
-rgb = my_lab2srgb(handles, Lab);
+rgb = gd_lab2rgb(Lab, handles.use_uplab);
 
 
 function [xxx,yyy,rgb] = lin_c_fit(c)
@@ -584,7 +584,7 @@ b = c.*sin(h/360*(2*pi));
 
 Lab = [L' a' b'];
 
-rgb = my_lab2srgb(handles, Lab);
+rgb = gd_lab2rgb(Lab, handles.use_uplab);
 
 
 function chr_val_Callback(hObject, eventdata, handles)
@@ -678,7 +678,7 @@ a = c.*cosd(h);
 b = c.*sind(h);
 
 Lab = [L(:) a(:) b(:)];
-CMAP = my_lab2srgb(handles, Lab);
+CMAP = gd_lab2rgb(Lab, handles.use_uplab);
 
 hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
 set(hs,'EdgeColor','none');
@@ -711,7 +711,7 @@ a = c.*cosd(h);
 b = c.*sind(h);
 
 Lab = [L(:) a(:) b(:)];
-CMAP = my_lab2srgb(handles, Lab);
+CMAP = gd_lab2rgb(Lab, handles.use_uplab);
 
 hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
 set(hs,'FaceColor','none');
@@ -745,7 +745,7 @@ a = c.*cosd(h);
 b = c.*sind(h);
 
 Lab = [L(:) a(:) b(:)];
-CMAP = my_lab2srgb(handles, Lab);
+CMAP = gd_lab2rgb(Lab, handles.use_uplab);
 
 hs = surf(h,L,c,reshape(CMAP,[size(L) 3]));
 set(hs,'EdgeColor','none');
@@ -758,13 +758,3 @@ ylabel('L')
 zlabel('C')
 
 
-% -------------------------------------------------------------------------
-% -------------------------------------------------------------------------
-function rgb = my_lab2srgb(handles, Lab)
-
-if handles.use_uplab;
-    P = iccread('CIELab_to_UPLab.icc');
-    cform = makecform('CLUT', P, 'AToB0');
-    Lab = applycform(Lab, cform);
-end
-rgb = gd_lab2rgb(Lab);

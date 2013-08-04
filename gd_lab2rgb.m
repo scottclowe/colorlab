@@ -1,21 +1,41 @@
-function rgb = gd_lab2rgb(Lab, func)
-% Utility for converting from CIELab to sRGB
+function rgb = gd_lab2rgb(Lab, use_uplab, spacefun)
+% Utility for converting from CIELab (or UPLab) to sRGB
 % Gracefully degrading utility
-% Uses 'func' if provided ...
+% Uses 'spacefun' if provided ...
 % If not, uses ImageProcessingToolbox if available ...
 % If not, uses colorspace (which is a function available on FEX) ...
 % If not, recommends download of colorspace (using suggestFEXpackage)
 
+if nargin<3
+    spacefun = [];
+end
 if nargin<2
-    func = [];
+    use_uplab = false;
 end
 
-if ~isempty(func)
-    rgb = func(Lab);
+if ~isempty(spacefun)
+    rgb = spacefun(Lab);
     return;
 end
 
+% Move from UPLab to CIELab
+% UPLab was made by Bruce Lindbloom and provides a space where Munsell
+% colors are uniformly spaced
+% http://www.brucelindbloom.com/index.html?UPLab.html
+% The A2B0 tag of the profile converts from CIE Lab to UP Lab. The B2A0 tag 
+% performs the inverse transformation... In this way, a linear gamut 
+% mapping in UP Lab is equivalent to a nonlinear mapping along the curved 
+% Munsell lines in CIE Lab. This should fix, or at least greatly reduce the 
+% "blue turns purple" problem.
+if use_uplab;
+    P = iccread('CIELab_to_UPLab.icc');
+    % B2A0: UPLab to CIELab
+    cform = makecform('CLUT', P, 'BToA0');
+    Lab = applycform(Lab, cform);
+end
+
 % If ImageProcessingToolbox is available to use, use it.
+% Move from CIELab to sRGB
 if license('checkout','image_toolbox')
     rgb = applycform(Lab, makecform('lab2srgb'));
     return;
@@ -44,6 +64,7 @@ if ~exist('colorspace','file')
 end
 
 % Use colorspace
+% Move from CIELab to sRGB
 rgb = colorspace('Lab->RGB',Lab);
 return;
 

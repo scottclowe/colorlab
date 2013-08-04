@@ -9,6 +9,7 @@
 
 function [rgb,params] = labwheel(n,L,c,h0,h1)
 
+% -------------------------------------------------------------------------
 if nargin<4
     h0 = 0;
 end
@@ -45,6 +46,10 @@ if nargin<1
     n = size(get(gcf,'colormap'),1);
 end
 
+% -------------------------------------------------------------------------
+use_uplab = false;
+
+% -------------------------------------------------------------------------
 h = linspace(h0, h1, (n+1)).';
 h = h(1:end-1);
 
@@ -54,27 +59,9 @@ Ls = repmat(L,n,1);
 
 Lab = [Ls, a, b];
 
-if license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    rgb = applycform(Lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-%     warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-%         ['Could not checkout the Image Processing Toolbox. ' ...
-%          'Using colorspace function.']);
-    rgb = colorspace('Lab->RGB',Lab);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-    if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,'You may wish to download the colorspace package.');
-    end
-end
+rgb = gd_lab2rgb(Lab, use_uplab);
 
+% -------------------------------------------------------------------------
 if nargout<2; return; end
 params.n  = n;
 params.L  = L;

@@ -7,6 +7,8 @@ if nargin<2
     func = [];
 end
 
+use_uplab = false;
+
 
 xx = [35, 110, 225, 300]
 yy = [16.5, 90, 75.4, 16.5]
@@ -42,27 +44,6 @@ solve(...
     );
 end
 
-if ~isempty(func)
-    cmap = func(Lab);
-elseif license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    cmap = applycform(Lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Using colorspace function.']);
-    cmap = colorspace('Lab->RGB',Lab);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,'You may wish to download the colorspace package.');
-     end
-end
+cmap = gd_lab2rgb(Lab, use_uplab, func);
 
 end

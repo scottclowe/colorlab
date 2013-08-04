@@ -8,6 +8,8 @@ end;
 
 method = 104;
 
+use_uplab = false;
+
 g = fetch_cielchab_gamut();
 
 % Start values
@@ -306,8 +308,7 @@ b = c.*sin(h/360*(2*pi));
 
 % Turn Lab into sRGB values
 Lab = [L' a' b'];
-cform = makecform('lab2srgb');
-rgb = applycform(Lab, cform);
+rgb = gd_lab2rgb(Lab, use_uplab);
 
 % Check for points out of gamut
 [TF,P2] = isingamut(Lab,g,'Lab');
@@ -334,8 +335,7 @@ else
 
     % Turn Lab into sRGB values
     Lab = [L' a' b'];
-    cform = makecform('lab2srgb');
-    rgb = applycform(Lab, cform);
+    rgb = gd_lab2rgb(Lab, use_uplab);
 
     % Check for points out of gamut
     [TF,P2] = isingamut(Lab,g,'Lab');

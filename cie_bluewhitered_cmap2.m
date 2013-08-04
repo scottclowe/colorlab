@@ -17,6 +17,8 @@ end
 
 % -------------------------------------------------------------------------
 % Parameters
+use_uplab = false;
+
 switch attributes
     case ''
 % CIELCH      [  L*      c    h]
@@ -73,7 +75,7 @@ end
 
 % Convert from Lab to srgb
 Lab  = [Lab1;Lab2];
-cmap = gd_lab2rgb(Lab,spacefun);
+cmap = gd_lab2rgb(Lab, use_uplab, spacefun);
 
 % If dbg, output figures showing colormap construction
 if dbg

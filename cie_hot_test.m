@@ -1,5 +1,7 @@
 % Outdated. see cie_hot_test2
 
+use_uplab = false;
+
 method = 2;
 
 g = fetch_cielchab_gamut();
@@ -71,8 +73,7 @@ a = c.*cos(h/360*(2*pi));
 b = c.*sin(h/360*(2*pi));
 
 Lab = [L' a' b'];
-cform = makecform('lab2srgb');
-rgb = applycform(Lab, cform);
+rgb = gd_lab2rgb(Lab, use_uplab);
 
 clrs = repmat(rgb,[1 1 20]);
 clrs = permute(clrs,[1 3 2]);

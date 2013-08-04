@@ -10,8 +10,8 @@ end
 if nargin<2
     N = [];
 end
-if nargin<3
-    point_method = 'face';
+if nargin<3 || isempty(point_method)
+    point_method = 'face-plus';
 end
 if nargin<4
     use_uplab = false;

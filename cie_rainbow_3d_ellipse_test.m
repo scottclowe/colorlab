@@ -1,6 +1,8 @@
 
 close all;
 
+use_uplab = false;
+
 %%
 g = fetch_cielchab_gamut();
 
@@ -52,8 +54,7 @@ b = P(:,2).*sin(P(:,3)/360*(2*pi));
 
 P2 = [P(:,1) a b];
 
-cform = makecform('lab2srgb');
-rgb = applycform(P2, cform);
+rgb = gd_lab2rgb(P2, use_uplab);
 
 figure; hold on;
 set(gca,'Color',[0.4663 0.4663 0.4663]);
@@ -346,8 +347,7 @@ plot(x(end), y(end), 'ks');
 
 
 Lab = [z' x' y'];
-cform = makecform('lab2srgb');
-rgb = applycform(Lab, cform);
+rgb = gd_lab2rgb(Lab, use_uplab);
 
 img = repmat(rgb,[1 1 20]);
 img = permute(img,[1 3 2]);
@@ -418,8 +418,7 @@ h = g.lchmesh.hgrid([1:end 1],:)/180*pi;
 aa = c.*cos(h);
 bb = c.*sin(h);
 
-cform = makecform('lab2srgb');
-CMAP = applycform([L(:) aa(:) bb(:)], cform);
+CMAP = gd_lab2rgb([L(:) aa(:) bb(:)], use_uplab);
 
 hs = surf(aa,bb,L,reshape(CMAP,[size(L) 3]));
 set(hs,'EdgeColor','none');
@@ -532,8 +531,7 @@ y = C(2) + A * cos(t_new) * U(2) + B * sin(t_new) * V(2);
 z = C(3) + A * cos(t_new) * U(3) + B * sin(t_new) * V(3);
 
 Lab = [z' x' y'];
-cform = makecform('lab2srgb');
-rgb = applycform(Lab, cform);
+rgb = gd_lab2rgb(Lab, use_uplab);
 
 ciebow_cmap = rgb;
 
@@ -620,8 +618,7 @@ y = C(2) + A * cos(t_new) * U(2) + B * sin(t_new) * V(2);
 z = C(3) + A * cos(t_new) * U(3) + B * sin(t_new) * V(3);
 
 Lab = [z' x' y'];
-cform = makecform('lab2srgb');
-rgb = applycform(Lab, cform);
+rgb = gd_lab2rgb(Lab, use_uplab);
 
 ciebow_cmap = rgb;
 

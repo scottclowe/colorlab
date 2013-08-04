@@ -4,6 +4,8 @@ close all;
 
 %% Parameters
 
+use_uplab = false;
+
 handpicked_bwr_hue1 = 290; % Blue
 handpicked_bwr_hue2 = 41;  % Red
 via_black = 0; % Go via near-white (0) or near-black (1)
@@ -273,8 +275,7 @@ b2 = linspace(   0, Cstart*sind(hue2), neach);
 Lab1 = [L1' a1' b1'];
 Lab2 = [L2' a2' b2'];
 Lab  = [Lab1;Lab2];
-cform = makecform('lab2srgb');
-cmap = applycform(Lab, cform);
+cmap = gd_lab2rgb(Lab, use_uplab);
 
 img = repmat(cmap,[1 1 20]);
 img = permute(img,[1 3 2]);
@@ -392,8 +393,7 @@ b2 = linspace(   0, Cstart*sind(hue2), neach);
 Lab1 = [L1' a1' b1'];
 Lab2 = [L2' a2' b2'];
 Lab  = [Lab1;Lab2];
-cform = makecform('lab2srgb');
-cmap = applycform(Lab, cform);
+cmap = gd_lab2rgb(Lab, use_uplab);
 
 img = repmat(cmap,[1 1 20]);
 img = permute(img,[1 3 2]);
@@ -506,8 +506,7 @@ b2 = linspace(   0, Cstart*sind(hue2), neach);
 Lab1 = [L1' a1' b1'];
 Lab2 = [L2' a2' b2'];
 Lab  = [Lab1;Lab2];
-cform = makecform('lab2srgb');
-cmap = applycform(Lab, cform);
+cmap = gd_lab2rgb(Lab, use_uplab);
 
 img = repmat(cmap,[1 1 20]);
 img = permute(img,[1 3 2]);
