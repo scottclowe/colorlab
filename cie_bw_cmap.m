@@ -1,10 +1,13 @@
-function cmap = cie_bw_cmap(n, func)
+function cmap = cie_bw_cmap(n, func, dbg)
 
 if nargin<1
     n = size(get(gcf,'colormap'),1);
 end
 if nargin<2
     func = [];
+end
+if nargin<3
+    dbg = 0;
 end
 
 L = linspace(0,100,n)';
@@ -13,25 +16,19 @@ b = zeros(n,1);
 
 Lab = [L a b];
 
-if ~isempty(func)
-    cmap = func(Lab);
-elseif license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    cmap = applycform(Lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Using colorspace function.']);
-    cmap = colorspace('Lab->RGB',Lab);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,'You may wish to download the colorspace package.');
-     end
+cmap = gd_lab2rgb(Lab, func);
+
+% -------------------------------------------------------------------------
+% If dbg mode, display a figure of the outputted colormap
+if dbg;
+    img = repmat(cmap,[1 1 20]);
+    img = permute(img,[1 3 2]);
+    figure;
+    imagesc(img);
+    axis xy;
+    title('Output colormap');
+    
+    plot_labcurve_rgbgamut(Lab);
+end
+
 end

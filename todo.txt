@@ -1,0 +1,10 @@
+TO DO
+
+[ ] - Try ciebow with linear L*
+[ ] - Script to automatically find best "pinched helix"
+[ ] - blue-white-red which goes to darker shades
+[ ] - programmatically find suitable range to x-white-y with darker shades
+[ ] - green-white-purple
+[ ] - Flow-chart
+[ ] - Write up
+[ ] - UPLab

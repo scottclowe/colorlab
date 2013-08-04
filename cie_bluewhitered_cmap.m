@@ -89,7 +89,7 @@ end
 
 % Convert from Lab to srgb
 Lab  = [Lab1;Lab2];
-cmap = failsafe_lab2rgb(Lab,func);
+cmap = gd_lab2rgb(Lab,func);
 
 
 % If verbose, output figures showing colormap construction

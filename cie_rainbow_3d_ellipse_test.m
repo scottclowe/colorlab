@@ -144,33 +144,33 @@ close all;
 
 % Set#1: full 3d ellipse
 % C = [15 10 65];
-% a = 70;
-% b = 50;
+% A = 70;
+% B = 50;
 % theta = -70/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
 % % phi = 0; %atan(47/180);
-% phi = -atan(50/2/a);
-% psi = -atan(30/2/b); %pi/4;
+% phi = -atan(50/2/A);
+% psi = -atan(30/2/B); %pi/4;
 % U = [ cos(theta) sin(theta) sin(phi)];
 % V = [-sin(theta) cos(theta) sin(psi)];
 
 % Nearly there with partial ellipse
 % C = [140 -50 15];
-% a = 200;
-% b = 90;
+% A = 200;
+% B = 90;
 % theta = -27/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
 % % phi = 0; %atan(47/180);
-% phi = -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/a);
-% psi = 0; %5/180*pi; % atan(30/2/b); %pi/4;
+% phi = -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/A);
+% psi = 0; %5/180*pi; % atan(30/2/B); %pi/4;
 % U = [ cos(theta) sin(theta) sin(phi)];
 % V = [-sin(theta) cos(theta) sin(psi)];
 
 % Working partial ellipse
-% a = 300;
-% b = 85;
+% A = 300;
+% B = 85;
 % theta = -31/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
 % % phi = 0; %atan(47/180);
-% phi = -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/a);
-% psi = -2/180*pi; %5/180*pi; % atan(30/2/b); %pi/4;
+% phi = -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/A);
+% psi = -2/180*pi; %5/180*pi; % atan(30/2/B); %pi/4;
 % U = [ cos(theta) sin(theta) sin(phi)];
 % V = [-sin(theta) cos(theta) sin(psi)];
 % 
@@ -178,60 +178,87 @@ close all;
 % P = [-48 51 92];
 % t1 = pi;
 % C = [...
-%     P(1) - (a * cos(t1) * U(1) + b * sin(t1) * V(1)) ...
-%     P(2) - (a * cos(t1) * U(2) + b * sin(t1) * V(2)) ...
-%     P(3) - (a * cos(t1) * U(3) + b * sin(t1) * V(3)) ...
+%     P(1) - (A * cos(t1) * U(1) + B * sin(t1) * V(1)) ...
+%     P(2) - (A * cos(t1) * U(2) + B * sin(t1) * V(2)) ...
+%     P(3) - (A * cos(t1) * U(3) + B * sin(t1) * V(3)) ...
 %     ];
 % t_start = 3.75;
 % t_end = 1.75;
 
 % Pretty much there ellipse
-% a = 300;
-% b = 94;
+% A = 300;
+% B = 94;
 % theta = -30/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
 % % phi = 0; %atan(47/180);
-% phi = -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/a);
-% psi = -2/180*pi; %5/180*pi; % atan(30/2/b); %pi/4;
+% phi = -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/A);
+% psi = -2/180*pi; %5/180*pi; % atan(30/2/B); %pi/4;
 % t_start = 3.75;
 % t_end = 1.75;
 % P = [-48 57 92];
 
 % Working ellipse
-% a = 300;
-% b = 91;
+% A = 300;
+% B = 91;
 % theta = -25/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
 % % phi = 0; %atan(47/180);
-% phi = -17.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/a);
-% psi = 1.7/180*pi; %5/180*pi; % atan(30/2/b); %pi/4;
+% phi = -17.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/A);
+% psi = 1.7/180*pi; %5/180*pi; % atan(30/2/B); %pi/4;
 % t_start = 4.31;
 % t_end = 2.20;
 % P = [-60 49 88];
 % 
 % Working under less accurate gamut
-% a = 300;
-% b = 93.5;
+% A = 300;
+% B = 93.5;
 % theta = -25/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
 % % phi = 0; %atan(47/180);
-% phi = -17.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/a);
-% psi = 1.7/180*pi; %5/180*pi; % atan(30/2/b); %pi/4;
+% phi = -17.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/A);
+% psi = 1.7/180*pi; %5/180*pi; % atan(30/2/B); %pi/4;
 % t_start = 4.31;
 % t_end = 2.20;
 % P = [-60 49 88];
 % %   [  x  y  z ]
 % %   [  a  b  L ]
 
-% Working under more accurate gamut & included in cmap builder
-a = 400;
-b = 106;
-theta = -25.5/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
+% % Set#1 Working under more accurate gamut & included in cmap builder
+% A = 400;
+% B = 106;
+% theta = -25.5/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
+% % phi = 0; %atan(47/180);
+% phi = -17.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/A);
+% psi = 1.7/180*pi; %5/180*pi; % atan(30/2/B); %pi/4;
+% t_start = 4.2;
+% t_end = 2.30;
+% P = [-60 49 88];
+% %   [  x  y  z]
+% %   [  a  b  L]
+
+% % Set#2 Working under more accurate gamut & included in cmap builder
+% A = 190;
+% B = 89;
+% theta = -24.5/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
+% % phi = 0; %atan(47/180);
+% phi = -23.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/A);
+% psi = 0/180*pi; %5/180*pi; % atan(30/2/B); %pi/4;
+% t_start = 4.6;
+% t_end = 2.05;
+% P = [-41 37 91];
+% %   [  x  y  z]
+% %   [  a  b  L]
+
+% Set#3 Working under more accurate gamut & included in cmap builder
+A = 190;
+B = 89;
+theta = -24.5/180*pi; %atan(-(93+113)/(15+55)); % -60/180*pi;
 % phi = 0; %atan(47/180);
-phi = -17.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/a);
-psi = 1.7/180*pi; %5/180*pi; % atan(30/2/b); %pi/4;
-t_start = 4.2;
-t_end = 2.30;
-P = [-60 49 88];
-%   [  x  y  z ]
-%   [  a  b  L ]
+phi = -23.5/180*pi; % -atan((90-30)/sqrt((51+64)^2+(110-12)^2)); % -20/180*pi; % -atan(50/2/A);
+psi = 0/180*pi; %5/180*pi; % atan(30/2/B); %pi/4;
+t_start = 4.6;
+t_end = 2.05;
+P = [-41 37 91];
+%   [  x  y  z]
+%   [  a  b  L]
+
 
 % U and V are the major and minor axes respectively
 % theta is the angle of rotation in the x-y plane
@@ -243,17 +270,17 @@ V = [-sin(theta) cos(theta) sin(psi)];
 % Define centre such that when t=pi, we are at P
 t1 = pi;
 C = [...
-    P(1) - (a * cos(t1) * U(1) + b * sin(t1) * V(1)) ...
-    P(2) - (a * cos(t1) * U(2) + b * sin(t1) * V(2)) ...
-    P(3) - (a * cos(t1) * U(3) + b * sin(t1) * V(3)) ...
+    P(1) - (A * cos(t1) * U(1) + B * sin(t1) * V(1)) ...
+    P(2) - (A * cos(t1) * U(2) + B * sin(t1) * V(2)) ...
+    P(3) - (A * cos(t1) * U(3) + B * sin(t1) * V(3)) ...
     ];
 
 t0 = 60/180*pi;
 n = 64;
 t = t0 + linspace(0,2*pi,n);
-x = C(1) + a * cos(t) * U(1) + b * sin(t) * V(1);
-y = C(2) + a * cos(t) * U(2) + b * sin(t) * V(2);
-z = C(3) + a * cos(t) * U(3) + b * sin(t) * V(3);
+x = C(1) + A * cos(t) * U(1) + B * sin(t) * V(1);
+y = C(2) + A * cos(t) * U(2) + B * sin(t) * V(2);
+z = C(3) + A * cos(t) * U(3) + B * sin(t) * V(3);
 
 % figure;
 % plot3(x,y,z);
@@ -269,27 +296,9 @@ scatter(...
     20,...
     g.lch_chproj.rgb,...
     'filled');
-[X Y] = calculateEllipse(C(1), C(2), a, b, theta/pi*180);
+[X Y] = calculateEllipse(C(1), C(2), A, B, theta/pi*180);
 plot(X,Y,'k');
 axis equal
-
-res = 17;
-
-f2 = figure('Position',[150 150 550 550]);
-hold on;
-plot3(x,y,z,'k');
-scatter3(...
-    g.lab([1:res:end-1 end],2), ...
-    g.lab([1:res:end-1 end],3), ...
-    g.lab([1:res:end-1 end],1), ...
-    20, ...
-    g.rgb([1:res:end-1 end],:), ...
-    'filled');
-set(gca,'Color',[0.4663 0.4663 0.4663]);
-set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
-xlabel('a*')
-ylabel('b*')
-zlabel('L*')
 
 
 % start_coord = [70 -109 29];
@@ -303,17 +312,38 @@ zlabel('L*')
 
 n = 64;
 t = linspace(t_start,t_end,n);
-x = C(1) + a * cos(t) * U(1) + b * sin(t) * V(1);
-y = C(2) + a * cos(t) * U(2) + b * sin(t) * V(2);
-z = C(3) + a * cos(t) * U(3) + b * sin(t) * V(3);
+x = C(1) + A * cos(t) * U(1) + B * sin(t) * V(1);
+y = C(2) + A * cos(t) * U(2) + B * sin(t) * V(2);
+z = C(3) + A * cos(t) * U(3) + B * sin(t) * V(3);
 
-figure(f2);
-plot3(x(1)  , y(1)  , z(1)  , 'ko');
-plot3(x(end), y(end), z(end), 'ks');
 
 figure(f1);
 plot(x(1)  , y(1)  , 'ko');
 plot(x(end), y(end), 'ks');
+
+
+% res = 17;
+% 
+% f2 = figure('Position',[150 150 550 550]);
+% hold on;
+% plot3(x,y,z,'k');
+% scatter3(...
+%     g.lab([1:res:end-1 end],2), ...
+%     g.lab([1:res:end-1 end],3), ...
+%     g.lab([1:res:end-1 end],1), ...
+%     20, ...
+%     g.rgb([1:res:end-1 end],:), ...
+%     'filled');
+% set(gca,'Color',[0.4663 0.4663 0.4663]);
+% set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+% xlabel('a*')
+% ylabel('b*')
+% zlabel('L*')
+%
+% figure(f2);
+% plot3(x(1)  , y(1)  , z(1)  , 'ko');
+% plot3(x(end), y(end), z(end), 'ks');
+
 
 Lab = [z' x' y'];
 cform = makecform('lab2srgb');
@@ -345,32 +375,32 @@ zlabel('L');
 view(0,90);
 
 
-figure;
-hold on;
-plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
-
-% Get a mesh version of the gamut
-if ~isfield(g,'lchmesh')
-    g.lchmesh = make_gamut_mesh(g);
-end
-
-L = g.lchmesh.Lgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
-c = g.lchmesh.cgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
-h = g.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end])/180*pi;
-a = c.*cos(h);
-b = c.*sin(h);
-
-cform = makecform('lab2srgb');
-CMAP = applycform([L(:) a(:) b(:)], cform);
-
-hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
-set(hs,'FaceColor','none');
-
-set(gca,'Color',[0.4663 0.4663 0.4663]);
-set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
-xlabel('a*')
-ylabel('b*')
-zlabel('L*')
+% figure;
+% hold on;
+% plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
+% 
+% % Get a mesh version of the gamut
+% if ~isfield(g,'lchmesh')
+%     g.lchmesh = make_gamut_mesh(g);
+% end
+% 
+% L = g.lchmesh.Lgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+% c = g.lchmesh.cgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+% h = g.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end])/180*pi;
+% aa= c.*cos(h);
+% bb= c.*sin(h);
+% 
+% cform = makecform('lab2srgb');
+% CMAP = applycform([L(:) aa(:) bb(:)], cform);
+% 
+% hs = mesh(aa,bb,L,reshape(CMAP,[size(L) 3]));
+% set(hs,'FaceColor','none');
+% 
+% set(gca,'Color',[0.4663 0.4663 0.4663]);
+% set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+% xlabel('a*')
+% ylabel('b*')
+% zlabel('L*')
 
 
 figure;
@@ -385,13 +415,13 @@ end
 L = g.lchmesh.Lgrid([1:end 1],:);
 c = g.lchmesh.cgrid([1:end 1],:);
 h = g.lchmesh.hgrid([1:end 1],:)/180*pi;
-a = c.*cos(h);
-b = c.*sin(h);
+aa = c.*cos(h);
+bb = c.*sin(h);
 
 cform = makecform('lab2srgb');
-CMAP = applycform([L(:) a(:) b(:)], cform);
+CMAP = applycform([L(:) aa(:) bb(:)], cform);
 
-hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
+hs = surf(aa,bb,L,reshape(CMAP,[size(L) 3]));
 set(hs,'EdgeColor','none');
 set(hs,'FaceAlpha',0.75);
 
@@ -400,6 +430,23 @@ set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
 xlabel('a*')
 ylabel('b*')
 zlabel('L*')
+
+
+% figure;
+% hold on;
+% plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
+% 
+% hs = surf(aa,bb,L);
+% set(hs,'FaceColor','red');
+% set(hs,'EdgeColor','none');
+% set(hs,'FaceAlpha',0.75);
+% camlight left; lighting phong;
+% 
+% set(gca,'Color',[0.4663 0.4663 0.4663]);
+% set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+% xlabel('a*')
+% ylabel('b*')
+% zlabel('L*')
 
 %%
 % Ideas for parametrising ellipse by arc length:
@@ -426,9 +473,9 @@ zlabel('L*')
 % First generate a ton of points to find the end points of theta
 n = 100001;
 t = linspace(t_start,t_end,n);
-x = C(1) + a * cos(t) * U(1) + b * sin(t) * V(1);
-y = C(2) + a * cos(t) * U(2) + b * sin(t) * V(2);
-z = C(3) + a * cos(t) * U(3) + b * sin(t) * V(3);
+x = C(1) + A * cos(t) * U(1) + B * sin(t) * V(1);
+y = C(2) + A * cos(t) * U(2) + B * sin(t) * V(2);
+z = C(3) + A * cos(t) * U(3) + B * sin(t) * V(3);
 
 Lab = [z' x' y'];
 TF = isingamut(Lab,g,'Lab');
@@ -439,9 +486,9 @@ btsp_t_end = t(find(TF,1,'last'));
 % Now generate a ton of points in this range
 n = 100001;
 t = linspace(btsp_t_srt,btsp_t_end,n);
-x = C(1) + a * cos(t) * U(1) + b * sin(t) * V(1);
-y = C(2) + a * cos(t) * U(2) + b * sin(t) * V(2);
-z = C(3) + a * cos(t) * U(3) + b * sin(t) * V(3);
+x = C(1) + A * cos(t) * U(1) + B * sin(t) * V(1);
+y = C(2) + A * cos(t) * U(2) + B * sin(t) * V(2);
+z = C(3) + A * cos(t) * U(3) + B * sin(t) * V(3);
 
 Lab = [z' x' y'];
 TF = isingamut(Lab,g,'Lab');
@@ -480,9 +527,9 @@ t_new = interp1(Lab_inv_runtot,t,arclen_targets);
 t_new(1)   = btsp_t_srt;
 t_new(end) = btsp_t_end;
 
-x = C(1) + a * cos(t_new) * U(1) + b * sin(t_new) * V(1);
-y = C(2) + a * cos(t_new) * U(2) + b * sin(t_new) * V(2);
-z = C(3) + a * cos(t_new) * U(3) + b * sin(t_new) * V(3);
+x = C(1) + A * cos(t_new) * U(1) + B * sin(t_new) * V(1);
+y = C(2) + A * cos(t_new) * U(2) + B * sin(t_new) * V(2);
+z = C(3) + A * cos(t_new) * U(3) + B * sin(t_new) * V(3);
 
 Lab = [z' x' y'];
 cform = makecform('lab2srgb');
@@ -528,13 +575,13 @@ cmap_inv = sqrt(sum(cmap_dif.^2,2));
 % Now generate a ton of points in this range
 n = 100001;
 t1 = linspace(btsp_t_srt, pi, n);
-x1 = C(1) + a * cos(t1) * U(1) + b * sin(t1) * V(1);
-y1 = C(2) + a * cos(t1) * U(2) + b * sin(t1) * V(2);
-z1 = C(3) + a * cos(t1) * U(3) + b * sin(t1) * V(3);
+x1 = C(1) + A * cos(t1) * U(1) + B * sin(t1) * V(1);
+y1 = C(2) + A * cos(t1) * U(2) + B * sin(t1) * V(2);
+z1 = C(3) + A * cos(t1) * U(3) + B * sin(t1) * V(3);
 t2 = linspace(pi, btsp_t_end, n);
-x2 = C(1) + a * cos(t2) * U(1) + b * sin(t2) * V(1);
-y2 = C(2) + a * cos(t2) * U(2) + b * sin(t2) * V(2);
-z2 = C(3) + a * cos(t2) * U(3) + b * sin(t2) * V(3);
+x2 = C(1) + A * cos(t2) * U(1) + B * sin(t2) * V(1);
+y2 = C(2) + A * cos(t2) * U(2) + B * sin(t2) * V(2);
+z2 = C(3) + A * cos(t2) * U(3) + B * sin(t2) * V(3);
 
 Lab1 = [z1' x1' y1'];
 Lab2 = [z2' x2' y2'];
@@ -568,9 +615,9 @@ t2_new = interp1(Lab2_inv_runtot, t2, arclen_targets_red);
 
 t_new = [btsp_t_srt t1_new(2:end-1) pi t2_new(2:end-1) btsp_t_end];
 
-x = C(1) + a * cos(t_new) * U(1) + b * sin(t_new) * V(1);
-y = C(2) + a * cos(t_new) * U(2) + b * sin(t_new) * V(2);
-z = C(3) + a * cos(t_new) * U(3) + b * sin(t_new) * V(3);
+x = C(1) + A * cos(t_new) * U(1) + B * sin(t_new) * V(1);
+y = C(2) + A * cos(t_new) * U(2) + B * sin(t_new) * V(2);
+z = C(3) + A * cos(t_new) * U(3) + B * sin(t_new) * V(3);
 
 Lab = [z' x' y'];
 cform = makecform('lab2srgb');

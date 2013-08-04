@@ -1,4 +1,4 @@
-function cmap = cie_purplegreen_cmap(n, attr, func, dbg)
+function cmap = cie_purplegreen_cmap(n, attributes, spacefun, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
@@ -6,30 +6,30 @@ if nargin<4 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
 end
 if nargin<3
-    func = []; % function to map from cielab to srgb
+    spacefun = []; % function to map from cielab to srgb
 end
-if nargin<2 || isempty(attr)
-    attr = 'fixed'; % Colormap type option
+if nargin<2 || isempty(attributes)
+    attributes = 'Lfix'; % Colormap type option
 end
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
 end
 
 % -------------------------------------------------------------------------
-switch lower(attr)
-    case 'variable'
+switch lower(attributes)
+    case 'lvar'
         % CIE  [  L*      C      h]
         lch1 = [ 46.25  112.5  314]; % purple
         lch2 = [ 87.75  112.5  134]; % green
-    case 'fixed'
+    case 'lfix'
         % CIE  [  L*     C      h]
         lch1 = [ 60.75   83    314]; % purple
         lch2 = [ 60.75   83    134]; % green
-    case 'seperation'
-        lch1 = [ 30.5   130    302]; % purple
+    case 'maxsep'
+        lch1 = [ 30.5   130    302]; % blue
         lch2 = [ 90     100    122]; % green
     otherwise
-        error('Unfamiliar colormap attribute: %s',attr);
+        error('Unfamiliar colormap attribute: %s',attributes);
 end
 
 % -------------------------------------------------------------------------
@@ -42,7 +42,7 @@ b = linspace(lab1(3), lab2(3), n);
 
 Lab = [L' a' b'];
 
-cmap = gd_lab2rgb(Lab, func);
+cmap = gd_lab2rgb(Lab, spacefun);
 
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap
@@ -53,12 +53,15 @@ if dbg;
     imagesc(img);
     axis xy;
     title('Output colormap');
+    
+    plot_labcurve_rgbgamut(Lab)
 end
 
 end
 
-% hue found using gamut_interactive_app
+% % hue found using gamut_interactive_app
 
+% % Then Chroma and Lightness found using the following:
 % k = min(g.lch(g.lch(:,3)==134,2),g.lch(g.lch(:,3)==134+180,2));
 % [C,I] = max(k)
 % gg = g.lch(g.lch(:,3)==134,:);

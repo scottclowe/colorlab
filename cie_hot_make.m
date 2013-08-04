@@ -56,8 +56,8 @@ if dbg
     legend('chroma','hue','Location','NorthWest')
     
     % Check for points out of gamut
-    g = fetch_cielchab_gamut();
-    [TF,P2] = isingamut(Lab,g,'Lab');
+    rgbgamut = fetch_cielchab_gamut();
+    [TF,P2] = isingamut(Lab,rgbgamut,'Lab');
     fprintf('attr #%s has %d of %d in gamut.\n',attr,sum(TF),length(TF));
     
     % Plot c vs maxc in gamut
@@ -70,6 +70,9 @@ if dbg
         params.expnt, params.h0, params.h_per_L, params.L_off));
     xlabel('chroma');
     ylabel('Lightness');
+    
+    
+    plot_labcurve_rgbgamut(Lab)
 end
 
 end
@@ -89,57 +92,71 @@ params.c0       = 0;
 switch attr
     case '1' %25
         % Based on Set#5
-        params.expnt = 2;
-        params.h0 = 6.5;
-        params.hmax = 106;
-        params.L_off = 0;
-        params.L0   = 2;
-        params.Lmax = 98;
-        params.maxc = 73.9; % 75.6 -> 74.25 -> 73.9
+        params.expnt  = 2;
+        params.h0     = 6.5;
+        params.hmax   = 106;
+        params.L_off  = 0;
+        params.L0     = 5; %2;
+        params.Lmax   = 95; %98;
+        params.maxc   = 73.9; % 75.6 -> 74.25 -> 73.9
         
         params.h_per_L = (params.hmax-params.h0)/100;
         
     case '2' %9
-        params.expnt = 2.2;
-        params.h0 = 15;
-        params.hmax = 100;
-        params.L_off = 0;
-        params.L0   = 3;
-        params.Lmax = 97;
-        params.maxc = 73; %[];
+        params.expnt  = 2.2;
+        params.h0     = 15;
+        params.hmax   = 100;
+        params.L_off  = 0;
+        params.L0     = 5; %3;
+        params.Lmax   = 95; %97;
+        params.maxc   = 73; %[];
         
         params.h_per_L = (params.hmax-params.h0)/100;
         
     case '3' %11
-        params.expnt = 2.3;
-        params.h0 = 10;
-        params.hmax = 100;
-        params.L_off = 5;
-        params.L0   = 3;
-        params.Lmax = 97;
-        params.maxc = 71; %[];
+        params.expnt  = 2.3;
+        params.h0     = 10;
+        params.hmax   = 100;
+        params.L_off  = 5;
+        params.L0     = 5; %3;
+        params.Lmax   = 95; %97;
+        params.maxc   = 71; %[];
         
         params.h_per_L = (params.hmax-params.h0)/100;
         
         
     case '4' %10
-        params.expnt = 2.5;
-        params.h0 = 15;
-        params.hmax = 100;
-        params.L_off = 5;
-        params.L0   = 3;
-        params.Lmax = 97;
-        params.maxc = 67.8; %[];
+        params.expnt  = 2.5;
+        params.h0     = 15;
+        params.hmax   = 100;
+        params.L_off  = 5;
+        params.L0     = 5; %3;
+        params.Lmax   = 95; %97;
+        params.maxc   = 67.8; %[];
         
         params.h_per_L = (params.hmax-params.h0)/100;
+        
+        
     case '5' %12
-        params.expnt = 2.3;
-        params.h0 = 15;
-        params.hmax = 100;
-        params.L_off = 5;
-        params.L0   = 3;
-        params.Lmax = 97;
-        params.maxc = 67.7; %[];
+        params.expnt  = 2.3;
+        params.h0     = 15;
+        params.hmax   = 100;
+        params.L_off  = 5;
+        params.L0     = 5; %3;
+        params.Lmax   = 95; %97;
+        params.maxc   = 67.7; %[];
+        
+        params.h_per_L = (params.hmax-params.h0)/100;
+        
+        
+    case 'cool:1' %104
+        params.expnt  = 2;
+        params.h0     = 340;
+        params.hmax   = 172;
+        params.L_off  = -15;
+        params.L0     = 3;
+        params.Lmax   = 85;
+        params.maxc   = 70; %[];
         
         params.h_per_L = (params.hmax-params.h0)/100;
         

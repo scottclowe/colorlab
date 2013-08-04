@@ -1,42 +1,43 @@
+% Find seperation distance for a set of different hues
 clear all;
 close all;
 
+%% Parameters
 
-%% Find seperation distance for a set of different hues
+handpicked_bwr_hue1 = 290; % Blue
+handpicked_bwr_hue2 = 41;  % Red
+via_black = 0; % Go via near-white (0) or near-black (1)
 
-handpicked_bwr_hue_b = 290; 
-handpicked_bwr_hue_r = 41;
+hue1_range = 260:315;
+hue2_range =  10:70 ;
 
 
-via_black = 0;
-
+%% Main body
 
 g = fetch_cielchab_gamut('srgb');
 
-hue_b_range = 260:315;
-hue_r_range =  10:70 ;
 
-all_best_sep     = nan(length(hue_b_range),length(hue_r_range));
-all_best_sep_m   = nan(length(hue_b_range),length(hue_r_range));
-all_best_C_sep   = nan(length(hue_b_range),length(hue_r_range));
-all_best_C_sep_m = nan(length(hue_b_range),length(hue_r_range));
+all_best_sep     = nan(length(hue1_range),length(hue2_range));
+all_best_sep_m   = nan(length(hue1_range),length(hue2_range));
+all_best_C_sep   = nan(length(hue1_range),length(hue2_range));
+all_best_C_sep_m = nan(length(hue1_range),length(hue2_range));
 
 
-for ib=1:length(hue_b_range)
-    for ir=1:length(hue_r_range)
-        hue_b = hue_b_range(ib);
-        hue_r = hue_r_range(ir);
+for ih1=1:length(hue1_range)
+    for ih2=1:length(hue2_range)
+        hue1 = hue1_range(ih1);
+        hue2 = hue2_range(ih2);
 
-ghb = g.lch(g.lch(:,3)==hue_b,:);
-ghr = g.lch(g.lch(:,3)==hue_r,:);
+gh1 = g.lch(g.lch(:,3)==hue1,:);
+gh2 = g.lch(g.lch(:,3)==hue2,:);
 
-jointL = intersect(ghb(:,1),ghr(:,1));
-ghb = ghb(ismember(ghb(:,1),jointL),:);
-ghr = ghr(ismember(ghb(:,1),jointL),:);
+jointL = intersect(gh1(:,1),gh2(:,1));
+gh1 = gh1(ismember(gh1(:,1),jointL),:);
+gh2 = gh2(ismember(gh1(:,1),jointL),:);
 
-jointC = min(ghb(:,2),ghr(:,2));
+jointC = min(gh1(:,2),gh2(:,2));
 [Cmax,I_Cmax] = max(jointC);
-L_Cmax = ghr(I_Cmax,1);
+L_Cmax = gh2(I_Cmax,1);
 
 switch via_black
     case 0
@@ -48,8 +49,8 @@ switch via_black
 end
 
 % figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-% plot(ghb(:,1),ghb(:,2),'b-');
-% plot(ghr(:,1),ghr(:,2),'r-');
+% plot(gh1(:,1),gh1(:,2),'b-');
+% plot(gh2(:,1),gh2(:,2),'r-');
 % % plot(jointL,jointC,'kx');
 
 
@@ -102,7 +103,7 @@ for i=1:length(m_list)
     end
     moveC = m*moveL+k;
     if via_black
-        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
+        I_start = find(moveC>jointC(jointL>=Lend),1,'fih2st')-1;
         if I_start<0; continue; end;
     else
         I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
@@ -136,10 +137,10 @@ for i=1:length(m_list)
     
 end
 
-        all_best_sep(ib,ir)     = best_sep;
-        all_best_sep_m(ib,ir)   = best_sep_m;
-        all_best_C_sep(ib,ir)   = best_C_sep;
-        all_best_C_sep_m(ib,ir) = best_C_m;
+        all_best_sep(ih1,ih2)     = best_sep;
+        all_best_sep_m(ih1,ih2)   = best_sep_m;
+        all_best_C_sep(ih1,ih2)   = best_C_sep;
+        all_best_C_sep_m(ih1,ih2) = best_C_m;
         
     end
 end
@@ -149,19 +150,19 @@ end
 
 figure;
 subplot(2,2,1);
-imagesc(hue_r_range,hue_b_range,all_best_sep);
+imagesc(hue2_range,hue1_range,all_best_sep);
 colormap(hot); freezeColors; colorbar; cbfreeze;
 title('Best seperation distance');
 subplot(2,2,2);
-imagesc(hue_r_range,hue_b_range,all_best_sep_m);
+imagesc(hue2_range,hue1_range,all_best_sep_m);
 colormap(hot); freezeColors; colorbar; cbfreeze;
 title('gradient');
 subplot(2,2,3);
-imagesc(hue_r_range,hue_b_range,all_best_C_sep);
+imagesc(hue2_range,hue1_range,all_best_C_sep);
 colormap(hot); freezeColors; colorbar; cbfreeze;
 title('Best chroma distance');
 subplot(2,2,4);
-imagesc(hue_r_range,hue_b_range,all_best_C_sep_m);
+imagesc(hue2_range,hue1_range,all_best_C_sep_m);
 colormap(hot); freezeColors; colorbar; cbfreeze;
 title('gradient');
 
@@ -171,21 +172,21 @@ title('gradient');
 
 [n_best_sep,I] = max(all_best_sep(:));
 m = all_best_sep_m(I);
-[ib,ir] = ind2sub(size(all_best_sep),I); %numel(all_best_sep));
+[ih1,ih2] = ind2sub(size(all_best_sep),I); %numel(all_best_sep));
 
-hue_b = hue_b_range(ib);
-hue_r = hue_r_range(ir);
+hue1 = hue1_range(ih1);
+hue2 = hue2_range(ih2);
 
-ghb = g.lch(g.lch(:,3)==hue_b,:);
-ghr = g.lch(g.lch(:,3)==hue_r,:);
+gh1 = g.lch(g.lch(:,3)==hue1,:);
+gh2 = g.lch(g.lch(:,3)==hue2,:);
 
-jointL = intersect(ghb(:,1),ghr(:,1));
-ghb = ghb(ismember(ghb(:,1),jointL),:);
-ghr = ghr(ismember(ghb(:,1),jointL),:);
+jointL = intersect(gh1(:,1),gh2(:,1));
+gh1 = gh1(ismember(gh1(:,1),jointL),:);
+gh2 = gh2(ismember(gh1(:,1),jointL),:);
 
-jointC = min(ghb(:,2),ghr(:,2));
+jointC = min(gh1(:,2),gh2(:,2));
 [Cmax,I_Cmax] = max(jointC);
-L_Cmax = ghr(I_Cmax,1);
+L_Cmax = gh2(I_Cmax,1);
 
 switch via_black
     case 0
@@ -199,10 +200,10 @@ initL = jointL(valid_I);
 
 % Plot the blue and red chroma curves to see how well they match
 figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-plot(ghb(:,1),ghb(:,2),'b-');
-plot(ghr(:,1),ghr(:,2),'r-');
+plot(gh1(:,1),gh1(:,2),'b-');
+plot(gh2(:,1),gh2(:,2),'r-');
 % plot(jointL,jointC,'kx');
-title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
+title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue1,hue2));
 
     % Given a gradient, compute the chroma values for each L
 %     C = m*L+k
@@ -235,7 +236,7 @@ title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
     end
     moveC = m*moveL+k;
     if via_black
-        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
+        I_start = find(moveC>jointC(jointL>=Lend),1,'fih2st')-1;
         if I_start<0; continue; end;
     else
         I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
@@ -256,18 +257,18 @@ plot(initL,initC,'y-');
 plot(Lend,0,'yo');
 plot(moveL,moveC,'g-');
 plot(Lstart,Cstart,'go');
-title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
+title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue1,hue2));
 
 
 % Plot sample colormap
 neach = 32;
 L1 = linspace(Lstart            , Lend, neach);
-a1 = linspace(Cstart*cosd(hue_b),    0, neach);
-b1 = linspace(Cstart*sind(hue_b),    0, neach);
+a1 = linspace(Cstart*cosd(hue1),    0, neach);
+b1 = linspace(Cstart*sind(hue1),    0, neach);
 
 L2 = linspace(Lend, Lstart            , neach);
-a2 = linspace(   0, Cstart*cosd(hue_r), neach);
-b2 = linspace(   0, Cstart*sind(hue_r), neach);
+a2 = linspace(   0, Cstart*cosd(hue2), neach);
+b2 = linspace(   0, Cstart*sind(hue2), neach);
 
 Lab1 = [L1' a1' b1'];
 Lab2 = [L2' a2' b2'];
@@ -280,30 +281,30 @@ img = permute(img,[1 3 2]);
 figure;
 imagesc(img);
 axis xy;
-title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
+title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue1,hue2));
 
 %%
 
 % Handpicked from the matrix of values.
-hue_b = handpicked_bwr_hue_b; 
-hue_r = handpicked_bwr_hue_r;
+hue1 = handpicked_bwr_hue1; 
+hue2 = handpicked_bwr_hue2;
 
-ib = find(hue_b_range==hue_b,1);
-ir = find(hue_r_range==hue_r,1);
+ih1 = find(hue1_range==hue1,1);
+ih2 = find(hue2_range==hue2,1);
 
-n_best_sep = all_best_sep(ib,ir);
-m = all_best_sep_m(ib,ir);
+n_best_sep = all_best_sep(ih1,ih2);
+m = all_best_sep_m(ih1,ih2);
 
-ghb = g.lch(g.lch(:,3)==hue_b,:);
-ghr = g.lch(g.lch(:,3)==hue_r,:);
+gh1 = g.lch(g.lch(:,3)==hue1,:);
+gh2 = g.lch(g.lch(:,3)==hue2,:);
 
-jointL = intersect(ghb(:,1),ghr(:,1));
-ghb = ghb(ismember(ghb(:,1),jointL),:);
-ghr = ghr(ismember(ghb(:,1),jointL),:);
+jointL = intersect(gh1(:,1),gh2(:,1));
+gh1 = gh1(ismember(gh1(:,1),jointL),:);
+gh2 = gh2(ismember(gh1(:,1),jointL),:);
 
-jointC = min(ghb(:,2),ghr(:,2));
+jointC = min(gh1(:,2),gh2(:,2));
 [Cmax,I_Cmax] = max(jointC);
-L_Cmax = ghr(I_Cmax,1);
+L_Cmax = gh2(I_Cmax,1);
 
 switch via_black
     case 0
@@ -317,10 +318,10 @@ initL = jointL(valid_I);
 
 % Plot the blue and red chroma curves to see how well they match
 figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-plot(ghb(:,1),ghb(:,2),'b-');
-plot(ghr(:,1),ghr(:,2),'r-');
+plot(gh1(:,1),gh1(:,2),'b-');
+plot(gh2(:,1),gh2(:,2),'r-');
 % plot(jointL,jointC,'kx');
-title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
+title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue1,hue2));
 
 
     % Given a gradient, compute the chroma values for each L
@@ -354,7 +355,7 @@ title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r))
     end
     moveC = m*moveL+k;
     if via_black
-        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
+        I_start = find(moveC>jointC(jointL>=Lend),1,'fih2st')-1;
         if I_start<0; continue; end;
     else
         I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
@@ -375,18 +376,18 @@ plot(initL,initC,'y-');
 plot(Lend,0,'yo');
 plot(moveL,moveC,'g-');
 plot(Lstart,Cstart,'go');
-title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
+title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue1,hue2));
 
 
 % Plot sample colormap
 neach = 32;
 L1 = linspace(Lstart            , Lend, neach);
-a1 = linspace(Cstart*cosd(hue_b),    0, neach);
-b1 = linspace(Cstart*sind(hue_b),    0, neach);
+a1 = linspace(Cstart*cosd(hue1),    0, neach);
+b1 = linspace(Cstart*sind(hue1),    0, neach);
 
 L2 = linspace(Lend, Lstart            , neach);
-a2 = linspace(   0, Cstart*cosd(hue_r), neach);
-b2 = linspace(   0, Cstart*sind(hue_r), neach);
+a2 = linspace(   0, Cstart*cosd(hue2), neach);
+b2 = linspace(   0, Cstart*sind(hue2), neach);
 
 Lab1 = [L1' a1' b1'];
 Lab2 = [L2' a2' b2'];
@@ -399,7 +400,7 @@ img = permute(img,[1 3 2]);
 figure;
 imagesc(img);
 axis xy;
-title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r));
+title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue1,hue2));
 
 %%
 
@@ -407,21 +408,21 @@ title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue_b,hue_r))
 
 [n_best_C_sep,I] = max(all_best_C_sep(:));
 m = all_best_C_sep_m(I);
-[ib,ir] = ind2sub(size(all_best_C_sep),I);
+[ih1,ih2] = ind2sub(size(all_best_C_sep),I);
 
-hue_b = hue_b_range(ib);
-hue_r = hue_r_range(ir);
+hue1 = hue1_range(ih1);
+hue2 = hue2_range(ih2);
 
-ghb = g.lch(g.lch(:,3)==hue_b,:);
-ghr = g.lch(g.lch(:,3)==hue_r,:);
+gh1 = g.lch(g.lch(:,3)==hue1,:);
+gh2 = g.lch(g.lch(:,3)==hue2,:);
 
-jointL = intersect(ghb(:,1),ghr(:,1));
-ghb = ghb(ismember(ghb(:,1),jointL),:);
-ghr = ghr(ismember(ghb(:,1),jointL),:);
+jointL = intersect(gh1(:,1),gh2(:,1));
+gh1 = gh1(ismember(gh1(:,1),jointL),:);
+gh2 = gh2(ismember(gh1(:,1),jointL),:);
 
-jointC = min(ghb(:,2),ghr(:,2));
+jointC = min(gh1(:,2),gh2(:,2));
 [Cmax,I_Cmax] = max(jointC);
-L_Cmax = ghr(I_Cmax,1);
+L_Cmax = gh2(I_Cmax,1);
 
 switch via_black
     case 0
@@ -435,10 +436,10 @@ initL = jointL(valid_I);
 
 % Plot the blue and red chroma curves to see how well they match
 figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-plot(ghb(:,1),ghb(:,2),'b-');
-plot(ghr(:,1),ghr(:,2),'r-');
+plot(gh1(:,1),gh1(:,2),'b-');
+plot(gh2(:,1),gh2(:,2),'r-');
 % plot(jointL,jointC,'kx');
-title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue_b,hue_r));
+title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue1,hue2));
 
 
     % Given a gradient, compute the chroma values for each L
@@ -472,7 +473,7 @@ title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue_b,hue_r));
     end
     moveC = m*moveL+k;
     if via_black
-        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
+        I_start = find(moveC>jointC(jointL>=Lend),1,'fih2st')-1;
         if I_start<0; continue; end;
     else
         I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
@@ -489,18 +490,18 @@ plot(initL,initC,'y-');
 plot(Lend,0,'yo');
 plot(moveL,moveC,'g-');
 plot(Lstart,Cstart,'go');
-title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue_b,hue_r));
+title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue1,hue2));
 
 
 % Plot sample colormap
 neach = 32;
 L1 = linspace(Lstart            , Lend, neach);
-a1 = linspace(Cstart*cosd(hue_b),    0, neach);
-b1 = linspace(Cstart*sind(hue_b),    0, neach);
+a1 = linspace(Cstart*cosd(hue1),    0, neach);
+b1 = linspace(Cstart*sind(hue1),    0, neach);
 
 L2 = linspace(Lend, Lstart            , neach);
-a2 = linspace(   0, Cstart*cosd(hue_r), neach);
-b2 = linspace(   0, Cstart*sind(hue_r), neach);
+a2 = linspace(   0, Cstart*cosd(hue2), neach);
+b2 = linspace(   0, Cstart*sind(hue2), neach);
 
 Lab1 = [L1' a1' b1'];
 Lab2 = [L2' a2' b2'];
@@ -513,4 +514,4 @@ img = permute(img,[1 3 2]);
 figure;
 imagesc(img);
 axis xy;
-title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue_b,hue_r));
+title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue1,hue2));

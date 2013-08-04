@@ -1,7 +1,8 @@
-function [gamut] = fetch_cielchab_gamut(space, N, point_method)
+function [gamut] = fetch_cielchab_gamut(space, N, point_method, use_uplab)
 
 verbose = 0;
 
+% -------------------------------------------------------------------------
 % - INPUT HANDLING -
 if nargin<1
     space = 'srgb';
@@ -12,7 +13,11 @@ end
 if nargin<3
     point_method = 'face';
 end
+if nargin<4
+    use_uplab = false;
+end
 
+% -------------------------------------------------------------------------
 % Swap to canonical names
 switch lower(space)
     case {'srgb','rgb'}
@@ -27,20 +32,27 @@ switch lower(point_method)
         point_method = 'face-plus'; % Canonical
 end
 
+% -------------------------------------------------------------------------
 % Check to see if matfile exists
-matname = [space 'gamut.mat'];
+if use_uplab
+    matname = [space 'gamut_uplab.mat'];
+else
+    matname = [space 'gamut.mat'];
+end
 dirname = fileparts(mfilename('fullpath')); % Folder containing this .m file
 fname   = fullfile(dirname,matname);
 
+% -------------------------------------------------------------------------
 % If it doesn't, run script and save
 if ~exist(fname,'file')
     if verbose; fprintf('Couldn''t load %s\n',fname); end
-    [gamut] = make_cielchab_gamut(space, N, point_method);
+    [gamut] = make_cielchab_gamut(space, N, point_method, use_uplab);
     save(fname,'-struct','gamut');
     if verbose; fprintf('Made and saved gamut as %s\n',fname); end
     return;
 end
 
+% -------------------------------------------------------------------------
 % If it does, load it and check settings are ok
 gamut = load(fname);
 
@@ -68,7 +80,7 @@ else
 end
 
 % If options not good enough, make with given inputs and save
-[gamut] = make_cielchab_gamut(space, N, point_method);
+[gamut] = make_cielchab_gamut(space, N, point_method, use_uplab);
 save(fname,'-struct','gamut');
 if verbose; fprintf('Made and saved %s gamut as %s\n',space,fname); end
 

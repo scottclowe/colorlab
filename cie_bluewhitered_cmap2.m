@@ -1,12 +1,15 @@
-function cmap = cie_bluewhitered_cmap2(n, func, dbg)
+function cmap = cie_bluewhitered_cmap2(n, attributes, spacefun, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
-if nargin<3 || isempty(dbg)
+if nargin<4 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
 end
+if nargin<3
+    spacefun = []; % function to map from cielab to srgb. (Only used if stored cmap doesn't exist or needs replacing)
+end
 if nargin<2
-    func = []; % function to map from cielab to srgb. (Only used if stored cmap doesn't exist or needs replacing)
+    attributes = '';
 end
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
@@ -14,11 +17,29 @@ end
 
 % -------------------------------------------------------------------------
 % Parameters
-
+switch attributes
+    case ''
 % CIELCH      [  L*      c    h]
   lchblue   = [ 44.25,  91, 290]; % 289
   lchred    = [ 44.25,  91,  41];
   wp        = [ 99.00,   0,   0];
+    case 'lfix'
+% CIELCH      [  L*      c    h]
+  lchblue   = [ 44.75,  92, 290]; % 289
+  lchred    = [ 44.75,  92,  41];
+  wp        = [ 44.75,   0,   0];
+%     case 'lfixdark'
+% % CIELCH      [  L*      c    h]
+% %   lchblue   = [ 38.50  106.64  294];
+% %   lchred    = [ 38.50   82.89   41];
+% %   wp        = [ 38.50,   0,      0];
+%   lchblue   = [ 38.50  105  294];
+%   lchred    = [ 38.50   82   41];
+%   wp        = [ 38.50,   0,   0];
+    otherwise
+        error('Unfamiliar colormap attribute: %s',attributes);
+end
+        
 
 % -------------------------------------------------------------------------
 % CIELab    [  L*   a*   b*]
@@ -52,14 +73,14 @@ end
 
 % Convert from Lab to srgb
 Lab  = [Lab1;Lab2];
-cmap = gd_lab2rgb(Lab,func);
+cmap = gd_lab2rgb(Lab,spacefun);
 
 % If dbg, output figures showing colormap construction
 if dbg
-    g = fetch_cielchab_gamut('srgb');
+    rgbgamut = fetch_cielchab_gamut('srgb');
 
-    ghb = g.lch(g.lch(:,3)==lchblue(3),:);
-    ghr = g.lch(g.lch(:,3)==lchred(3),:);
+    ghb = rgbgamut.lch(rgbgamut.lch(:,3)==lchblue(3),:);
+    ghr = rgbgamut.lch(rgbgamut.lch(:,3)==lchred(3),:);
 
     figure; set(gca,'Color',[.467 .467 .467]); hold on; box on;
     plot(ghb(:,2),ghb(:,1),'b-');
@@ -74,6 +95,9 @@ if dbg
     figure;
     imagesc(img);
     axis xy;
+    
+    
+    plot_labcurve_rgbgamut(Lab)
 end
 
 end

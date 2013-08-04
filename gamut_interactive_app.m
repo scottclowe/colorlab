@@ -52,8 +52,10 @@ function gamut_interactive_app_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to gamut_interactive_app (see VARARGIN)
 
-% handles.rgbgamut = fetch_cielchab_gamut('srgb',256,'face');
-handles.rgbgamut = fetch_cielchab_gamut('srgb');
+% Need to make a dial for this
+handles.use_uplab = false;
+
+handles.rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face-plus', handles.use_uplab);
 
 if ~isfield(handles.rgbgamut,'lch_chr')
     lch_chr = find_gamut_chr(handles.rgbgamut);
@@ -222,7 +224,7 @@ switch lower(dim_name)
     case {'mesh','mesh (lab)'}
         plot_mesh(handles);
     case {'surface lch','surface (lch)'}
-        plot_surface_LCh(handles);
+        plot_surface_lch(handles);
     otherwise
         error('Unknown dimension setting: %s',dim_name);
 end
@@ -451,26 +453,8 @@ gb = Lmax.lch(:,2).*sin(Lmax.lch(:,3)/360*(2*pi));
 Lmax.lab = [Lmax.lch(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-if license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    Lmin.rgb = applycform(Lmin.lab, cform);
-    Lmax.rgb = applycform(Lmax.lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-%     warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-%         ['Could not checkout the Image Processing Toolbox. ' ...
-%          'Using colorspace function, but output not guaranteed correct.']);
-    Lmin.rgb = colorspace('Lab->RGB',Lmin.lab);
-    Lmax.rgb = colorspace('Lab->RGB',Lmax.lab);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     suggestFEXpackage(28790,'You may wish to download the colorspace package.')
-end
+Lmin.rgb = my_lab2srgb(Lmin.lab);
+Lmax.rgb = my_lab2srgb(Lmax.lab);
 
 lch_chr.Lmin = Lmin;
 lch_chr.Lmax = Lmax;
@@ -576,8 +560,7 @@ b = c.*sin(h/360*(2*pi));
 
 Lab = [L' a' b'];
 
-cform = makecform('lab2srgb');
-rgb = applycform(Lab, cform);
+rgb = my_lab2srgb(handles, Lab);
 
 
 function [xxx,yyy,rgb] = lin_c_fit(c)
@@ -601,8 +584,7 @@ b = c.*sin(h/360*(2*pi));
 
 Lab = [L' a' b'];
 
-cform = makecform('lab2srgb');
-rgb = applycform(Lab, cform);
+rgb = my_lab2srgb(handles, Lab);
 
 
 function chr_val_Callback(hObject, eventdata, handles)
@@ -691,12 +673,12 @@ end
 
 L = handles.rgbgamut.lchmesh.Lgrid([1:end 1],:);
 c = handles.rgbgamut.lchmesh.cgrid([1:end 1],:);
-h = handles.rgbgamut.lchmesh.hgrid([1:end 1],:)/180*pi;
-a = c.*cos(h);
-b = c.*sin(h);
+h = handles.rgbgamut.lchmesh.hgrid([1:end 1],:);
+a = c.*cosd(h);
+b = c.*sind(h);
 
-cform = makecform('lab2srgb');
-CMAP = applycform([L(:) a(:) b(:)], cform);
+Lab = [L(:) a(:) b(:)];
+CMAP = my_lab2srgb(handles, Lab);
 
 hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
 set(hs,'EdgeColor','none');
@@ -724,12 +706,12 @@ end
 
 L = handles.rgbgamut.lchmesh.Lgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
 c = handles.rgbgamut.lchmesh.cgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
-h = handles.rgbgamut.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end])/180*pi;
-a = c.*cos(h);
-b = c.*sin(h);
+h = handles.rgbgamut.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+a = c.*cosd(h);
+b = c.*sind(h);
 
-cform = makecform('lab2srgb');
-CMAP = applycform([L(:) a(:) b(:)], cform);
+Lab = [L(:) a(:) b(:)];
+CMAP = my_lab2srgb(handles, Lab);
 
 hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
 set(hs,'FaceColor','none');
@@ -758,13 +740,12 @@ end
 L = handles.rgbgamut.lchmesh.Lgrid([1:end 1],:);
 c = handles.rgbgamut.lchmesh.cgrid([1:end 1],:);
 h = handles.rgbgamut.lchmesh.hgrid([1:end 1],:);
+h(end,:) = h(end,:) + 360;
 a = c.*cosd(h);
 b = c.*sind(h);
 
-cform = makecform('lab2srgb');
-CMAP = applycform([L(:) a(:) b(:)], cform);
-
-h(end,:) = h(end,:) + 360;
+Lab = [L(:) a(:) b(:)];
+CMAP = my_lab2srgb(handles, Lab);
 
 hs = surf(h,L,c,reshape(CMAP,[size(L) 3]));
 set(hs,'EdgeColor','none');
@@ -775,3 +756,15 @@ set(handles.main_axes,'XLim',[0 360],'YLim',[0 100],'ZLim',[0 150]);
 xlabel('h')
 ylabel('L')
 zlabel('C')
+
+
+% -------------------------------------------------------------------------
+% -------------------------------------------------------------------------
+function rgb = my_lab2srgb(handles, Lab)
+
+if handles.use_uplab;
+    P = iccread('CIELab_to_UPLab.icc');
+    cform = makecform('CLUT', P, 'AToB0');
+    Lab = applycform(Lab, cform);
+end
+rgb = gd_lab2rgb(Lab);

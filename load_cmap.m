@@ -19,6 +19,9 @@ interp_method = 'linear'; % Interpolation method used to go from saved cmap to o
 cmap_foldername = 'cmaps';
 
 % -------------------------------------------------------------------------
+if isnumeric(attr); attr = num2str(attr); end
+
+% -------------------------------------------------------------------------
 % Folder and filenames
 dirname = fileparts(mfilename('fullpath')); % Folder containing this .m file
 dirname = fullfile(dirname, cmap_foldername); % Folder designated for stored cmaps

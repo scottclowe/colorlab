@@ -3,6 +3,7 @@
 close all;
 
 % For a pre-existing implementation, see:
+% http://www.vendian.org/mncharity/dir3/blackbody/parameters.html
 % http://www.vendian.org/mncharity/dir3/blackbody/UnstableURLs/tool_pl.txt
 % Also of some help is
 % http://www.fourmilab.ch/documents/specrend/specrend.c
@@ -19,6 +20,7 @@ primaries = [0.6400 0.3300 0.2126;   % Red
              0.3000 0.6000 0.7153;   % Green
              0.1500 0.0600 0.0721;]; % Blue
 wp        = [0.3127 0.3290 1.0000 ]; % White
+
 
 % Color matching functions taken from http://www.cvrl.org/cmfs.htm
 cie_cmf_fname = 'lin2012xyz2e_fine_7sf.csv';
@@ -87,8 +89,10 @@ zlabel('Z');
 
 xyz = bsxfun(@rdivide,XYZ,sum(XYZ,2));
 
+
+
 figure; hold on;
-plot(xyz(:,1),xyz(:,2),'-o');
+plot(xyz(:,1),xyz(:,2),'b-');
 plot(primaries([1:3 1],1),primaries([1:3 1],2),'k-');
 plot(primaries(1,1),primaries(1,2),'ro');
 plot(primaries(2,1),primaries(2,2),'go');
@@ -99,6 +103,11 @@ ylabel('y');
 xlim([0 1]);
 ylim([0 1]);
 set(gca,'Color',[0.4663 0.4663 0.4663]);
+
+% Chromaticity co-ordinates (wavelength in xyz)
+cc = load('cc2012xyz10_fine_5dp.csv');
+plot(cc([1:end 1],2),cc([1:end 1],3),'w-');
+
 
 figure;
 plot3(xyz(:,1),xyz(:,2),XYZ(:,2),'-o');
@@ -145,12 +154,15 @@ Lab = applycform(XYZ2,makecform('xyz2lab'));
 % cform = makecform('xyl2lab');
 % Lab = applycform([x y Y],cform);
 
-figure;
-plot3(Lab(:,2),Lab(:,3),Lab(:,1),'-o')
-xlabel('a*')
-ylabel('b*')
-zlabel('L*')
-set(gca,'Color',[0.4663 0.4663 0.4663]);
+% figure;
+% plot3(Lab(:,2),Lab(:,3),Lab(:,1),'-o')
+% xlabel('a*')
+% ylabel('b*')
+% zlabel('L*')
+% set(gca,'Color',[0.4663 0.4663 0.4663]);
+
+plot_labcurve_rgbgamut(Lab);
+
 
 % g = fetch_cielchab_gamut;
 % % Get a mesh version of the gamut

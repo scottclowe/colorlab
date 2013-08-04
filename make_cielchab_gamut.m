@@ -1,4 +1,4 @@
-function [gamut] = make_cielchab_gamut(space, N, point_method)
+function [gamut] = make_cielchab_gamut(space, N, point_method, use_uplab)
 
 % - INPUT HANDLING -
 if nargin<1
@@ -11,6 +11,9 @@ if nargin<2
 end
 if nargin<3
     point_method = 'face-plus';
+end
+if nargin<4
+    use_uplab = false;
 end
 
 % - INPUT SWITCHING -
@@ -48,11 +51,11 @@ end
 % kform = makecform('cmyk2srgb', 'RenderingIntent', 'RelativeColorimetric');
 
 % Make the main gamut object
-gamut = make_gamut_lh(space, N, point_method);
+gamut = make_gamut_lh(space, N, point_method, use_uplab);
 
 % Have to compute again to find a format for the gamut which lets us browse
 % by chroma
-gamut.lch_chr = make_gamut_chr(gamut);
+gamut.lch_chr = make_gamut_chr(gamut, use_uplab);
 
 % Make a mesh we can interpolate on
 gamut.lchmesh = make_gamut_mesh(gamut);
@@ -61,7 +64,7 @@ end
 
 
 % Make a gamut indexed by lightness and hue
-function gamut = make_gamut_lh(space, N, point_method)
+function gamut = make_gamut_lh(space, N, point_method, use_uplab)
 
 % Don't want these to be 3,6,7,9,11,...
 % Only products of 2 and 5 which divide 10 nicely
@@ -168,26 +171,7 @@ switch lower(point_method)
 end
 
 % Swap between spaces. Use whichever function is available
-if license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('srgb2lab');
-    Lab = applycform(rgb, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-%     warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-%         ['Could not checkout the Image Processing Toolbox. ' ...
-%          'Using colorspace function, but output not guaranteed correct.']);
-    Lab = colorspace('RGB->Lab',rgb);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,'You may wish to download the colorspace package.');
-     end
-end
+Lab = my_srgb2lab(rgb, use_uplab);
 
 % Seperate Lab components
 L = Lab(:,1);
@@ -255,24 +239,7 @@ gb = lch_gamut(:,2).*sin(lch_gamut(:,3)/360*(2*pi));
 lab_gamut = [lch_gamut(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-if license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    rgb_gamut = applycform(lab_gamut, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-%     warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-%         ['Could not checkout the Image Processing Toolbox. ' ...
-%          'Using colorspace function, but output not guaranteed correct.']);
-    rgb_gamut = colorspace('Lab->RGB',lab_gamut);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     suggestFEXpackage(28790,'You may wish to download the colorspace package.')
-end
+rgb_gamut = my_lab2srgb(lab_gamut, use_uplab);
 
 gamut.lch           = lch_gamut;
 gamut.lab           = lab_gamut;
@@ -290,7 +257,7 @@ end
 
 
 % Make a gamut indexed by chroma
-function [lch_chr] = make_gamut_chr(g)
+function [lch_chr] = make_gamut_chr(g, use_uplab)
 
 max_c = max(g.lch(:,3));
 hues = unique(g.lch(:,3));
@@ -322,28 +289,55 @@ gb = Lmax.lch(:,2).*sin(Lmax.lch(:,3)/360*(2*pi));
 Lmax.lab = [Lmax.lch(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-if license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    Lmin.rgb = applycform(Lmin.lab, cform);
-    Lmax.rgb = applycform(Lmax.lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-%     warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-%         ['Could not checkout the Image Processing Toolbox. ' ...
-%          'Using colorspace function, but output not guaranteed correct.']);
-    Lmin.rgb = colorspace('Lab->RGB',Lmin.lab);
-    Lmax.rgb = colorspace('Lab->RGB',Lmax.lab);
-else
-    % Use colorspace
-    warning('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function.']);
-     suggestFEXpackage(28790,'You may wish to download the colorspace package.')
-end
+Lmin.rgb = my_lab2srgb(Lmin.lab, use_uplab);
+Lmax.rgb = my_lab2srgb(Lmax.lab, use_uplab);
+
 
 lch_chr.Lmin = Lmin;
 lch_chr.Lmax = Lmax;
+
+end
+
+function Lab = my_srgb2lab(rgb, use_uplab)
+
+if license('checkout','image_toolbox')
+    % If using ImageProcessingToolbox
+    Lab = applycform(rgb, makecform('srgb2lab'));
+elseif exist('colorspace','file')
+    % Use colorspace
+    Lab = colorspace('RGB->Lab',rgb);
+else
+    if exist('suggestFEXpackage','file')
+        suggestFEXpackage(28790,...
+            ['Since the Image Processing Toolbox is unavailable, '...
+             'you may wish to download the colorspace package.\n' ...
+             'This package will allow you to convert between different '...
+             'colorspaces without the MATLAB toolbox' ...
+            ]);
+    end
+    error('LABWHEEL:NoIPToolbox:NoColorspace',...
+        ['Could not checkout the Image Processing Toolbox. ' ...
+         'Colorspace function not present either.\n' ...
+         'You need one of the two to run this function.']);
+end
+
+if use_uplab;
+    P = iccread('CIELab_to_UPLab.icc');
+    cform = makecform('CLUT', P, 'BToA0');
+    Lab = [applycform(Lab(1:floor(length(Lab)/2),:), cform); ...
+        applycform(Lab(floor(length(Lab)/2):end,:), cform)];
+end
+
+end
+
+function rgb = my_lab2srgb(Lab, use_uplab)
+
+if use_uplab;
+    P = iccread('CIELab_to_UPLab.icc');
+    cform = makecform('CLUT', P, 'AToB0');
+    Lab = [applycform(Lab(1:floor(length(Lab)/2),:), cform); ...
+        applycform(Lab(floor(length(Lab)/2):end,:), cform)];
+end
+rgb = gd_lab2rgb(Lab);
 
 end

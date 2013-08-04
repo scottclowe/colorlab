@@ -1,4 +1,4 @@
-function cmap = cie_rainbow_cmap_make(n, attr, func, dbg)
+function cmap = cie_rainbow_cmap_make(n, attributes, spacefun, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
@@ -6,10 +6,10 @@ if nargin<4 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
 end
 if nargin<3
-    func = []; % function to map from cielab to srgb
+    spacefun = []; % function to map from cielab to srgb
 end
-if nargin<2 || isempty(attr)
-    attr = 'greenmid'; % Colormap type option
+if nargin<2 || isempty(attributes)
+    attributes = 'greenmid'; % Colormap type option
 end
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
@@ -17,40 +17,69 @@ end
 
 % -------------------------------------------------------------------------
 % Main function body
-switch lower(attr)
+attrbreaks = strfind(attributes,':');
+if isempty(attrbreaks)
+    typ = attributes;
+    paramset = '1';
+else
+    typ = attributes(1:attrbreaks(1)-1);
+    paramset = attributes(attrbreaks(1)+1:end);
+end
+    
+switch lower(typ)
     case 'smooth'
-        cmap = cie_rainbow_cmap_make_smooth(n, func, dbg);
+        cmap = cie_rainbow_cmap_make_smooth(n, paramset, spacefun, dbg);
     case 'greenmid'
-        cmap = cie_rainbow_cmap_make_greenmid(n, func, dbg);
+        cmap = cie_rainbow_cmap_make_greenmid(n, paramset, spacefun, dbg);
     otherwise
-        error('Unfamiliar colormap attribute: %s',attr);
+        error('Unfamiliar colormap attribute: %s',typ);
 end
 
 end
 
-function params = get_rainbow_ellipse_params()
+
+function params = get_rainbow_ellipse_params(paramset)
 % Declares parameters for the (partial) ellipse in CIELab which is used to
 % generate the colormap
 
-params.P       = [-60 49 88];                       % Green point
-params.C       = [301.0341 -123.2044  -32.2823];    % Centre
-params.a       = 400;                               % Major axis coef
-params.b       = 106;                               % Minor axis coef
-params.theta   = -25.5/180*pi; % Rotation of ellipse wrt ab-plane of L*a*b*
-params.phi     = -17.5/180*pi; % L* Inclination of major axis
-params.psi     =   1.7/180*pi; % L* Inclination of minor axis
-params.U       = [ cos(params.theta) sin(params.theta) sin(params.phi)]; % Major axis
-params.V       = [-sin(params.theta) cos(params.theta) sin(params.psi)]; % Minor axis
-params.t_start = 4.2;          % Good start point
-params.t_end   = 2.3;          % Good end point
+switch paramset
+    case '1'
+        params.P       = [-60 49 88];                       % Green point
+        params.C       = [301.0341 -123.2044  -32.2823];    % Centre
+        params.a       = 400;                               % Major axis coef
+        params.b       = 106;                               % Minor axis coef
+        params.theta   = -25.5/180*pi; % Rotation of ellipse wrt ab-plane of L*a*b*
+        params.phi     = -17.5/180*pi; % L* Inclination of major axis
+        params.psi     =   1.7/180*pi; % L* Inclination of minor axis
+        params.U       = [ cos(params.theta) sin(params.theta) sin(params.phi)]; % Major axis
+        params.V       = [-sin(params.theta) cos(params.theta) sin(params.psi)]; % Minor axis
+        params.t_start = 4.2;          % Good start point
+        params.t_end   = 2.3;          % Good end point
+
+    case '2'
+        params.P       = [-41 37 91];
+        params.C       = [131.8926  -41.7917   15.2377];
+        params.a       = 190;
+        params.b       =  89;
+        params.theta   = -24.5/180*pi;
+        params.phi     = -23.5/180*pi;
+        params.psi     =     0/180*pi;
+        params.U       = [ cos(params.theta) sin(params.theta) sin(params.phi)]; % Major axis
+        params.V       = [-sin(params.theta) cos(params.theta) sin(params.psi)]; % Minor axis
+        params.t_start = 4.6;          % Good start point
+        params.t_end   = 2.05;         % Good end point
+        
+    otherwise
+        error('Unfamiliar parameter set');
+end
 
 end
 
 
-function [btsp_t_srt, btsp_t_end] = find_ellipse_ends()
+function [btsp_t_srt, btsp_t_end] = find_ellipse_ends(paramset)
 % Finds the limiting points which are only just inside the ellipse
 
-params = get_rainbow_ellipse_params();
+params = get_rainbow_ellipse_params(paramset);
 rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face');
 
 
@@ -64,19 +93,26 @@ z = params.C(3) + params.a * cos(t) * params.U(3) + params.b * sin(t) * params.V
 Lab = [z' x' y'];
 TF = isingamut(Lab,rgbgamut,'Lab');
 
-% Go one point on the safe side
-btsp_t_srt = t(find(TF,1,'first')+1);
-btsp_t_end = t(find(TF,1,'last')-1);
+% Find edges of gamut
+I_srt = find(TF,1,'first');
+I_end = find(TF,1,'last');
+
+% Go back by a Euclidian distance of 1 to be sure we're in gamut
+de_srt = sqrt(sum(bsxfun(@minus,Lab(I_srt:I_end,:),Lab(I_srt,:)).^2,2));
+de_end = sqrt(sum(bsxfun(@minus,Lab(I_srt:I_end,:),Lab(I_end,:)).^2,2));
+btsp_t_srt = t(I_srt-1+find(de_srt>1,1,'first'));
+btsp_t_end = t(I_srt-1+find(de_end>1,1,'last'));
 
 end
 
-function ciebow_cmap = cie_rainbow_cmap_make_smooth(n_target, func, dbg)
 
-params = get_rainbow_ellipse_params();
+function ciebow_cmap = cie_rainbow_cmap_make_smooth(n_target, paramset, spacefun, dbg)
+
+params = get_rainbow_ellipse_params(paramset);
 rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face');
 
 % First generate a ton of points to find the end points of theta
-[btsp_t_srt, btsp_t_end] = find_ellipse_ends();
+[btsp_t_srt, btsp_t_end] = find_ellipse_ends(paramset);
 
 % Now generate a ton of points in this range
 n = 100001;
@@ -133,7 +169,7 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = gd_lab2rgb(Lab, func);
+ciebow_cmap = gd_lab2rgb(Lab, spacefun);
 
 % debugging figures
 if dbg;
@@ -187,38 +223,13 @@ if dbg;
     zlabel('L*')
     
     
-    figure;
-    hold on;
-    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
-    
-    % Get a mesh version of the gamut
-    if ~isfield(rgbgamut,'lchmesh')
-        rgbgamut.lchmesh = make_gamut_mesh(rgbgamut);
-    end
-
-    L = rgbgamut.lchmesh.Lgrid([1:end 1],:);
-    c = rgbgamut.lchmesh.cgrid([1:end 1],:);
-    h = rgbgamut.lchmesh.hgrid([1:end 1],:)/180*pi;
-    a = c.*cos(h);
-    b = c.*sin(h);
-
-    cform = makecform('lab2srgb');
-    CMAP = applycform([L(:) a(:) b(:)], cform);
-
-    hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
-    set(hs,'EdgeColor','none');
-    set(hs,'FaceAlpha',0.75);
-
-    set(gca,'Color',[0.4663 0.4663 0.4663]);
-    set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
-    xlabel('a*')
-    ylabel('b*')
-    zlabel('L*')
+    plot_labcurve_rgbgamut(Lab)
 end
 
 end
 
-function ciebow_cmap = cie_rainbow_cmap_make_greenmid(n_target, func, dbg)
+
+function ciebow_cmap = cie_rainbow_cmap_make_greenmid(n_target, paramset, spacefun, dbg)
 % Option to have same amount of red as blue
 % This is a very simple method used where the curve is split in two and
 % there are different Delta E values between colours in each.
@@ -226,11 +237,11 @@ function ciebow_cmap = cie_rainbow_cmap_make_greenmid(n_target, func, dbg)
 
 % Mid point is at t=pi
 
-params = get_rainbow_ellipse_params();
+params = get_rainbow_ellipse_params(paramset);
 rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face');
 
 % First generate a ton of points to find the end points of theta
-[btsp_t_srt, btsp_t_end] = find_ellipse_ends();
+[btsp_t_srt, btsp_t_end] = find_ellipse_ends(paramset);
 
 % Now generate a ton of points in this range
 n = 100001;
@@ -309,7 +320,7 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = gd_lab2rgb(Lab, func);
+ciebow_cmap = gd_lab2rgb(Lab, spacefun);
 
 % debugging figures
 if dbg;
@@ -362,34 +373,7 @@ if dbg;
     ylabel('b*')
     zlabel('L*')
     
-    
-    figure;
-    hold on;
-    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
-    
-    % Get a mesh version of the gamut
-    if ~isfield(rgbgamut,'lchmesh')
-        rgbgamut.lchmesh = make_gamut_mesh(rgbgamut);
-    end
-
-    L = rgbgamut.lchmesh.Lgrid([1:end 1],:);
-    c = rgbgamut.lchmesh.cgrid([1:end 1],:);
-    h = rgbgamut.lchmesh.hgrid([1:end 1],:)/180*pi;
-    a = c.*cos(h);
-    b = c.*sin(h);
-
-    cform = makecform('lab2srgb');
-    CMAP = applycform([L(:) a(:) b(:)], cform);
-
-    hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
-    set(hs,'EdgeColor','none');
-    set(hs,'FaceAlpha',0.75);
-
-    set(gca,'Color',[0.4663 0.4663 0.4663]);
-    set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
-    xlabel('a*')
-    ylabel('b*')
-    zlabel('L*')
+    plot_labcurve_rgbgamut(Lab)
 end
 
 end

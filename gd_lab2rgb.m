@@ -12,31 +12,39 @@ end
 
 if ~isempty(func)
     rgb = func(Lab);
-elseif license('checkout','image_toolbox')
-    % If using ImageProcessingToolbox
-    cform = makecform('lab2srgb');
-    rgb = applycform(Lab, cform);
-elseif exist('colorspace','file')
-    % Use colorspace
-%     warning('LABWHEEL:NoIPToolbox:UseColorspace',...
-%         ['Could not checkout the Image Processing Toolbox. ' ...
-%          'Using colorspace function.']);
-    rgb = colorspace('Lab->RGB',Lab);
-else
-    % Use colorspace
-     if exist('suggestFEXpackage','file')
-        suggestFEXpackage(28790,...
+    return;
+end
+
+% If ImageProcessingToolbox is available to use, use it.
+if license('checkout','image_toolbox')
+    rgb = applycform(Lab, makecform('lab2srgb'));
+    return;
+end
+
+% If we don't have colorspace, suggest it
+if ~exist('colorspace','file')
+    if exist('suggestFEXpackage','file')
+        folder = suggestFEXpackage(28790,...
             ['Since the Image Processing Toolbox is unavailable, '...
              'you may wish to download the colorspace package.\n' ...
              'This package will allow you to convert between different '...
              'colorspaces without the MATLAB toolbox' ...
             ]);
-     end
-    error('LABWHEEL:NoIPToolbox:NoColorspace',...
-        ['Could not checkout the Image Processing Toolbox. ' ...
-         'Colorspace function not present either.\n' ...
-         'You need one of the two to run this function. ' ...
-         ]);
+    else
+        folder = '';
+    end
+    if isempty(folder)
+        % User did not download colorspace
+        error('LABWHEEL:NoIPToolbox:NoColorspace',...
+            ['Could not checkout the Image Processing Toolbox. ' ...
+             'Colorspace function not present either.\n' ...
+             'You need one of the two to run this function. ' ...
+             ]);
+    end
 end
+
+% Use colorspace
+rgb = colorspace('Lab->RGB',Lab);
+return;
 
 end
