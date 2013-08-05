@@ -6,12 +6,12 @@ close all;
 
 use_uplab = false;
 
-handpicked_bwr_hue1 = 290; % Blue
-handpicked_bwr_hue2 = 41;  % Red
-via_black = 0; % Go via near-white (0) or near-black (1)
+handpicked_bwr_hue1 = []; % 290; % Blue
+handpicked_bwr_hue2 = []; % 41;  % Red
+via_black = 1; % Go via near-white (0) or near-black (1)
 
-hue1_range = 260:315;
-hue2_range =  10:70 ;
+hue1_range = 0:359; %260:315;
+hue2_range = 0:359; % 10:70 ;
 
 
 %% Main body
@@ -105,7 +105,7 @@ for i=1:length(m_list)
     end
     moveC = m*moveL+k;
     if via_black
-        I_start = find(moveC>jointC(jointL>=Lend),1,'fih2st')-1;
+        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
         if I_start<0; continue; end;
     else
         I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
@@ -238,7 +238,7 @@ title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue1,hue2));
     end
     moveC = m*moveL+k;
     if via_black
-        I_start = find(moveC>jointC(jointL>=Lend),1,'fih2st')-1;
+        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
         if I_start<0; continue; end;
     else
         I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
@@ -285,6 +285,10 @@ axis xy;
 title(sprintf('Best seperation distance (%.2f): %d, %d',sep_dist,hue1,hue2));
 
 %%
+
+if isempty(handpicked_bwr_hue1) || isempty(handpicked_bwr_hue2)
+    return;
+end
 
 % Handpicked from the matrix of values.
 hue1 = handpicked_bwr_hue1; 
@@ -356,7 +360,7 @@ title(sprintf('Chosen seperation distance (%.2f): %d, %d',sep_dist,hue1,hue2));
     end
     moveC = m*moveL+k;
     if via_black
-        I_start = find(moveC>jointC(jointL>=Lend),1,'fih2st')-1;
+        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
         if I_start<0; continue; end;
     else
         I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
@@ -473,7 +477,7 @@ title(sprintf('Best C max (%.2f): %d, %d',Cstart,hue1,hue2));
     end
     moveC = m*moveL+k;
     if via_black
-        I_start = find(moveC>jointC(jointL>=Lend),1,'fih2st')-1;
+        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
         if I_start<0; continue; end;
     else
         I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
