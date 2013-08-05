@@ -19,18 +19,17 @@ if ~isempty(spacefun)
 end
 
 % Move from UPLab to CIELab
-% UPLab was made by Bruce Lindbloom and provides a space where Munsell
-% colors are uniformly spaced
+% UPLab was made by Bruce Lindbloom and provides a color space where the
+% Munsell colors are uniformly spaced.
 % http://www.brucelindbloom.com/index.html?UPLab.html
-% The A2B0 tag of the profile converts from CIE Lab to UP Lab. The B2A0 tag 
-% performs the inverse transformation... In this way, a linear gamut 
-% mapping in UP Lab is equivalent to a nonlinear mapping along the curved 
-% Munsell lines in CIE Lab. This should fix, or at least greatly reduce the 
-% "blue turns purple" problem.
+% Turns out, the mapping is the opposite way around to what Bruce says, and
+% the original (CIELab_to_UPLab.icc) is and the second version
+% (CIELab_to_UPLab2.icc) is not compliant with the standard directions.
+% http://argyllcms.com/doc/iccgamutmapping.html
 if use_uplab;
     P = iccread('CIELab_to_UPLab.icc');
-    % B2A0: UPLab to CIELab
-    cform = makecform('CLUT', P, 'BToA0');
+    % AToB0: UPLab to CIELab
+    cform = makecform('CLUT', P, 'AToB0');
     Lab = applycform(Lab, cform);
 end
 
