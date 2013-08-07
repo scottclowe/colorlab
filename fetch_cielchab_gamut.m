@@ -1,6 +1,6 @@
 function [gamut] = fetch_cielchab_gamut(space, N, point_method, use_uplab)
 
-verbose = 0;
+verbose = 1;
 
 % -------------------------------------------------------------------------
 % - INPUT HANDLING -
@@ -63,7 +63,7 @@ if nargin<2; return; end
 % as good as requested
 if strcmp(gamut.point_method, point_method) || ...
     (strcmp(gamut.point_method,'face-plus') && strcmp(point_method,'face'))
-    if  gamut.N==N
+    if isempty(N) || gamut.N==N
         return;
     elseif gamut.N>N
         if verbose;

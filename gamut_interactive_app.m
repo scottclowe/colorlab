@@ -407,7 +407,7 @@ aa = cc.*cosd(hh);
 bb = cc.*sind(hh);
 Lab = cat(3,LL,aa,bb);
 
-rgb = gd_lab2rgb(Lab,handles.use_uplab);
+rgb = safe_lab2rgb(Lab,handles.use_uplab);
 li = rgb(:,:,1)<0|rgb(:,:,2)<0|rgb(:,:,3)<0|rgb(:,:,1)>1|rgb(:,:,2)>1|rgb(:,:,3)>1;
 rgb(repmat(li,[1 1 3])) = .4663;
 
@@ -566,7 +566,7 @@ bb = meshgrid(b,a)';
 LL = repmat(L,size(aa));
 
 Lab = cat(3,LL,aa,bb);
-rgb = gd_lab2rgb(Lab,handles.use_uplab);
+rgb = safe_lab2rgb(Lab,handles.use_uplab);
 li = rgb(:,:,1)<0|rgb(:,:,2)<0|rgb(:,:,3)<0|rgb(:,:,1)>1|rgb(:,:,2)>1|rgb(:,:,3)>1;
 rgb(repmat(li,[1 1 3])) = .4663;
 
@@ -591,7 +591,7 @@ bb = meshgrid(b,a)';
 LL = repmat(L,size(aa));
 
 Lab = cat(3,LL,aa,bb);
-rgb = gd_lab2rgb(Lab,handles.use_uplab);
+rgb = safe_lab2rgb(Lab,handles.use_uplab);
 li = rgb(:,:,1)<0|rgb(:,:,2)<0|rgb(:,:,3)<0|rgb(:,:,1)>1|rgb(:,:,2)>1|rgb(:,:,3)>1;
 rgb(repmat(li,[1 1 3])) = .4663;
 
@@ -684,8 +684,8 @@ gb = Lmax.lch(:,2).*sin(Lmax.lch(:,3)/360*(2*pi));
 Lmax.lab = [Lmax.lch(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-Lmin.rgb = gd_lab2rgb(Lmin.lab, handles.use_uplab);
-Lmax.rgb = gd_lab2rgb(Lmax.lab, handles.use_uplab);
+Lmin.rgb = safe_lab2rgb(Lmin.lab, handles.use_uplab);
+Lmax.rgb = safe_lab2rgb(Lmax.lab, handles.use_uplab);
 
 lch_chr.Lmin = Lmin;
 lch_chr.Lmax = Lmax;
@@ -757,7 +757,7 @@ aa = cc.*cosd(hh);
 bb = cc.*sind(hh);
 Lab = cat(3,LL,aa,bb);
 
-rgb = gd_lab2rgb(Lab,handles.use_uplab);
+rgb = safe_lab2rgb(Lab,handles.use_uplab);
 li = rgb(:,:,1)<0|rgb(:,:,2)<0|rgb(:,:,3)<0|rgb(:,:,1)>1|rgb(:,:,2)>1|rgb(:,:,3)>1;
 rgb(repmat(li,[1 1 3])) = .4663;
 
@@ -911,7 +911,7 @@ a = c.*cosd(h);
 b = c.*sind(h);
 
 Lab = [L(:) a(:) b(:)];
-rgb = gd_lab2rgb(Lab, handles.use_uplab);
+rgb = safe_lab2rgb(Lab, handles.use_uplab);
 
 hs = surf(a,b,L,reshape(rgb,[size(L) 3]));
 set(hs,'EdgeColor','none');
@@ -932,7 +932,7 @@ a = c.*cosd(h);
 b = c.*sind(h);
 
 Lab = [L(:) a(:) b(:)];
-rgb = gd_lab2rgb(Lab, handles.use_uplab);
+rgb = safe_lab2rgb(Lab, handles.use_uplab);
 
 hs = mesh(a,b,L,reshape(rgb,[size(L) 3]));
 set(hs,'FaceColor','none');
@@ -953,7 +953,7 @@ a = c.*cosd(h);
 b = c.*sind(h);
 
 Lab = [L(:) a(:) b(:)];
-rgb = gd_lab2rgb(Lab, handles.use_uplab);
+rgb = safe_lab2rgb(Lab, handles.use_uplab);
 
 hs = surf(h,L,c,reshape(rgb,[size(L) 3]));
 set(hs,'EdgeColor','none');
@@ -975,7 +975,7 @@ a = c.*cosd(h);
 b = c.*sind(h);
 
 Lab = [L(:) a(:) b(:)];
-rgb = gd_lab2rgb(Lab, handles.use_uplab);
+rgb = safe_lab2rgb(Lab, handles.use_uplab);
 
 hs = mesh(h,L,c,reshape(rgb,[size(L) 3]));
 set(hs,'FaceColor','none');

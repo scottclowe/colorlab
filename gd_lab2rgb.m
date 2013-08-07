@@ -33,39 +33,39 @@ if use_uplab;
     Lab = applycform(Lab, cform);
 end
 
-% % % If ImageProcessingToolbox is available to use, use it.
-% % % Move from CIELab to sRGB
-% % if license('checkout','image_toolbox')
-% %     rgb = applycform(Lab, makecform('lab2srgb'));
-% %     return;
-% % end
-% 
-% % If we don't have colorspace, suggest it
-% if ~exist('colorspace','file')
-%     if exist('suggestFEXpackage','file')
-%         folder = suggestFEXpackage(28790,...
-%             ['Since the Image Processing Toolbox is unavailable, '...
-%              'you may wish to download the colorspace package.\n' ...
-%              'This package will allow you to convert between different '...
-%              'colorspaces without the MATLAB toolbox' ...
-%             ]);
-%     else
-%         folder = '';
-%     end
-%     if isempty(folder)
-%         % User did not download colorspace
-%         error('LABWHEEL:NoIPToolbox:NoColorspace',...
-%             ['Could not checkout the Image Processing Toolbox. ' ...
-%              'Colorspace function not present either.\n' ...
-%              'You need one of the two to run this function. ' ...
-%              ]);
-%     end
-% end
-% 
-% % Use colorspace
+% % If ImageProcessingToolbox is available to use, use it.
 % % Move from CIELab to sRGB
-% rgb = colorspace('Lab->RGB',Lab);
+% if license('checkout','image_toolbox')
+%     rgb = applycform(Lab, makecform('lab2srgb'));
+%     return;
+% end
 
-rgb = my_colorspace('Lab->RGB',Lab);
+% If we don't have colorspace, suggest it
+if ~exist('colorspace','file')
+    if exist('suggestFEXpackage','file')
+        folder = suggestFEXpackage(28790,...
+            ['Since the Image Processing Toolbox is unavailable, '...
+             'you may wish to download the colorspace package.\n' ...
+             'This package will allow you to convert between different '...
+             'colorspaces without the MATLAB toolbox' ...
+            ]);
+    else
+        folder = '';
+    end
+    if isempty(folder)
+        % User did not download colorspace
+        error('LABWHEEL:NoIPToolbox:NoColorspace',...
+            ['Could not checkout the Image Processing Toolbox. ' ...
+             'Colorspace function not present either.\n' ...
+             'You need one of the two to run this function. ' ...
+             ]);
+    end
+end
+
+% Use colorspace
+% Move from CIELab to sRGB
+rgb = colorspace('Lab->RGB',Lab);
+
+% rgb = my_colorspace('Lab->RGB',Lab);
 
 end

@@ -99,7 +99,49 @@ if dbg
     axis xy;
     
     
-    plot_labcurve_rgbgamut(Lab)
+    plot_labcurve_rgbgamut(Lab);
+    
+    
+    % Plot lines ontop of 
+    figure; set(gca,'Color',[.4663 .4663 .4663]); hold on; box on;
+    
+    intv = 0.5;
+    L = 0:intv:100;
+    c = 0:intv:150;
+    c1 = [ fliplr(c) c(2:end)];
+    c2 = [-fliplr(c) c(2:end)];
+    
+    cc = meshgrid(c1,L);
+    LL = meshgrid(L,c1)';
+    hh = [...
+        repmat(lchblue(3),[length(L) length(c)-1]) ...
+        zeros(length(L), 1) ...
+        repmat(lchred(3) ,[length(L) length(c)-1]) ...
+        ];
+    
+    aa = cc.*cosd(hh);
+    bb = cc.*sind(hh);
+    Lab = cat(3,LL,aa,bb);
+    
+    rgb = safe_lab2rgb(Lab,use_uplab);
+    li = rgb(:,:,1)<0|rgb(:,:,2)<0|rgb(:,:,3)<0|rgb(:,:,1)>1|rgb(:,:,2)>1|rgb(:,:,3)>1;
+    rgb(repmat(li,[1 1 3])) = .4663;
+    
+    image(c2,L,rgb);
+    set(gca,'YDir','normal');
+    xlim([-150 150]);
+    ylim([0 100]);
+    set(gca,'XTick',get(gca,'XTick'));
+    set(gca,'XTickLabel',abs(get(gca,'XTick')));
+    
+    hold on;
+    
+    L1 = Lab1(:,1);
+    C1 = sqrt(Lab1(:,2).^2+Lab1(:,3).^2);
+    L2 = Lab2(:,1);
+    C2 = sqrt(Lab2(:,2).^2+Lab2(:,3).^2);
+    plot([-C1;C2],[L1;L2],'ks-');
+
 end
 
 end

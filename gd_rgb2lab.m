@@ -19,38 +19,38 @@ if ~isempty(spacefun)
 end
 
 
-Lab = my_colorspace('RGB->Lab',rgb);
+% Lab = my_colorspace('RGB->Lab',rgb);
 
-% % If ImageProcessingToolbox is available to use, use it.
-% % Move from sRGB to CIELab
-% if false % license('checkout','image_toolbox')
-%     Lab = applycform(rgb, makecform('srgb2lab'));
-% else
-%     % If we don't have colorspace, suggest it
-%     if ~exist('colorspace','file')
-%         if exist('suggestFEXpackage','file')
-%             folder = suggestFEXpackage(28790,...
-%                 ['Since the Image Processing Toolbox is unavailable, '...
-%                  'you may wish to download the colorspace package.\n' ...
-%                  'This package will allow you to convert between different '...
-%                  'colorspaces without the MATLAB toolbox' ...
-%                 ]);
-%         else
-%             folder = '';
-%         end
-%         if isempty(folder)
-%             % User did not download colorspace
-%             error('LABWHEEL:NoIPToolbox:NoColorspace',...
-%                 ['Could not checkout the Image Processing Toolbox. ' ...
-%                  'Colorspace function not present either.\n' ...
-%                  'You need one of the two to run this function. ' ...
-%                  ]);
-%         end
-%     end
-%     % Use colorspace
-%     % Move from sRGB to CIELab
-%     Lab = colorspace('RGB->Lab',rgb);
-% end
+% If ImageProcessingToolbox is available to use, use it.
+% Move from sRGB to CIELab
+if false % license('checkout','image_toolbox')
+    Lab = applycform(rgb, makecform('srgb2lab'));
+else
+    % If we don't have colorspace, suggest it
+    if ~exist('colorspace','file')
+        if exist('suggestFEXpackage','file')
+            folder = suggestFEXpackage(28790,...
+                ['Since the Image Processing Toolbox is unavailable, '...
+                 'you may wish to download the colorspace package.\n' ...
+                 'This package will allow you to convert between different '...
+                 'colorspaces without the MATLAB toolbox' ...
+                ]);
+        else
+            folder = '';
+        end
+        if isempty(folder)
+            % User did not download colorspace
+            error('LABWHEEL:NoIPToolbox:NoColorspace',...
+                ['Could not checkout the Image Processing Toolbox. ' ...
+                 'Colorspace function not present either.\n' ...
+                 'You need one of the two to run this function. ' ...
+                 ]);
+        end
+    end
+    % Use colorspace
+    % Move from sRGB to CIELab
+    Lab = colorspace('RGB->Lab',rgb);
+end
 
 % Move from CIELab to UPLab
 % UPLab was made by Bruce Lindbloom and provides a color space where the
