@@ -21,15 +21,17 @@ use_uplab = false;
 
 switch attributes
     case ''
-% CIELCH      [  L*      c    h]
-  lchblue   = [ 44.25,  91, 290]; % 289
-  lchred    = [ 44.25,  91,  41];
-  wp        = [ 99.00,   0,   0];
+        % CIELCH      [  L*      c    h]
+        lchblue   = [ 46.375,  93.9075, 296];
+        lchred    = [ 46.375,  93.9075,  40];
+        wp        = [ 97.411,   0     ,   0];
+        
     case 'lfix'
-% CIELCH      [  L*      c    h]
-  lchblue   = [ 44.75,  92, 290]; % 289
-  lchred    = [ 44.75,  92,  41];
-  wp        = [ 44.75,   0,   0];
+        % CIELCH      [  L*      c    h]
+        lchblue   = [ 46.3125, 94.0625, 296];
+        lchred    = [ 46.3125, 94.0625,  40];
+        wp        = [ 46.3125,  0     ,   0];
+        
 %     case 'lfixdark'
 % % CIELCH      [  L*      c    h]
 % %   lchblue   = [ 38.50  106.64  294];
@@ -38,10 +40,25 @@ switch attributes
 %   lchblue   = [ 38.50  105  294];
 %   lchred    = [ 38.50   82   41];
 %   wp        = [ 38.50,   0,   0];
+        
+    case 'uplab'
+        % CIELCH    [  L*      c         h   ]
+        lchblue   = [ 50.25,  95.6875, 309   ];
+        lchred    = [ 50.25,  95.6875,  54.75];
+        wp        = [ 92.777,  0,        0   ];
+        use_uplab = true;
+        
+    case 'uplab:lfix'
+        % CIELCH    [  L*       c         h   ]
+        lchblue   = [ 50.625,  96.3438, 309   ];
+        lchred    = [ 50.625,  96.3438,  54.75];
+        wp        = [ 50.625,   0,        0   ];
+        use_uplab = true;
+        
     otherwise
         error('Unfamiliar colormap attribute: %s',attributes);
 end
-        
+
 
 % -------------------------------------------------------------------------
 % CIELab    [  L*   a*   b*]
@@ -79,7 +96,7 @@ cmap = gd_lab2rgb(Lab, use_uplab, spacefun);
 
 % If dbg, output figures showing colormap construction
 if dbg
-    rgbgamut = fetch_cielchab_gamut('srgb');
+    rgbgamut = fetch_cielchab_gamut('srgb', [], [], use_uplab);
 
     ghb = rgbgamut.lch(rgbgamut.lch(:,3)==lchblue(3),:);
     ghr = rgbgamut.lch(rgbgamut.lch(:,3)==lchred(3),:);
@@ -99,7 +116,7 @@ if dbg
     axis xy;
     
     
-    plot_labcurve_rgbgamut(Lab);
+    plot_labcurve_rgbgamut(Lab, use_uplab);
     
     
     % Plot lines ontop of 
