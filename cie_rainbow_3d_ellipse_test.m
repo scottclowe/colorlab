@@ -54,7 +54,7 @@ b = P(:,2).*sin(P(:,3)/360*(2*pi));
 
 P2 = [P(:,1) a b];
 
-rgb = gd_lab2rgb(P2, use_uplab);
+rgb = soft_lab2rgb(P2, use_uplab);
 
 figure; hold on;
 set(gca,'Color',[0.4663 0.4663 0.4663]);
@@ -347,7 +347,7 @@ plot(x(end), y(end), 'ks');
 
 
 Lab = [z' x' y'];
-rgb = gd_lab2rgb(Lab, use_uplab);
+rgb = soft_lab2rgb(Lab, use_uplab);
 
 img = repmat(rgb,[1 1 20]);
 img = permute(img,[1 3 2]);
@@ -418,7 +418,7 @@ h = g.lchmesh.hgrid([1:end 1],:)/180*pi;
 aa = c.*cos(h);
 bb = c.*sin(h);
 
-CMAP = gd_lab2rgb([L(:) aa(:) bb(:)], use_uplab);
+CMAP = soft_lab2rgb([L(:) aa(:) bb(:)], use_uplab);
 
 hs = surf(aa,bb,L,reshape(CMAP,[size(L) 3]));
 set(hs,'EdgeColor','none');
@@ -531,7 +531,7 @@ y = C(2) + A * cos(t_new) * U(2) + B * sin(t_new) * V(2);
 z = C(3) + A * cos(t_new) * U(3) + B * sin(t_new) * V(3);
 
 Lab = [z' x' y'];
-rgb = gd_lab2rgb(Lab, use_uplab);
+rgb = soft_lab2rgb(Lab, use_uplab);
 
 ciebow_cmap = rgb;
 
@@ -618,7 +618,7 @@ y = C(2) + A * cos(t_new) * U(2) + B * sin(t_new) * V(2);
 z = C(3) + A * cos(t_new) * U(3) + B * sin(t_new) * V(3);
 
 Lab = [z' x' y'];
-rgb = gd_lab2rgb(Lab, use_uplab);
+rgb = soft_lab2rgb(Lab, use_uplab);
 
 ciebow_cmap = rgb;
 

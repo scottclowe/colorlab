@@ -1,4 +1,4 @@
-function Lab = gd_rgb2lab(rgb, use_uplab, spacefun)
+function Lab = soft_rgb2lab(rgb, use_uplab, spacefun)
 % Utility for converting from sRGB to CIELab (or UPLab)
 % Gracefully degrading utility
 % Uses 'spacefun' if provided ...

@@ -44,6 +44,6 @@ solve(...
     );
 end
 
-cmap = gd_lab2rgb(Lab, use_uplab, func);
+cmap = soft_lab2rgb(Lab, use_uplab, func);
 
 end

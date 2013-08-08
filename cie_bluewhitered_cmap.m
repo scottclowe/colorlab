@@ -91,7 +91,7 @@ end
 
 % Convert from Lab to srgb
 Lab  = [Lab1;Lab2];
-cmap = gd_lab2rgb(Lab, use_uplab, spacefun);
+cmap = soft_lab2rgb(Lab, use_uplab, spacefun);
 
 
 % If verbose, output figures showing colormap construction

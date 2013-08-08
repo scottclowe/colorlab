@@ -6,7 +6,7 @@ end
 
 figure;
 hold on;
-plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'kx-');
+plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'ks-');
 
 % Get a mesh version of the gamut
 rgbgamut = fetch_cielchab_gamut('srgb', [], [], use_uplab);
@@ -20,9 +20,9 @@ h = rgbgamut.lchmesh.hgrid([1:end 1],:)/180*pi;
 a = c.*cos(h);
 b = c.*sin(h);
 
-CMAP = gd_lab2rgb([L(:) a(:) b(:)], use_uplab);
+rgb = soft_lab2rgb([L(:) a(:) b(:)], use_uplab);
 
-hs = surf(a,b,L,reshape(CMAP,[size(L) 3]));
+hs = surf(a,b,L,reshape(rgb,[size(L) 3]));
 set(hs,'EdgeColor','none');
 set(hs,'FaceAlpha',0.75);
 

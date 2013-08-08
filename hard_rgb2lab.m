@@ -1,5 +1,5 @@
-function rgb = safe_lab2rgb(Lab, use_uplab)
-% Utility for converting from CIELab (or UPLab) to sRGB
+function Lab = hard_rgb2lab(rgb, use_uplab)
+% Utility for converting from sRGB to CIELab (or UPLab)
 % Gracefully degrading utility
 % Uses 'spacefun' if provided ...
 % If not, uses ImageProcessingToolbox if available ...
@@ -10,7 +10,9 @@ if nargin<2
     use_uplab = false;
 end
 
-% Move from UPLab to CIELab
+Lab = my_colorspace('RGB->Lab',rgb);
+
+% Move from CIELab to UPLab
 % UPLab was made by Bruce Lindbloom and provides a color space where the
 % Munsell colors are uniformly spaced.
 % http://www.brucelindbloom.com/index.html?UPLab.html
@@ -20,15 +22,9 @@ end
 % http://argyllcms.com/doc/iccgamutmapping.html
 if use_uplab;
     P = iccread('CIELab_to_UPLab.icc');
-    % AToB0: UPLab to CIELab
-    cform = makecform('CLUT', P, 'AToB0');
+    % BToA0: CIELab to UPLab
+    cform = makecform('CLUT', P, 'BToA0');
     Lab = applycform(Lab, cform);
-%     tempLab = nan(size(Lab));
-%     li = ~(isnan(Lab(:,1)) | isnan(Lab(:,2)) | isnan(Lab(:,3)));
-%     tempLab(li,:) = applycform(Lab(li,:), cform);
-%     Lab = tempLab;
 end
-
-rgb = my_colorspace('Lab->RGB',Lab);
 
 end

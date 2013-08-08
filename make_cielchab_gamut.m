@@ -187,7 +187,7 @@ switch lower(point_method)
 end
 
 % Swap between spaces. Use whichever function is available
-Lab = gd_rgb2lab(rgb, use_uplab);
+Lab = soft_rgb2lab(rgb, use_uplab);
 
 % Seperate Lab components
 L = Lab(:,1);
@@ -255,7 +255,7 @@ gb = lch_gamut(:,2).*sin(lch_gamut(:,3)/360*(2*pi));
 lab_gamut = [lch_gamut(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-rgb_gamut = gd_lab2rgb(lab_gamut, use_uplab);
+rgb_gamut = soft_lab2rgb(lab_gamut, use_uplab);
 
 gamut.lch           = lch_gamut;
 gamut.lab           = lab_gamut;
@@ -300,7 +300,7 @@ if use_uplab
     aa2 = cc2.*cosd(hh2);
     bb2 = cc2.*sind(hh2);
     Lab = [LL2(:) aa2(:) bb2(:)];
-    rgb = safe_lab2rgb(Lab, use_uplab);
+    rgb = hard_lab2rgb(Lab, use_uplab);
     li = rgb(:,1)<0|rgb(:,2)<0|rgb(:,3)<0|rgb(:,1)>1|rgb(:,2)>1|rgb(:,3)>1;
     
     % THIS IS WRONG.
@@ -332,7 +332,7 @@ else
     aa = cc_min.*cosd(hh);
     bb = cc_min.*sind(hh);
     Lab = [LL(:) aa(:) bb(:)];
-    rgb = safe_lab2rgb(Lab, use_uplab);
+    rgb = hard_lab2rgb(Lab, use_uplab);
     li = rgb(:,1)<0|rgb(:,2)<0|rgb(:,3)<0|rgb(:,1)>1|rgb(:,2)>1|rgb(:,3)>1;
     
     cc_min(li) = 0;
@@ -355,7 +355,7 @@ while c_intv>target_c_intv
     aa = cc_try.*cosd(hh);
     bb = cc_try.*sind(hh);
     Lab = [LL(:) aa(:) bb(:)];
-    rgb = safe_lab2rgb(Lab, use_uplab);
+    rgb = hard_lab2rgb(Lab, use_uplab);
     li = rgb(:,1)<0|rgb(:,2)<0|rgb(:,3)<0|rgb(:,1)>1|rgb(:,2)>1|rgb(:,3)>1;
     cc_min(~li) = cc_try(~li);
     cc_max( li) = cc_try( li);
@@ -363,7 +363,7 @@ end
 
 LCh = [LL(:) cc_min(:) hh(:)];
 Lab = [LCh(:,1) LCh(:,2).*cosd(LCh(:,3)) LCh(:,2).*sind(LCh(:,3))];
-rgb = safe_lab2rgb(Lab, use_uplab);
+rgb = hard_lab2rgb(Lab, use_uplab);
 
 gamut.lch           = LCh;
 gamut.lch_max       = [LL(:) cc_max(:) hh(:)];
@@ -422,8 +422,8 @@ gb = Lmax.lch(:,2).*sind(Lmax.lch(:,3));
 Lmax.lab = [Lmax.lch(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-Lmin.rgb = safe_lab2rgb(Lmin.lab, use_uplab);
-Lmax.rgb = safe_lab2rgb(Lmax.lab, use_uplab);
+Lmin.rgb = hard_lab2rgb(Lmin.lab, use_uplab);
+Lmax.rgb = hard_lab2rgb(Lmax.lab, use_uplab);
 
 lch_chr.Lmin = Lmin;
 lch_chr.Lmax = Lmax;

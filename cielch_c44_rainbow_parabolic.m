@@ -124,7 +124,7 @@ b = c.*sin(h/360*(2*pi));
 Lab = [L' a' b'];
 
 % Move from Lab into rgb
-rgb = gd_lab2rgb(Lab, use_uplab, func);
+rgb = soft_lab2rgb(Lab, use_uplab, func);
 
 % -- Plot for debug ---
 if debug

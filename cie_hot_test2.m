@@ -248,7 +248,7 @@ b = c.*sin(h/360*(2*pi));
 
 % Turn Lab into sRGB values
 Lab = [L' a' b'];
-rgb = gd_lab2rgb(Lab, use_uplab);
+rgb = soft_lab2rgb(Lab, use_uplab);
 
 % Check for points out of gamut
 [TF,P2] = isingamut(Lab,g,'Lab');

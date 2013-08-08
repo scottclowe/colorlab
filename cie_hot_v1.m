@@ -29,7 +29,7 @@ Lab(~TF,:) = P2(~TF,:);
 
 sum(TF)/n
 
-cmap = gd_lab2rgb(Lab, use_uplab, func);
+cmap = soft_lab2rgb(Lab, use_uplab, func);
 
 end
 
@@ -86,7 +86,7 @@ a = c.*cos(h/360*(2*pi));
 b = c.*sin(h/360*(2*pi));
 
 Lab = [L' a' b'];
-rgb = gd_lab2rgb(Lab);
+rgb = soft_lab2rgb(Lab);
 
 clrs = repmat(rgb,[1 1 20]);
 clrs = permute(clrs,[1 3 2]);

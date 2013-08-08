@@ -7,10 +7,16 @@ use_uplab = false;
 % hue1_range = 260:315; %0:179;
 % hue2_range =  10:70; %180+[-15:15];
 
-hue1_range = 292:.25:305; %260:315; %0:359; %260:315;
-hue2_range =  39:.25:41;  % 10:70;  %0:359; % 10:70 ;
+% hue1_range = 292:.25:305; %260:315; %0:359; %260:315;
+% hue2_range =  39:.25:41;  % 10:70;  %0:359; % 10:70 ;
 
-h2_isdynamic = 0;
+% hue1_range = 307:.25:312; %200:320; %260:315; %0:359; %260:315;
+% hue2_range =  52:.25:56; % 20:90;  % 10:70;  %0:359; % 10:70 ;
+
+hue1_range = 0:179;
+hue2_range = 180;
+
+h2_isdynamic = 1;
 
 L_range = [];
 
@@ -200,8 +206,8 @@ end
 
 %% Example of manual extraction of particular hues
 
-h1 = 296;
-h2 = 40;
+h1 = 90;
+h2 = 280;
 
 ih1 = find(hue1_range==h1);
 ih2 = find(hue2_range==h2);

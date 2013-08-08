@@ -92,7 +92,7 @@ end
 
 % Convert from Lab to srgb
 Lab  = [Lab1;Lab2];
-cmap = gd_lab2rgb(Lab, use_uplab, spacefun);
+cmap = soft_lab2rgb(Lab, use_uplab, spacefun);
 
 % If dbg, output figures showing colormap construction
 if dbg
@@ -140,7 +140,7 @@ if dbg
     bb = cc.*sind(hh);
     Lab = cat(3,LL,aa,bb);
     
-    rgb = safe_lab2rgb(Lab,use_uplab);
+    rgb = hard_lab2rgb(Lab,use_uplab);
     li = rgb(:,:,1)<0|rgb(:,:,2)<0|rgb(:,:,3)<0|rgb(:,:,1)>1|rgb(:,:,2)>1|rgb(:,:,3)>1;
     rgb(repmat(li,[1 1 3])) = .4663;
     

@@ -59,7 +59,7 @@ Ls = repmat(L,n,1);
 
 Lab = [Ls, a, b];
 
-rgb = gd_lab2rgb(Lab, use_uplab);
+rgb = soft_lab2rgb(Lab, use_uplab);
 
 % -------------------------------------------------------------------------
 if nargout<2; return; end

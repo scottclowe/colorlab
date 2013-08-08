@@ -171,7 +171,7 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = gd_lab2rgb(Lab, params.use_uplab, spacefun);
+ciebow_cmap = soft_lab2rgb(Lab, params.use_uplab, spacefun);
 
 % debugging figures
 if dbg;
@@ -212,7 +212,7 @@ if dbg;
     a = c.*cos(h);
     b = c.*sin(h);
     
-    CMAP = gd_lab2rgb([L(:) a(:) b(:)], use_uplab);
+    CMAP = soft_lab2rgb([L(:) a(:) b(:)], use_uplab);
 
     hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
     set(hs,'FaceColor','none');
@@ -321,7 +321,7 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = gd_lab2rgb(Lab, params.use_uplab, spacefun);
+ciebow_cmap = soft_lab2rgb(Lab, params.use_uplab, spacefun);
 
 % debugging figures
 if dbg;
@@ -362,7 +362,7 @@ if dbg;
     a = c.*cos(h);
     b = c.*sin(h);
 
-    CMAP = gd_lab2rgb([L(:) a(:) b(:)], use_uplab);
+    CMAP = soft_lab2rgb([L(:) a(:) b(:)], use_uplab);
 
     hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
     set(hs,'FaceColor','none');

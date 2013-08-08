@@ -34,7 +34,7 @@ b = c.*sin(h/360*(2*pi));
 
 % Turn Lab into sRGB values
 Lab = [L' a' b'];
-cmap = gd_lab2rgb(Lab, params.use_uplab, spacefun);
+cmap = soft_lab2rgb(Lab, params.use_uplab, spacefun);
 
 % -------------------------------------------------------------------------
 if dbg
