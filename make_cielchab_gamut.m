@@ -278,7 +278,7 @@ end
 % space and see if is in known gamut.
 function gamut = make_gamut_lh_v2(space, N, use_uplab)
 
-target_c_intv = 2^-4;
+target_c_intv = 2^-5;
 Lintv = 100/N;
 hintv = min(1,Lintv*2);
 L = 0:Lintv:100;
