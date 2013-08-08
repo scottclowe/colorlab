@@ -4,15 +4,17 @@ close all;
 
 %% Parameters
 
-use_uplab = false;
+use_uplab = true;
 
-handpicked_bwr_hue1 = 296; %[]; % 290; % Blue
-handpicked_bwr_hue2 = 40; %[]; % 41;  % Red
+% CIELab bwr: 296, 40
+% UPLab bwr:  309, 54.75
+handpicked_bwr_hue1 = 309; %[]; % 290; % Blue
+handpicked_bwr_hue2 = 54.75; %[]; % 41;  % Red
 
 via_black = 0; % Go via near-white (0) or near-black (1)
 
-hue1_range = 292:.25:305; %260:315; %0:359; %260:315;
-hue2_range =  39:.25:41;  % 10:70;  %0:359; % 10:70 ;
+hue1_range = 307:.25:312; %200:320; %260:315; %0:359; %260:315;
+hue2_range =  52:.25:56; % 20:90;  % 10:70;  %0:359; % 10:70 ;
 
 
 %% Main body
@@ -207,12 +209,12 @@ switch via_black
 end
 initL = jointL(valid_I);
 
-% Plot the blue and red chroma curves to see how well they match
-figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-plot(gh1(:,1),gh1(:,2),'b-');
-plot(gh2(:,1),gh2(:,2),'r-');
-% plot(jointL,jointC,'kx');
-title(sprintf('Best seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
+% % Plot the blue and red chroma curves to see how well they match
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
+% plot(gh1(:,1),gh1(:,2),'b-');
+% plot(gh2(:,1),gh2(:,2),'r-');
+% % plot(jointL,jointC,'kx');
+% title(sprintf('Best seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
 
     % Given a gradient, compute the chroma values for each L
 %     C = m*L+k
@@ -259,14 +261,26 @@ title(sprintf('Best seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
     sep_dist = sqrt((Lstart-Lend).^2+Cstart.^2);
     
 
-% Plot derivation of map
+% % Plot derivation of map
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
+% plot(jointL,jointC,'k-');
+% plot(initL,initC,'y-');
+% plot(Lend,0,'yo');
+% plot(moveL,moveC,'g-');
+% plot(Lstart,Cstart,'go');
+% title(sprintf('Chosen seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
+
+% Plot the blue and red chroma curves to see how well they match
+% WITH derivation of map
 figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-plot(jointL,jointC,'k-');
+plot(gh1(:,1),gh1(:,2),'b-');
+plot(gh2(:,1),gh2(:,2),'r-');
 plot(initL,initC,'y-');
 plot(Lend,0,'yo');
 plot(moveL,moveC,'g-');
 plot(Lstart,Cstart,'go');
-title(sprintf('Best seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
+% plot(jointL,jointC,'kx');
+title(sprintf('Chosen seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
 
 
 % Plot sample colormap
@@ -299,6 +313,141 @@ fprintf('Best 2norm seperation solution, Lab: %s -> %s -> %s\n',...
     mat2str([Lstart Cstart*cosd(hue1) Cstart*sind(hue1)]),...
     mat2str([Lend 0 0]),...
     mat2str([Lstart Cstart*cosd(hue2) Cstart*sind(hue2)]));
+
+%% Best chroma seperation
+
+% m = best_sep_m;
+
+[n_best_C_sep,I] = max(all_best_C_sep(:));
+m = all_best_C_sep_m(I);
+[ih1,ih2] = ind2sub(size(all_best_C_sep),I);
+
+hue1 = hue1_range(ih1);
+hue2 = hue2_range(ih2);
+
+gh1 = g.lch(g.lch(:,3)==hue1,:);
+gh2 = g.lch(g.lch(:,3)==hue2,:);
+
+jointL = intersect(gh1(:,1),gh2(:,1));
+gh1 = gh1(ismember(gh1(:,1),jointL),:);
+gh2 = gh2(ismember(gh1(:,1),jointL),:);
+
+jointC = min(gh1(:,2),gh2(:,2));
+[Cmax,I_Cmax] = max(jointC);
+L_Cmax = gh2(I_Cmax,1);
+
+switch via_black
+    case 0
+        valid_I = I_Cmax:length(jointC);
+    case 1
+        valid_I = 1:I_Cmax;
+    otherwise
+        error('Bad via colour');
+end
+initL = jointL(valid_I);
+
+% % Plot the blue and red chroma curves to see how well they match
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
+% plot(gh1(:,1),gh1(:,2),'b-');
+% plot(gh2(:,1),gh2(:,2),'r-');
+% % plot(jointL,jointC,'kx');
+% title(sprintf('Best C max (%d, %d) = %.2f',hue1,hue2,Cstart));
+
+
+    % Given a gradient, compute the chroma values for each L
+%     C = m*L+k
+    % Since L=100 has C=0, curve is offset by
+%     k = C-m*L
+    if via_black
+        initk = 0;
+    else
+        initk = -m*100;
+    end
+    initC = m*initL+initk;
+    
+    % Find min chroma offset needed so all datapoints are in gamut
+    k = initk - max(initC - jointC(valid_I));
+    
+    % Find the intersection of this moved line with C=0
+%     C = m*L+k
+%     0 = m*Lend+k
+%     Lend = -k/m
+    Lend = -k/m;
+    
+    % Now we know the L start value needed to make this gradient work
+    
+    % Find the furthest we can draw the line before intersecting chroma
+    % boundary
+    if via_black
+        moveL = jointL(jointL>=Lend);
+    else
+        moveL = jointL(jointL<=Lend);
+    end
+    moveC = m*moveL+k;
+    if via_black
+        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
+        if I_start<0; continue; end;
+    else
+        I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
+        if I_start>length(moveC); continue; end;
+    end
+    Lstart = jointL(I_start);
+    Cstart = moveC(I_start);
+
+
+% % Plot derivation of map
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
+% plot(jointL,jointC,'k-');
+% plot(initL,initC,'y-');
+% plot(Lend,0,'yo');
+% plot(moveL,moveC,'g-');
+% plot(Lstart,Cstart,'go');
+% title(sprintf('Chosen seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
+
+% Plot the blue and red chroma curves to see how well they match
+% WITH derivation of map
+figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
+plot(gh1(:,1),gh1(:,2),'b-');
+plot(gh2(:,1),gh2(:,2),'r-');
+plot(initL,initC,'y-');
+plot(Lend,0,'yo');
+plot(moveL,moveC,'g-');
+plot(Lstart,Cstart,'go');
+% plot(jointL,jointC,'kx');
+title(sprintf('Chosen seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
+
+
+% Plot sample colormap
+neach = 32;
+L1 = linspace(Lstart            , Lend, neach);
+a1 = linspace(Cstart*cosd(hue1),    0, neach);
+b1 = linspace(Cstart*sind(hue1),    0, neach);
+
+L2 = linspace(Lend, Lstart            , neach);
+a2 = linspace(   0, Cstart*cosd(hue2), neach);
+b2 = linspace(   0, Cstart*sind(hue2), neach);
+
+Lab1 = [L1' a1' b1'];
+Lab2 = [L2' a2' b2'];
+Lab  = [Lab1;Lab2];
+cmap = gd_lab2rgb(Lab, use_uplab);
+
+img = repmat(cmap,[1 1 20]);
+img = permute(img,[1 3 2]);
+figure;
+imagesc(img);
+axis xy;
+title(sprintf('Best C max (%d, %d) = %.2f',hue1,hue2,Cstart));
+
+fprintf('Best chroma seperation solution, LCh: %s -> %s -> %s\n',...
+    mat2str([Lstart Cstart hue1]),...
+    mat2str([Lend 0 0]),...
+    mat2str([Lstart Cstart hue2]));
+fprintf('Best chroma seperation solution, Lab: %s -> %s -> %s\n',...
+    mat2str([Lstart Cstart*cosd(hue1) Cstart*sind(hue1)]),...
+    mat2str([Lend 0 0]),...
+    mat2str([Lstart Cstart*cosd(hue2) Cstart*sind(hue2)]));
+
 
 %% Chosen hues, for its optimal seperation
 
@@ -337,12 +486,12 @@ switch via_black
 end
 initL = jointL(valid_I);
 
-% Plot the blue and red chroma curves to see how well they match
-figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-plot(gh1(:,1),gh1(:,2),'b-');
-plot(gh2(:,1),gh2(:,2),'r-');
-% plot(jointL,jointC,'kx');
-title(sprintf('Chosen seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
+% % Plot the blue and red chroma curves to see how well they match
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
+% plot(gh1(:,1),gh1(:,2),'b-');
+% plot(gh2(:,1),gh2(:,2),'r-');
+% % plot(jointL,jointC,'kx');
+% title(sprintf('Chosen seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
 
 
     % Given a gradient, compute the chroma values for each L
@@ -390,15 +539,26 @@ title(sprintf('Chosen seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
     sep_dist = sqrt((Lstart-Lend).^2+Cstart.^2);
     
 
-% Plot derivation of map
+% % Plot derivation of map
+% figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
+% plot(jointL,jointC,'k-');
+% plot(initL,initC,'y-');
+% plot(Lend,0,'yo');
+% plot(moveL,moveC,'g-');
+% plot(Lstart,Cstart,'go');
+% title(sprintf('Chosen seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
+
+% Plot the blue and red chroma curves to see how well they match
+% WITH derivation of map
 figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-plot(jointL,jointC,'k-');
+plot(gh1(:,1),gh1(:,2),'b-');
+plot(gh2(:,1),gh2(:,2),'r-');
 plot(initL,initC,'y-');
 plot(Lend,0,'yo');
 plot(moveL,moveC,'g-');
 plot(Lstart,Cstart,'go');
+% plot(jointL,jointC,'kx');
 title(sprintf('Chosen seperation distance (%d, %d) = %.2f',hue1,hue2,sep_dist));
-
 
 % Plot sample colormap
 neach = 32;
@@ -427,128 +587,6 @@ fprintf('Chosen hues solution, LCh: %s -> %s -> %s\n',...
     mat2str([Lend 0 0]),...
     mat2str([Lstart Cstart hue2]));
 fprintf('Chosen hues solution, Lab: %s -> %s -> %s\n',...
-    mat2str([Lstart Cstart*cosd(hue1) Cstart*sind(hue1)]),...
-    mat2str([Lend 0 0]),...
-    mat2str([Lstart Cstart*cosd(hue2) Cstart*sind(hue2)]));
-
-%% Best chroma seperation
-
-% m = best_sep_m;
-
-[n_best_C_sep,I] = max(all_best_C_sep(:));
-m = all_best_C_sep_m(I);
-[ih1,ih2] = ind2sub(size(all_best_C_sep),I);
-
-hue1 = hue1_range(ih1);
-hue2 = hue2_range(ih2);
-
-gh1 = g.lch(g.lch(:,3)==hue1,:);
-gh2 = g.lch(g.lch(:,3)==hue2,:);
-
-jointL = intersect(gh1(:,1),gh2(:,1));
-gh1 = gh1(ismember(gh1(:,1),jointL),:);
-gh2 = gh2(ismember(gh1(:,1),jointL),:);
-
-jointC = min(gh1(:,2),gh2(:,2));
-[Cmax,I_Cmax] = max(jointC);
-L_Cmax = gh2(I_Cmax,1);
-
-switch via_black
-    case 0
-        valid_I = I_Cmax:length(jointC);
-    case 1
-        valid_I = 1:I_Cmax;
-    otherwise
-        error('Bad via colour');
-end
-initL = jointL(valid_I);
-
-% Plot the blue and red chroma curves to see how well they match
-figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-plot(gh1(:,1),gh1(:,2),'b-');
-plot(gh2(:,1),gh2(:,2),'r-');
-% plot(jointL,jointC,'kx');
-title(sprintf('Best C max (%d, %d) = %.2f',hue1,hue2,Cstart));
-
-
-    % Given a gradient, compute the chroma values for each L
-%     C = m*L+k
-    % Since L=100 has C=0, curve is offset by
-%     k = C-m*L
-    if via_black
-        initk = 0;
-    else
-        initk = -m*100;
-    end
-    initC = m*initL+initk;
-    
-    % Find min chroma offset needed so all datapoints are in gamut
-    k = initk - max(initC - jointC(valid_I));
-    
-    % Find the intersection of this moved line with C=0
-%     C = m*L+k
-%     0 = m*Lend+k
-%     Lend = -k/m
-    Lend = -k/m;
-    
-    % Now we know the L start value needed to make this gradient work
-    
-    % Find the furthest we can draw the line before intersecting chroma
-    % boundary
-    if via_black
-        moveL = jointL(jointL>=Lend);
-    else
-        moveL = jointL(jointL<=Lend);
-    end
-    moveC = m*moveL+k;
-    if via_black
-        I_start = find(moveC>jointC(jointL>=Lend),1,'first')-1;
-        if I_start<0; continue; end;
-    else
-        I_start = find(moveC>jointC(jointL<=Lend),1,'last')+1;
-        if I_start>length(moveC); continue; end;
-    end
-    Lstart = jointL(I_start);
-    Cstart = moveC(I_start);
-
-
-% Plot derivation of map
-figure;hold on;set(gca,'Color',[.467 .467 .467]);box on;
-plot(jointL,jointC,'k-');
-plot(initL,initC,'y-');
-plot(Lend,0,'yo');
-plot(moveL,moveC,'g-');
-plot(Lstart,Cstart,'go');
-title(sprintf('Best C max (%d, %d) = %.2f',hue1,hue2,Cstart));
-
-
-% Plot sample colormap
-neach = 32;
-L1 = linspace(Lstart            , Lend, neach);
-a1 = linspace(Cstart*cosd(hue1),    0, neach);
-b1 = linspace(Cstart*sind(hue1),    0, neach);
-
-L2 = linspace(Lend, Lstart            , neach);
-a2 = linspace(   0, Cstart*cosd(hue2), neach);
-b2 = linspace(   0, Cstart*sind(hue2), neach);
-
-Lab1 = [L1' a1' b1'];
-Lab2 = [L2' a2' b2'];
-Lab  = [Lab1;Lab2];
-cmap = gd_lab2rgb(Lab, use_uplab);
-
-img = repmat(cmap,[1 1 20]);
-img = permute(img,[1 3 2]);
-figure;
-imagesc(img);
-axis xy;
-title(sprintf('Best C max (%d, %d) = %.2f',hue1,hue2,Cstart));
-
-fprintf('Best chroma seperation solution, LCh: %s -> %s -> %s\n',...
-    mat2str([Lstart Cstart hue1]),...
-    mat2str([Lend 0 0]),...
-    mat2str([Lstart Cstart hue2]));
-fprintf('Best chroma seperation solution, Lab: %s -> %s -> %s\n',...
     mat2str([Lstart Cstart*cosd(hue1) Cstart*sind(hue1)]),...
     mat2str([Lend 0 0]),...
     mat2str([Lstart Cstart*cosd(hue2) Cstart*sind(hue2)]));
