@@ -31,6 +31,8 @@ switch lower(point_method)
         point_method = 'face'; % Canonical
     case {'face-plus'}
         point_method = 'face-plus'; % Canonical
+    case {'inv'}
+        point_method = 'inv'; % Canonical
     otherwise
         error('Unknown point picking method');
 end
@@ -42,6 +44,8 @@ if isempty(N)
             N = 1024; % 64-bit open cube
         case 'face-plus'
             N = 1024;
+        case 'inv'
+            N = 200;
         otherwise
             error('Unknown point method');
     end
@@ -51,19 +55,31 @@ end
 % kform = makecform('cmyk2srgb', 'RenderingIntent', 'RelativeColorimetric');
 
 % Make the main gamut object
-gamut = make_gamut_lh(space, N, point_method, use_uplab);
-
-% Have to compute again to find a format for the gamut which lets us browse
-% by chroma
-gamut.lch_chr = make_gamut_chr(gamut, use_uplab);
-
-% Make a mesh we can interpolate on
-gamut.lchmesh = make_gamut_mesh(gamut);
+switch point_method
+    case {'cube','face','face-plus'}
+        warning('Forward gamut generation is inefficient. Use inverse method.');
+        gamut = make_gamut_lh(space, N, point_method, use_uplab);
+        % Make a mesh we can interpolate on
+        gamut.lchmesh = make_gamut_mesh(gamut);
+    case {'inv'}
+        gamut = make_gamut_lh_v2(space, N, use_uplab);
+    otherwise
+            error('Unknown point method');
+end
+gamut.point_method  = point_method;
+ 
+% % Have to compute again to find a format for the gamut which lets us browse
+% % by chroma
+% gamut.lch_chr = parse_gamut_chr(gamut, use_uplab);
 
 end
 
 
+
 % Make a gamut indexed by lightness and hue
+% Made by generating lots of points in source space and converting them to
+% the destination (PCS) space. Have to round and max to make this in nice
+% intervals in the PCS, which makes the gamut look larger than it is.
 function gamut = make_gamut_lh(space, N, point_method, use_uplab)
 
 % Don't want these to be 3,6,7,9,11,...
@@ -247,19 +263,136 @@ gamut.rgb           = rgb_gamut;
 gamut.space         = space;
 gamut.N             = N;
 gamut.Ntot          = Ntot;
-gamut.point_method  = point_method;
 gamut.Lprec         = Lprec;
 gamut.Lintv         = Lintv;
 gamut.hprec         = hprec;
 gamut.hintv         = hintv;
 
+
 end
 
 
-% Make a gamut indexed by chroma
-function [lch_chr] = make_gamut_chr(g, use_uplab)
 
-max_c = max(g.lch(:,3));
+% Make a gamut indexed by lightness and hue
+% Generate points in representation (PCS) space, then transform into source
+% space and see if is in known gamut.
+function gamut = make_gamut_lh_v2(space, N, use_uplab)
+
+target_c_intv = 2^-4;
+Lintv = 100/N;
+hintv = min(1,Lintv*2);
+L = 0:Lintv:100;
+h = 0:hintv:360;
+h(end) = [];
+
+% L = 0:intv:100;
+% h = 0:intv:360;
+
+[LL,hh] = meshgrid(L,h);
+
+if use_uplab
+    % UPLab representation has holes. Need to find inside of the holes.
+    % Generate points with interval of 1
+    c_intv = 2;
+    c_init = 0:c_intv:160;
+    [LL2,hh2,cc2] = meshgrid(L,h,c_init);
+%     [hh,LL,cc] = ndgrid(h,L,C_init);
+    aa2 = cc2.*cosd(hh2);
+    bb2 = cc2.*sind(hh2);
+    Lab = [LL2(:) aa2(:) bb2(:)];
+    rgb = safe_lab2rgb(Lab, use_uplab);
+    li = rgb(:,1)<0|rgb(:,2)<0|rgb(:,3)<0|rgb(:,1)>1|rgb(:,2)>1|rgb(:,3)>1;
+    
+    % THIS IS WRONG.
+%     cc2(li) = NaN; % Clear anything outside gamut
+%     cc_min = max(cc2,[],3); % Find the max in gamut
+%     cc_max = cc_min+c_intv; % True value no more than c_intv greater
+    
+    % Half-baked solution
+%     li = reshape(li,length(h),length(L),length(C_init));
+%     li = cat(3, ~li(:,:,1:end-1) & li(:,:,2:end), ~li(:,:,end));
+%     cc2(~li) = NaN;
+    
+    % Working solution
+    cc2(~li) = NaN; % Clear anything INSIDE gamut
+    cc_max = min(cc2,[],3); % Find the first edge of the gamut
+    cc_min = cc_max-c_intv; % Min value is no less than c_intv before this
+    cc_min(cc_min<0) = 0;
+    
+    Ntot = length(LL)*length(hh)*length(c_init) + ...
+        ceil(log2(c_intv/target_c_intv))*length(L)*length(h);
+else
+    % CIELab representation is isomorphic
+    % Generate points which match a power of two
+    c_intv = 2^8;
+    cc_min = zeros(size(LL));
+    cc_max = repmat(c_intv,size(LL));
+    
+    % Check 0 chroma is in gamut too
+    aa = cc_min.*cosd(hh);
+    bb = cc_min.*sind(hh);
+    Lab = [LL(:) aa(:) bb(:)];
+    rgb = safe_lab2rgb(Lab, use_uplab);
+    li = rgb(:,1)<0|rgb(:,2)<0|rgb(:,3)<0|rgb(:,1)>1|rgb(:,2)>1|rgb(:,3)>1;
+    
+    cc_min(li) = 0;
+    cc_max(li) = 0;
+    
+    Ntot = ceil(log2(c_intv/target_c_intv))*length(L)*length(h);
+end
+% 
+% % Manually set L=0 and L=100
+% cc_min([1 end],:) = 0;
+
+% Iterate until we have an match as close as necessary
+% Perform bisection between c_max and c_min for every L and h
+% We can bisect every L and h value at once
+n_iter = 0;
+while c_intv>target_c_intv
+    n_iter = n_iter+1;
+    c_intv = c_intv/2;
+    cc_try = cc_min+c_intv;
+    aa = cc_try.*cosd(hh);
+    bb = cc_try.*sind(hh);
+    Lab = [LL(:) aa(:) bb(:)];
+    rgb = safe_lab2rgb(Lab, use_uplab);
+    li = rgb(:,1)<0|rgb(:,2)<0|rgb(:,3)<0|rgb(:,1)>1|rgb(:,2)>1|rgb(:,3)>1;
+    cc_min(~li) = cc_try(~li);
+    cc_max( li) = cc_try( li);
+end
+
+LCh = [LL(:) cc_min(:) hh(:)];
+Lab = [LCh(:,1) LCh(:,2).*cosd(LCh(:,3)) LCh(:,2).*sind(LCh(:,3))];
+rgb = safe_lab2rgb(Lab, use_uplab);
+
+gamut.lch           = LCh;
+gamut.lch_max       = [LL(:) cc_max(:) hh(:)];
+gamut.lab           = Lab;
+gamut.rgb           = rgb;
+gamut.space         = space;
+gamut.N             = N;
+gamut.Ntot          = Ntot;
+gamut.Lprec         = 0;
+gamut.Lintv         = Lintv;
+gamut.hprec         = 0;
+gamut.hintv         = hintv;
+gamut.cintv         = c_intv;
+
+gamut.lchmesh.Lvec  = L;
+gamut.lchmesh.hvec  = h;
+gamut.lchmesh.Lgrid = LL;
+gamut.lchmesh.hgrid = hh;
+gamut.lchmesh.cgrid = cc_min;
+gamut.lchmesh.cgrid_max = cc_max;
+
+end
+
+
+
+% Make a gamut indexed by chroma
+function [lch_chr] = parse_gamut_chr(g, use_uplab)
+
+max_c = max(g.lch(:,2));
 hues = unique(g.lch(:,3));
 Lmin.lch = nan((max_c+1)*length(hues),3);
 Lmax.lch = nan((max_c+1)*length(hues),3);
@@ -280,18 +413,17 @@ end
 Lmin.lch = Lmin.lch(1:i,:);
 Lmax.lch = Lmax.lch(1:i,:);
 
-ga = Lmin.lch(:,2).*cos(Lmin.lch(:,3)/360*(2*pi));
-gb = Lmin.lch(:,2).*sin(Lmin.lch(:,3)/360*(2*pi));
+ga = Lmin.lch(:,2).*cosd(Lmin.lch(:,3));
+gb = Lmin.lch(:,2).*sind(Lmin.lch(:,3));
 Lmin.lab = [Lmin.lch(:,1) ga gb];
 
-ga = Lmax.lch(:,2).*cos(Lmax.lch(:,3)/360*(2*pi));
-gb = Lmax.lch(:,2).*sin(Lmax.lch(:,3)/360*(2*pi));
+ga = Lmax.lch(:,2).*cosd(Lmax.lch(:,3));
+gb = Lmax.lch(:,2).*sind(Lmax.lch(:,3));
 Lmax.lab = [Lmax.lch(:,1) ga gb];
 
 % Move back to RGB so we have a set of colors we can show
-Lmin.rgb = gd_lab2rgb(Lmin.lab, use_uplab);
-Lmax.rgb = gd_lab2rgb(Lmax.lab, use_uplab);
-
+Lmin.rgb = safe_lab2rgb(Lmin.lab, use_uplab);
+Lmax.rgb = safe_lab2rgb(Lmax.lab, use_uplab);
 
 lch_chr.Lmin = Lmin;
 lch_chr.Lmax = Lmax;

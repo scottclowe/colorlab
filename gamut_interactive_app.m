@@ -323,11 +323,12 @@ switch get(get(handles.pcs,'SelectedObject'),'Tag')
         error('Unfamiliar dial position');
 end
 
-handles.rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face-plus', handles.use_uplab);
+% handles.rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face-plus', handles.use_uplab);
+handles.rgbgamut = fetch_cielchab_gamut('srgb', [], [], handles.use_uplab);
 
-if ~isfield(handles.rgbgamut,'lch_chr')
-    handles.rgbgamut.lch_chr = find_gamut_chr(handles.rgbgamut);
-end
+% if ~isfield(handles.rgbgamut,'lch_chr')
+%     handles.rgbgamut.lch_chr = find_gamut_chr(handles.rgbgamut);
+% end
 if ~isfield(handles.rgbgamut,'lchmesh')
     handles.rgbgamut.lchmesh = make_gamut_mesh(handles.rgbgamut);
 end
@@ -399,8 +400,7 @@ h = v;
 L = 0:intv:100;
 c = -handles.cmax:intv:handles.cmax;
 
-cc = meshgrid(c,L);
-LL = meshgrid(L,c)';
+[cc,LL] = meshgrid(c,L);
 hh = repmat(h,size(cc));
 
 aa = cc.*cosd(hh);
@@ -561,8 +561,7 @@ intv = get_plot_intv(handles);
 L = v;
 a = [-fliplr(0:intv:handles.cmax) 0:intv:handles.cmax];
 b = a;
-aa = meshgrid(a,b);
-bb = meshgrid(b,a)';
+[aa,bb] = meshgrid(a,b);
 LL = repmat(L,size(aa));
 
 Lab = cat(3,LL,aa,bb);
@@ -586,8 +585,7 @@ intv = get_plot_intv(handles);
 L = v;
 a = [-fliplr(0:intv:maxc) 0:intv:maxc];
 b = a;
-aa = meshgrid(a,b);
-bb = meshgrid(b,a)';
+[aa,bb] = meshgrid(a,b);
 LL = repmat(L,size(aa));
 
 Lab = cat(3,LL,aa,bb);
@@ -749,8 +747,7 @@ c = v;
 L = 0:intv:100;
 h = 0:intv:360;
 
-hh = meshgrid(h,L);
-LL = meshgrid(L,h)';
+[hh,LL] = meshgrid(h,L);
 cc = repmat(c,size(hh));
 
 aa = cc.*cosd(hh);
