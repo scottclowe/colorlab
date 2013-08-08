@@ -2,10 +2,15 @@ clear all;
 
 %% Parameters
 
-hue1_range = 0:179;
-hue2_range = 180+[-15:15];
+use_uplab = false;
 
-h2_isdynamic = 1;
+% hue1_range = 260:315; %0:179;
+% hue2_range =  10:70; %180+[-15:15];
+
+hue1_range = 292:.25:305; %260:315; %0:359; %260:315;
+hue2_range =  39:.25:41;  % 10:70;  %0:359; % 10:70 ;
+
+h2_isdynamic = 0;
 
 L_range = [];
 
@@ -20,7 +25,7 @@ disp('------------------------------------------------------------------');
 
 hue1_range = mod(hue1_range,360);
 
-g = fetch_cielchab_gamut('srgb');
+g = fetch_cielchab_gamut('srgb', [], [], use_uplab);
 
 all_sep      = nan(length(hue1_range),min(length(hue2_range),1));
 all_Cjoint   = nan(length(hue1_range),min(length(hue2_range),1));
@@ -192,3 +197,17 @@ else
 
 
 end
+
+%% Example of manual extraction of particular hues
+
+h1 = 296;
+h2 = 40;
+
+ih1 = find(hue1_range==h1);
+ih2 = find(hue2_range==h2);
+C = all_Cjoint(ih1,ih2);
+L = all_Cjoint_L(ih1,ih2);
+
+Lch_start = [L C h1];
+Lch_end   = [L C h2];
+
