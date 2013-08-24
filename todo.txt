@@ -1,11 +1,12 @@
 TO DO
 
 [ ] - Try ciebow with linear L*
-[ ] - Script to automatically find best "pinched helix"
-[ ] - blue-white-red which goes to darker shades
+[ ] - Script to automatically find best "pinched helix" (hot)
 [ ] - programmatically find suitable range to x-white-y with darker shades
-[ ] - green-white-purple
-[ ] - cyan-black-yellow
+[ ] - blue-white-red which goes to darker shades
+[ ] - green-white-purple colormap
+[ ] - cyan-black-yellow colormap
+[ ] - hot-and-cold colormap
 [ ] - Swap to colorspace based gamut
 [ ] - Shrink previous colormaps to be in gamut
 [ ] - UPLab
