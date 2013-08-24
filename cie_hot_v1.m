@@ -1,10 +1,7 @@
-function cmap = cie_hot_v1(n, func)
+function cmap = cie_hot_v1(n)
 
 if nargin<1
     n = size(get(gcf,'colormap'),1);
-end
-if nargin<2
-    func = [];
 end
 
 use_uplab = false;
@@ -29,7 +26,7 @@ Lab(~TF,:) = P2(~TF,:);
 
 sum(TF)/n
 
-cmap = soft_lab2rgb(Lab, use_uplab, func);
+cmap = soft_lab2rgb(Lab, use_uplab);
 
 end
 

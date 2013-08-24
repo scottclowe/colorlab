@@ -1,12 +1,9 @@
-function cmap = cie_blueyellow_cmap(n, attributes, spacefun, dbg)
+function cmap = cie_blueyellow_cmap(n, attributes, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
-if nargin<4 || isempty(dbg)
+if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
-end
-if nargin<3
-    spacefun = []; % function to map from cielab to srgb
 end
 if nargin<2 || isempty(attributes)
     attributes = 'a0'; % Colormap type option
@@ -59,7 +56,7 @@ b = linspace(lab1(3), lab2(3), n);
 
 Lab = [L' a' b'];
 
-cmap = soft_lab2rgb(Lab, use_uplab, spacefun);
+cmap = soft_lab2rgb(Lab, use_uplab);
 
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap

@@ -1,4 +1,4 @@
-function rgb = soft_lab2rgb(Lab, use_uplab, spacefun)
+function rgb = soft_lab2rgb(Lab, use_uplab)
 % Utility for converting from CIELab (or UPLab) to sRGB
 % Gracefully degrading utility
 % Uses 'spacefun' if provided ...
@@ -6,17 +6,10 @@ function rgb = soft_lab2rgb(Lab, use_uplab, spacefun)
 % If not, uses colorspace (which is a function available on FEX) ...
 % If not, recommends download of colorspace (using suggestFEXpackage)
 
-if nargin<3
-    spacefun = [];
-end
 if nargin<2
     use_uplab = false;
 end
 
-if ~isempty(spacefun)
-    rgb = spacefun(Lab);
-    return;
-end
 
 % Move from UPLab to CIELab
 % UPLab was made by Bruce Lindbloom and provides a color space where the

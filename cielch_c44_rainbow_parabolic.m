@@ -3,16 +3,13 @@
 
 % First can be readily fixed, second cannot
 
-function rgb = cielch_c44_rainbow_parabolic(n, func, debug)
+function rgb = cielch_c44_rainbow_parabolic(n, debug)
 
 % Input handling
 if nargin<1
     n = size(get(gcf,'colormap'),1);
 end
 if nargin<2
-    func = [];
-end
-if nargin<3
     debug = 0;
 end
 
@@ -124,7 +121,7 @@ b = c.*sin(h/360*(2*pi));
 Lab = [L' a' b'];
 
 % Move from Lab into rgb
-rgb = soft_lab2rgb(Lab, use_uplab, func);
+rgb = soft_lab2rgb(Lab, use_uplab);
 
 % -- Plot for debug ---
 if debug

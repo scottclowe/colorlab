@@ -1,4 +1,4 @@
-function Lab = soft_rgb2lab(rgb, use_uplab, spacefun)
+function Lab = soft_rgb2lab(rgb, use_uplab)
 % Utility for converting from sRGB to CIELab (or UPLab)
 % Gracefully degrading utility
 % Uses 'spacefun' if provided ...
@@ -6,16 +6,8 @@ function Lab = soft_rgb2lab(rgb, use_uplab, spacefun)
 % If not, uses colorspace (which is a function available on FEX) ...
 % If not, recommends download of colorspace (using suggestFEXpackage)
 
-if nargin<3
-    spacefun = [];
-end
 if nargin<2
     use_uplab = false;
-end
-
-if ~isempty(spacefun)
-    Lab = spacefun(rgb);
-    return;
 end
 
 

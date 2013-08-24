@@ -1,12 +1,9 @@
-function cmap = cie_rainbow_cmap_make(n, attributes, spacefun, dbg)
+function cmap = cie_rainbow_cmap_make(n, attributes, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
-if nargin<4 || isempty(dbg)
+if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
-end
-if nargin<3
-    spacefun = []; % function to map from cielab to srgb
 end
 if nargin<2 || isempty(attributes)
     attributes = 'greenmid'; % Colormap type option
@@ -28,9 +25,9 @@ end
     
 switch lower(typ)
     case 'smooth'
-        cmap = cie_rainbow_cmap_make_smooth(n, paramset, spacefun, dbg);
+        cmap = cie_rainbow_cmap_make_smooth(n, paramset, dbg);
     case 'greenmid'
-        cmap = cie_rainbow_cmap_make_greenmid(n, paramset, spacefun, dbg);
+        cmap = cie_rainbow_cmap_make_greenmid(n, paramset, dbg);
     otherwise
         error('Unfamiliar colormap attribute: %s',typ);
 end
@@ -108,7 +105,7 @@ btsp_t_end = t(I_srt-1+find(de_end>1,1,'last'));
 end
 
 
-function ciebow_cmap = cie_rainbow_cmap_make_smooth(n_target, paramset, spacefun, dbg)
+function ciebow_cmap = cie_rainbow_cmap_make_smooth(n_target, paramset, dbg)
 
 params = get_rainbow_ellipse_params(paramset);
 rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face');
@@ -171,7 +168,7 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = soft_lab2rgb(Lab, params.use_uplab, spacefun);
+ciebow_cmap = soft_lab2rgb(Lab, params.use_uplab);
 
 % debugging figures
 if dbg;
@@ -230,7 +227,7 @@ end
 end
 
 
-function ciebow_cmap = cie_rainbow_cmap_make_greenmid(n_target, paramset, spacefun, dbg)
+function ciebow_cmap = cie_rainbow_cmap_make_greenmid(n_target, paramset, dbg)
 % Option to have same amount of red as blue
 % This is a very simple method used where the curve is split in two and
 % there are different Delta E values between colours in each.
@@ -321,7 +318,7 @@ y = params.C(2) + params.a * cos(t_new) * params.U(2) + params.b * sin(t_new) * 
 z = params.C(3) + params.a * cos(t_new) * params.U(3) + params.b * sin(t_new) * params.V(3);
 
 Lab = [z' x' y'];
-ciebow_cmap = soft_lab2rgb(Lab, params.use_uplab, spacefun);
+ciebow_cmap = soft_lab2rgb(Lab, params.use_uplab);
 
 % debugging figures
 if dbg;

@@ -1,4 +1,4 @@
-function cmap = cie_bluewhitered_cmap(n, spacefun, verbose)
+function cmap = cie_bluewhitered_cmap(n, verbose)
 
 % -------------------------------------------------------------------------
 % Default inputs
@@ -6,9 +6,6 @@ if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1);
 end
 if nargin<2
-    spacefun = [];
-end
-if nargin<3
     verbose = false;
 end
 
@@ -91,7 +88,7 @@ end
 
 % Convert from Lab to srgb
 Lab  = [Lab1;Lab2];
-cmap = soft_lab2rgb(Lab, use_uplab, spacefun);
+cmap = soft_lab2rgb(Lab, use_uplab);
 
 
 % If verbose, output figures showing colormap construction

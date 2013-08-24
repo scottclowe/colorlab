@@ -1,12 +1,9 @@
-function cmap = load_cmap(n, makefun, attr, spacefun, dbg)
+function cmap = load_cmap(n, makefun, attr, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
-if nargin<4 || isempty(dbg)
+if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
-end
-if nargin<3
-    spacefun = []; % function to map from cielab to srgb
 end
 if nargin<2 || isempty(attr)
     attr = []; % Colormap type option
@@ -50,7 +47,7 @@ if ~exist(file,'file') || size(raw_cmap,1)<n_file
     if ~exist(dirname,'dir'); mkdir(dirname); end
     
     % Make a highly sampled colormap to store for future use
-    raw_cmap = makefun(n_file, attr, spacefun, dbg);
+    raw_cmap = makefun(n_file, attr, dbg);
     
     % Save it as a tab deliminated file
     dlmwrite(file,raw_cmap,'delimiter','\t','precision','%.6f');

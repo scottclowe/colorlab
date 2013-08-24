@@ -1,12 +1,9 @@
-function cmap = cie_bw_cmap(n, spacefun, dbg)
+function cmap = cie_bw_cmap(n, dbg)
 
 if nargin<1
     n = size(get(gcf,'colormap'),1);
 end
 if nargin<2
-    spacefun = [];
-end
-if nargin<3
     dbg = 0;
 end
 
@@ -18,7 +15,7 @@ b = zeros(n,1);
 
 Lab = [L a b];
 
-cmap = gd_lab2rgb(Lab, use_uplab, spacefun);
+cmap = gd_lab2rgb(Lab, use_uplab);
 
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap

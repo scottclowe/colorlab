@@ -1,12 +1,9 @@
-function cmap = cie_bluewhitered_cmap2(n, attributes, spacefun, dbg)
+function cmap = cie_bluewhitered_cmap2(n, attributes, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
-if nargin<4 || isempty(dbg)
+if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
-end
-if nargin<3
-    spacefun = []; % function to map from cielab to srgb. (Only used if stored cmap doesn't exist or needs replacing)
 end
 if nargin<2
     attributes = '';
@@ -92,7 +89,7 @@ end
 
 % Convert from Lab to srgb
 Lab  = [Lab1;Lab2];
-cmap = soft_lab2rgb(Lab, use_uplab, spacefun);
+cmap = hard_lab2rgb(Lab, use_uplab);
 
 % If dbg, output figures showing colormap construction
 if dbg

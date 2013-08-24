@@ -1,12 +1,9 @@
-function cmap = cie_hot_make(n, attr, spacefun, dbg)
+function cmap = cie_hot_make(n, attr, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
-if nargin<4 || isempty(dbg)
+if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
-end
-if nargin<3
-    spacefun = []; % spacefuntion to map from cielab to srgb
 end
 if nargin<2 || isempty(attr)
     attr = '1'; % Colormap type option
@@ -34,7 +31,7 @@ b = c.*sin(h/360*(2*pi));
 
 % Turn Lab into sRGB values
 Lab = [L' a' b'];
-cmap = soft_lab2rgb(Lab, params.use_uplab, spacefun);
+cmap = soft_lab2rgb(Lab, params.use_uplab);
 
 % -------------------------------------------------------------------------
 if dbg

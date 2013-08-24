@@ -1,10 +1,7 @@
-function cielch_c44_rainbow(n, func)
+function cielch_c44_rainbow(n)
 
 if nargin<1
     n = size(get(gcf,'colormap'),1);
-end
-if nargin<2
-    func = [];
 end
 
 use_uplab = false;
@@ -44,6 +41,6 @@ solve(...
     );
 end
 
-cmap = soft_lab2rgb(Lab, use_uplab, func);
+cmap = soft_lab2rgb(Lab, use_uplab);
 
 end
