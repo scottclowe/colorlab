@@ -7,9 +7,12 @@
 %   
 %   Scott Lowe, April 2013
 
-function [rgb,params] = labwheel(n,L,c,h0,h1)
+function [rgb,params] = labwheel(n, L, c, h0, h1, dbg)
 
 % -------------------------------------------------------------------------
+if nargin<6
+    dbg = false;
+end
 if nargin<4
     h0 = 0;
 end
@@ -38,11 +41,11 @@ if nargin<=1
     % If no input, use hand picked set with partial circle of hues
     L = 60;
     c = 60;
-    h0 = 4.60; % 264/360*2*pi-2*pi; % 264 deg = 4.6077 rad
-    h1 = 2.62; % 150/360*2*pi;      % 150 deg = 2.6180 rad
+    h0 = -1.67; % 264/180*pi-2*pi; % -96 deg = -1.6755 rad
+    h1 =  2.61; % 150/180*pi;      % 150 deg =  2.6180 rad
 end
 % Default with same number of colors as in use for current colormap
-if nargin<1
+if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1);
 end
 
@@ -60,6 +63,18 @@ Ls = repmat(L,n,1);
 Lab = [Ls, a, b];
 
 rgb = soft_lab2rgb(Lab, use_uplab);
+
+% -------------------------------------------------------------------------
+% If dbg mode, display a figure of the outputted colormap
+if dbg;
+    img = repmat(rgb,[1 1 20]);
+    img = permute(img,[1 3 2]);
+    figure;
+    imagesc(img);
+    axis xy;
+    title('Output colormap');
+    plot_labcurve_rgbgamut(Lab, use_uplab);
+end
 
 % -------------------------------------------------------------------------
 if nargout<2; return; end
