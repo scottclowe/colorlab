@@ -23,8 +23,7 @@ Lab = my_colorspace('RGB->Lab',rgb);
 if use_uplab;
     P = iccread('CIELab_to_UPLab.icc');
     % BToA0: CIELab to UPLab
-    cform = makecform('CLUT', P, 'BToA0');
-    Lab = applycform(Lab, cform);
+    Lab = applycform(Lab, makecform('CLUT', P, 'BToA0'));
 end
 
 end

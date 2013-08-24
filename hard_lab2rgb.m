@@ -21,8 +21,7 @@ end
 if use_uplab;
     P = iccread('CIELab_to_UPLab.icc');
     % AToB0: UPLab to CIELab
-    cform = makecform('CLUT', P, 'AToB0');
-    Lab = applycform(Lab, cform);
+    Lab = applycform(Lab, makecform('CLUT', P, 'AToB0'));
 %     tempLab = nan(size(Lab));
 %     li = ~(isnan(Lab(:,1)) | isnan(Lab(:,2)) | isnan(Lab(:,3)));
 %     tempLab(li,:) = applycform(Lab(li,:), cform);
