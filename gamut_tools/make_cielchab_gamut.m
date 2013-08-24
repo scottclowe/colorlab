@@ -31,7 +31,7 @@ switch lower(point_method)
         point_method = 'face'; % Canonical
     case {'face-plus'}
         point_method = 'face-plus'; % Canonical
-    case {'inv'}
+    case {'inv','inverse'}
         point_method = 'inv'; % Canonical
     otherwise
         error('Unknown point picking method');
@@ -278,7 +278,7 @@ end
 % space and see if is in known gamut.
 function gamut = make_gamut_lh_v2(space, N, use_uplab)
 
-target_c_intv = 2^-5;
+target_c_intv = 0.0312; % 2^-5
 Lintv = 100/N;
 hintv = min(1,Lintv*2);
 L = 0:Lintv:100;

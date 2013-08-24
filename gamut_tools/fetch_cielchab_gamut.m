@@ -30,6 +30,8 @@ switch lower(point_method)
         point_method = 'face'; % Canonical
     case {'face-plus','face-cap'}
         point_method = 'face-plus'; % Canonical
+    case {'inv','inverse'}
+        point_method = 'inv'; % Canonical
 end
 
 % -------------------------------------------------------------------------
