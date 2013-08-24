@@ -1,10 +1,5 @@
 function Lab = hard_rgb2lab(rgb, use_uplab)
 % Utility for converting from sRGB to CIELab (or UPLab)
-% Gracefully degrading utility
-% Uses 'spacefun' if provided ...
-% If not, uses ImageProcessingToolbox if available ...
-% If not, uses colorspace (which is a function available on FEX) ...
-% If not, recommends download of colorspace (using suggestFEXpackage)
 
 if nargin<2
     use_uplab = false;
