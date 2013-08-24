@@ -73,7 +73,7 @@ a = c.*cos(h/360*(2*pi));
 b = c.*sin(h/360*(2*pi));
 
 Lab = [L' a' b'];
-rgb = gd_lab2rgb(Lab, use_uplab);
+rgb = soft_lab2rgb(Lab, use_uplab);
 
 clrs = repmat(rgb,[1 1 20]);
 clrs = permute(clrs,[1 3 2]);

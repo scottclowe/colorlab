@@ -15,7 +15,7 @@ b = zeros(n,1);
 
 Lab = [L a b];
 
-cmap = gd_lab2rgb(Lab, use_uplab);
+cmap = soft_lab2rgb(Lab, use_uplab); % Needs to be soft as white is outside by 3.8011e-05
 
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap

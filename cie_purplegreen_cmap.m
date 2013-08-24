@@ -41,7 +41,7 @@ b = linspace(lab1(3), lab2(3), n);
 
 Lab = [L' a' b'];
 
-cmap = gd_lab2rgb(Lab, use_uplab);
+cmap = hard_lab2rgb(Lab, use_uplab);
 
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap
