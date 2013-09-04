@@ -901,9 +901,14 @@ zlabel('L*')
 % -------------------------------------------------------------------------
 function plot_surface_lab(handles)
 
-L = handles.rgbgamut.lchmesh.Lgrid([1:end 1],:);
-c = handles.rgbgamut.lchmesh.cgrid([1:end 1],:);
-h = handles.rgbgamut.lchmesh.hgrid([1:end 1],:);
+target_Lintv = 1;
+target_hintv = 1;
+indIntvL = max(1,floor(target_Lintv/handles.rgbgamut.Lintv));
+indIntvh = max(1,floor(target_hintv/handles.rgbgamut.hintv));
+
+L = handles.rgbgamut.lchmesh.Lgrid([1:indIntvh:end 1],1:indIntvL:end);
+c = handles.rgbgamut.lchmesh.cgrid([1:indIntvh:end 1],1:indIntvL:end);
+h = handles.rgbgamut.lchmesh.hgrid([1:indIntvh:end 1],1:indIntvL:end);
 a = c.*cosd(h);
 b = c.*sind(h);
 
@@ -922,9 +927,14 @@ zlabel('L*')
 
 function plot_mesh_lab(handles)
 
-L = handles.rgbgamut.lchmesh.Lgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
-c = handles.rgbgamut.lchmesh.cgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
-h = handles.rgbgamut.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+target_Lintv = 4;
+target_hintv = 4;
+indIntvL = max(1,floor(target_Lintv/handles.rgbgamut.Lintv));
+indIntvh = max(1,floor(target_hintv/handles.rgbgamut.hintv));
+
+L = handles.rgbgamut.lchmesh.Lgrid([1:indIntvh:end 1],1:indIntvL:end);
+c = handles.rgbgamut.lchmesh.cgrid([1:indIntvh:end 1],1:indIntvL:end);
+h = handles.rgbgamut.lchmesh.hgrid([1:indIntvh:end 1],1:indIntvL:end);
 a = c.*cosd(h);
 b = c.*sind(h);
 
@@ -942,9 +952,14 @@ zlabel('L*')
 
 function plot_surface_lch(handles)
 
-L = handles.rgbgamut.lchmesh.Lgrid([1:end 1],:);
-c = handles.rgbgamut.lchmesh.cgrid([1:end 1],:);
-h = handles.rgbgamut.lchmesh.hgrid([1:end 1],:);
+target_Lintv = 1;
+target_hintv = 1;
+indIntvL = max(1,floor(target_Lintv/handles.rgbgamut.Lintv));
+indIntvh = max(1,floor(target_hintv/handles.rgbgamut.hintv));
+
+L = handles.rgbgamut.lchmesh.Lgrid([1:indIntvh:end 1],1:indIntvL:end);
+c = handles.rgbgamut.lchmesh.cgrid([1:indIntvh:end 1],1:indIntvL:end);
+h = handles.rgbgamut.lchmesh.hgrid([1:indIntvh:end 1],1:indIntvL:end);
 h(end,:) = h(end,:) + 360;
 a = c.*cosd(h);
 b = c.*sind(h);
@@ -964,9 +979,14 @@ zlabel('Chroma')
 
 function plot_mesh_lch(handles)
 
-L = handles.rgbgamut.lchmesh.Lgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
-c = handles.rgbgamut.lchmesh.cgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
-h = handles.rgbgamut.lchmesh.hgrid([1:4:(end-1) 1],[1:4:(end-1) end]);
+target_Lintv = 4;
+target_hintv = 4;
+indIntvL = max(1,floor(target_Lintv/handles.rgbgamut.Lintv));
+indIntvh = max(1,floor(target_hintv/handles.rgbgamut.hintv));
+
+L = handles.rgbgamut.lchmesh.Lgrid([1:indIntvh:end 1],1:indIntvL:end);
+c = handles.rgbgamut.lchmesh.cgrid([1:indIntvh:end 1],1:indIntvL:end);
+h = handles.rgbgamut.lchmesh.hgrid([1:indIntvh:end 1],1:indIntvL:end);
 h(end,:) = h(end,:) + 360;
 a = c.*cosd(h);
 b = c.*sind(h);
