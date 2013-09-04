@@ -58,7 +58,7 @@ end
 switch point_method
     case {'cube','face','face-plus'}
         warning('Forward gamut generation is inefficient. Use inverse method.');
-        gamut = make_gamut_lh(space, N, point_method, use_uplab);
+        gamut = make_gamut_lh_v1(space, N, point_method, use_uplab);
         % Make a mesh we can interpolate on
         gamut.lchmesh = make_gamut_mesh(gamut);
     case {'inv'}
@@ -80,7 +80,7 @@ end
 % Made by generating lots of points in source space and converting them to
 % the destination (PCS) space. Have to round and max to make this in nice
 % intervals in the PCS, which makes the gamut look larger than it is.
-function gamut = make_gamut_lh(space, N, point_method, use_uplab)
+function gamut = make_gamut_lh_v1(space, N, point_method, use_uplab)
 
 % Don't want these to be 3,6,7,9,11,...
 % Only products of 2 and 5 which divide 10 nicely
