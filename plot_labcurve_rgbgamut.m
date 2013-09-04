@@ -27,7 +27,8 @@ indIntvh = max(1,floor(target_hintv/rgbgamut.hintv));
 figure;
 hold on;
 if ~isempty(Lab);
-    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'ks-');
+    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'ks');
+    plot3(Lab(:,2), Lab(:,3), Lab(:,1), 'w-');
 end
 
 L = rgbgamut.lchmesh.Lgrid([1:indIntvh:end 1],1:indIntvL:end);
