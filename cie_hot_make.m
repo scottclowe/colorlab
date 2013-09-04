@@ -1,9 +1,12 @@
-function cmap = cie_hot_make(n, dbg)
+function cmap = cie_hot_make(n, attr, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
-if nargin<2 || isempty(dbg)
+if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
+end
+if nargin<2
+    attr = []; % Unused
 end
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
