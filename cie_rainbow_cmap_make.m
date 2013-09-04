@@ -79,7 +79,7 @@ function [btsp_t_srt, btsp_t_end] = find_ellipse_ends(paramset)
 % Finds the limiting points which are only just inside the ellipse
 
 params = get_rainbow_ellipse_params(paramset);
-rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face');
+rgbgamut = fetch_cielchab_gamut('srgb');
 
 
 % First generate a ton of points to find the end points of theta
@@ -108,7 +108,7 @@ end
 function ciebow_cmap = cie_rainbow_cmap_make_smooth(n_target, paramset, dbg)
 
 params = get_rainbow_ellipse_params(paramset);
-rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face');
+rgbgamut = fetch_cielchab_gamut('srgb');
 
 % First generate a ton of points to find the end points of theta
 [btsp_t_srt, btsp_t_end] = find_ellipse_ends(paramset);
@@ -209,7 +209,7 @@ if dbg;
     a = c.*cos(h);
     b = c.*sin(h);
     
-    CMAP = soft_lab2rgb([L(:) a(:) b(:)], use_uplab);
+    CMAP = soft_lab2rgb([L(:) a(:) b(:)], params.use_uplab);
 
     hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
     set(hs,'FaceColor','none');
@@ -236,7 +236,7 @@ function ciebow_cmap = cie_rainbow_cmap_make_greenmid(n_target, paramset, dbg)
 % Mid point is at t=pi
 
 params = get_rainbow_ellipse_params(paramset);
-rgbgamut = fetch_cielchab_gamut('srgb', 2048, 'face');
+rgbgamut = fetch_cielchab_gamut('srgb');
 
 % First generate a ton of points to find the end points of theta
 [btsp_t_srt, btsp_t_end] = find_ellipse_ends(paramset);
@@ -359,7 +359,7 @@ if dbg;
     a = c.*cos(h);
     b = c.*sin(h);
 
-    CMAP = soft_lab2rgb([L(:) a(:) b(:)], use_uplab);
+    CMAP = soft_lab2rgb([L(:) a(:) b(:)], params.use_uplab);
 
     hs = mesh(a,b,L,reshape(CMAP,[size(L) 3]));
     set(hs,'FaceColor','none');
