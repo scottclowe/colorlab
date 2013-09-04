@@ -9,8 +9,9 @@ TO DO
 [ ] - hot-and-cold colormap
 [ ] - Swap to colorspace based gamut
 [ ] - Shrink previous colormaps to be in gamut
+[ ] - Downsample gamut for Lab curve plotting
 [ ] - UPLab
 [ ] - Flow-chart
-[ ] - Name suite. Rename functions. (colorlab? cmaplab?)
+[ ] - Name suite. Rename functions. (colorlab? cmaplab? colab? clab?)
 [ ] - Write up
 [ ] - CMYK - ISO Coated v2 300% (ECI)
