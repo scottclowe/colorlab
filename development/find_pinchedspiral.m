@@ -8,6 +8,12 @@ close all;
 % handpicked_hue1 = 21;
 % handpicked_hue2 = 75;
 
+% All max one twist maximum euclidian length
+handpicked_hue1 = 252;
+handpicked_hue2 = 564;
+
+% All max one twist maximum chroma
+
 
 % All up to one complete twist
 % hue1_range = 0:359;
@@ -29,20 +35,36 @@ close all;
 % hue1_range =  0:1:30;
 % hue2_range = 70:1:106;
 
-% Hot seach space (tighter still)
-hue1_range =  7:1:25;
-hue2_range = 95:1:102;
+% % Hot seach space (tighter still)
+% hue1_range =  7:1:25;
+% hue2_range = 95:1:102;
+% % Outcome was h1=9;h2=95;Lmin=4;Lmax=96;expnt=2;
+
+% Cold search space
+hue1_range = 300:2:360;
+hue2_range = 210:2:260;
+
+% % Purple
+% hue1_range = 290:2:330;
+% hue2_range = 310:2:350;
+% % Outcome h1=308.5;h2=331;Lmin=4;Lmax=92;expnt=2;
+
+hue1_range = 301:.5:312;
+hue2_range = 328:.5:335;
+
+% hue1_range = 300:2:360;
+% hue2_range = 200:2:300;
 
 
 % Curve parameters
 use_uplab = false;
-npoints = 100;  % number of points to use in test series
-expnt_range = 2;    % exponent to use for chroma curve
-L_off = 0;      % offset to exponent (not for sine curve)
-c0 = 0.03;       % proportion of maxc to add to all chroma (maxc\approx75, 67<maxc<77)
-typ = 'pow';    % 'pow' or 'sin'
-Lmin_range = 4;       % minimum lightness (start)
-Lmax_range = 96;      % maximum lightness (end)
+npoints = 100;     % number of points to use in test series
+expnt_range = 2;   % exponents to use for chroma curve
+L_off = 0;         % offset to exponent (not for sine curve)
+c0 = 0.025;         % proportion of maxc to add to all chroma (maxc\approx75, 67<maxc<77)
+typ = 'pow';       % 'pow' or 'sin'
+Lmin_range =  4;   % minimum lightness (start)
+Lmax_range = 92;   % maximum lightness (end)
 
 
 
@@ -109,7 +131,7 @@ for iXpt=1:length(expnt_range)
     end
 end
 
-all_both = all_maxc/max(all_maxc(:))+all_eucl/max(all_eucl(:));
+all_both = 0.7*all_maxc/max(all_maxc(:)) + 0.3*all_eucl/max(all_eucl(:));
 
 all_maxc2 = max(max(max(all_maxc,[],5),[],4),[],3);
 all_eucl2 = max(max(max(all_eucl,[],5),[],4),[],3);
@@ -377,10 +399,6 @@ title(sprintf('%.2f %.2f; %.2f %.2f; %.2f: Sum (%.2f, %.2f)',...
 end
 
 %%
-
-% h1 = handpicked_hue1;
-% h2 = handpicked_hue2;
-
 return;
 %%
 [m1,I1] = max(all_both2,[],2);
@@ -438,3 +456,70 @@ title(sprintf('%.2f %.2f: %s',h1,h2,casediscr));
 
 end
 
+%%
+return;
+%%
+
+h1 = handpicked_hue1;
+h2 = handpicked_hue2;
+h1=308.5;h2=331;Lmin=4;Lmax=92;expnt=2;
+
+% ih1 = find(h1==hue1_range,1);
+% ih2 = find(h2==hue2_range,1);
+
+    Lmin = Lmin_range(miLmin);
+    Lmax = Lmax_range(miLmax);
+    expnt = expnt_range(miXpt);
+    
+    
+L = linspace(Lmin,Lmax,npoints);
+Lmid = (Lmin+Lmax)/2;
+
+h_per_L = (h2-h1)/(Lmax-Lmin);
+
+h = h1 + h_per_L * ((L-Lmin) + L_off - (L-Lmid).^2 * L_off/(Lmax-Lmid)^2);
+h = mod(h,360);
+
+switch typ
+    case 'sin'
+        c = c0 + (1-c0) * sin(pi* (L-Lmin)/(Lmax-Lmin) ).^expnt;
+    case 'pow'
+        c = 1 - (1-c0) * abs(((L-Lmid)*(min(Lmid-0,100-Lmid)/min(Lmax-Lmid,Lmid-Lmin))).^expnt) / abs(Lmid.^expnt);
+        c = max(0,c);
+    otherwise
+        error('Unfamiliar type');
+end
+
+Lch = [L' c' h'];
+
+% Check for points out of gamut
+[TF,P2] = isingamut(Lch,g,'Lch');
+
+P2C = P2(:,2);
+maxc = min(P2C./c');
+
+c = c * maxc;
+
+
+Lch = [L' c' h'];
+a = c.*cosd(h);
+b = c.*sind(h);
+Lab = [L' a' b'];
+
+% Euclidean length
+Lab_dif = diff(Lab,1,1);
+Lab_sep = sqrt(sum(Lab_dif.^2,2));
+Lab_len = sum(Lab_sep,1);
+
+rgb = hard_lab2rgb(Lab, use_uplab);
+
+img = repmat(rgb,[1 1 20]);
+img = permute(img,[1 3 2]);
+figure;
+imagesc(img);
+title(sprintf('%.2f %.2f; %.2f %.2f; %.2f: Sum (%.2f, %.2f)',...
+    h1,h2,Lmin,Lmax,expnt,maxc,Lab_len));
+
+plot_labcurve_rgbgamut(Lab, use_uplab);
+title(sprintf('%.2f %.2f; %.2f %.2f; %.2f: Sum (%.2f, %.2f)',...
+    h1,h2,Lmin,Lmax,expnt,maxc,Lab_len));
