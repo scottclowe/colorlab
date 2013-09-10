@@ -901,8 +901,9 @@ zlabel('L*')
 % -------------------------------------------------------------------------
 function plot_surface_lab(handles)
 
-target_Lintv = 1;
-target_hintv = 1;
+intv = get_plot_intv(handles);
+target_Lintv = intv; %1;
+target_hintv = intv; %1;
 indIntvL = max(1,floor(target_Lintv/handles.rgbgamut.Lintv));
 indIntvh = max(1,floor(target_hintv/handles.rgbgamut.hintv));
 
@@ -952,8 +953,9 @@ zlabel('L*')
 
 function plot_surface_lch(handles)
 
-target_Lintv = 1;
-target_hintv = 1;
+intv = get_plot_intv(handles);
+target_Lintv = intv; %1;
+target_hintv = intv; %1;
 indIntvL = max(1,floor(target_Lintv/handles.rgbgamut.Lintv));
 indIntvh = max(1,floor(target_hintv/handles.rgbgamut.hintv));
 
