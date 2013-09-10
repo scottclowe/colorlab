@@ -1,15 +1,15 @@
 TO DO
 
 [ ] - Try ciebow with linear L*
-[ ] - Script to automatically find best "pinched helix" (hot)
+[X] - Script to automatically find best "pinched helix" (hot)
 [ ] - programmatically find suitable range to x-white-y with darker shades
 [ ] - blue-white-red which goes to darker shades
 [ ] - green-white-purple colormap
 [ ] - cyan-black-yellow colormap
 [ ] - hot-and-cold colormap
-[ ] - Swap to colorspace based gamut
+[X] - Swap to colorspace based gamut
 [ ] - Shrink previous colormaps to be in gamut
-[ ] - Downsample gamut for Lab curve plotting
+[X] - Downsample gamut for Lab curve plotting
 [ ] - UPLab
 [ ] - Flow-chart
 [ ] - Name suite. Rename functions. (colorlab? cmaplab? colab? clab?)
