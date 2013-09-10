@@ -1,6 +1,6 @@
 function cmap = cie_bw_cmap(n, dbg)
 
-if nargin<1
+if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1);
 end
 if nargin<2
