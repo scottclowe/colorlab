@@ -12,12 +12,30 @@ use_uplab = false;
 
 % hue1_range = 307:.25:312; %200:320; %260:315; %0:359; %260:315;
 % hue2_range =  52:.25:56; % 20:90;  % 10:70;  %0:359; % 10:70 ;
+% h2_isdynamic = 0; % If true then h2=h1+h2
 
-hue1_range = 0:179;
-hue2_range = 180;
+% % Find best separation of two opposing hues
+% hue1_range = 0:179;
+% hue2_range = 180;
+% h2_isdynamic = 1; % If true then h2=h1+h2
+% L_range = [];
+% % Outcome: purple-green
 
-h2_isdynamic = 1;
+hue1_range = 80:100;
+hue2_range = 260:280;
+h2_isdynamic = 0;
+L_range = [];
 
+
+hue1_range =  60:103;
+hue2_range = 180:308;
+h2_isdynamic = 0;
+L_range = [];
+
+
+hue1_range = [102:.25:103];
+hue2_range = 270:307;
+h2_isdynamic = 0;
 L_range = [];
 
 %% Main code
@@ -65,7 +83,8 @@ for ih1=1:length(hue1_range)
         jointL = intersect(gh1(:,1),gh2(:,1));
         
         if ~isempty(L_range)
-            jointL = intersect(jointL,L_range);
+%             jointL = intersect(jointL,L_range);
+            jointL = jointL(jointL>=min(L_range)&jointL<=max(L_range));
         end
         
         gh1 = gh1(ismember(gh1(:,1),jointL),:);
@@ -116,14 +135,16 @@ best_sep_h2 = all_h2(I);
 [best_Csum,I] = max(all_Csum(:));
 best_Csum_h1 = all_h1(I);
 best_Csum_h2 = all_h2(I);
+best_Csum_L  = all_Csum_L(I);
 
 [best_Cjoint,I] = max(all_Cjoint(:));
 best_Cjoint_h1 = all_h1(I);
 best_Cjoint_h2 = all_h2(I);
+best_Cjoint_L  = all_Cjoint_L(I);
 
-fprintf('Best Euclidian:    sep(%2$3.1f, %3$3.1f)=%1$3.1f\n', best_sep,   best_sep_h1,   best_sep_h2 );
-fprintf('Best chroma sum:   sep(%2$3.1f, %3$3.1f)=%1$3.1f\n', best_Csum,  best_Csum_h1,  best_Csum_h2);
-fprintf('Best chroma joint: sep(%2$3.1f, %3$3.1f)=%1$3.1f\n', best_Cjoint,best_Cjoint_h1,best_Cjoint_h2);
+fprintf('Best Euclidian:    sep(%2$3.2f, %3$3.2f)=%1$3.2f\n'           , best_sep,   best_sep_h1,   best_sep_h2 );
+fprintf('Best chroma sum:   sep(%2$3.2f, %3$3.2f)=%1$3.2f at L=%4$3.2f\n', best_Csum,  best_Csum_h1,  best_Csum_h2,  best_Csum_L);
+fprintf('Best chroma joint: sep(%2$3.2f, %3$3.2f)=%1$3.2f at L=%4$3.2f\n', best_Cjoint,best_Cjoint_h1,best_Cjoint_h2,best_Cjoint_L);
 
 %%
 
@@ -134,7 +155,7 @@ if length(hue1_range)>1 && length(hue2_range)>1
     subplot(1,3,1);
     imagesc(hue2_range, hue1_range, all_sep);
     axis xy;
-    title(sprintf('Best Euclidian: sep(%2$3.1f, %3$3.1f)=%1$3.1f\n', best_sep, best_sep_h1, best_sep_h2 ));
+    title([{'Best Euclidian'} sprintf('sep(%2$3.2f, %3$3.2f)=%1$3.2f\n', best_sep, best_sep_h1, best_sep_h2 )]);
     colormap(cie_hot);
     colorbar;
     ylabel('Hue 1');
@@ -147,7 +168,7 @@ if length(hue1_range)>1 && length(hue2_range)>1
     subplot(1,3,2);
     imagesc(hue2_range, hue1_range, all_Csum);
     axis xy;
-    title(sprintf('Best chroma sum:   sep(%2$3.1f, %3$3.1f)=%1$3.1f\n', best_Csum,  best_Csum_h1,  best_Csum_h2));
+    title([{'Best chroma sum'} sprintf('sep(%2$3.2f, %3$3.2f)=%1$3.2f\n', best_Csum,  best_Csum_h1,  best_Csum_h2)]);
     colormap(cie_hot);
     colorbar;
     ylabel('Hue 1');
@@ -160,7 +181,7 @@ if length(hue1_range)>1 && length(hue2_range)>1
     subplot(1,3,3);
     imagesc(hue2_range, hue1_range, all_Cjoint);
     axis xy;
-    title(sprintf('Best chroma joint: sep(%2$3.1f, %3$3.1f)=%1$3.1f\n', best_Cjoint,best_Cjoint_h1,best_Cjoint_h2));
+    title([{'Best chroma joint'} sprintf('sep(%2$3.2f, %3$3.2f)=%1$3.2f\n', best_Cjoint,best_Cjoint_h1,best_Cjoint_h2)]);
     colormap(cie_hot);
     colorbar;
     ylabel('Hue 1');
@@ -185,35 +206,58 @@ else
 
     subplot(1,3,1);
     plot(x, all_sep);
-    ylabel(sprintf('Best Euclidian: sep(%2$3.1f, %3$3.1f)=%1$3.1f\n', best_sep, best_sep_h1, best_sep_h2 ));
+    ylabel(sprintf('Best Euclidian: sep(%2$3.2f, %3$3.2f)=%1$3.2f\n', best_sep, best_sep_h1, best_sep_h2 ));
     xlabel(xlab);
     xlim(x([1 end]));
 
     subplot(1,3,2);
     plot(x, all_Csum);
-    ylabel(sprintf('Best chroma sum:   sep(%2$3.1f, %3$3.1f)=%1$3.1f\n', best_Csum,  best_Csum_h1,  best_Csum_h2));
+    ylabel(sprintf('Best chroma sum:   sep(%2$3.2f, %3$3.2f)=%1$3.2f\n', best_Csum,  best_Csum_h1,  best_Csum_h2));
     xlabel(xlab);
     xlim(x([1 end]));
 
     subplot(1,3,3);
     plot(x, all_Cjoint);
-    ylabel(sprintf('Best chroma joint: sep(%2$3.1f, %3$3.1f)=%1$3.1f\n', best_Cjoint,best_Cjoint_h1,best_Cjoint_h2));
+    ylabel(sprintf('Best chroma joint: sep(%2$3.2f, %3$3.2f)=%1$3.2f\n', best_Cjoint,best_Cjoint_h1,best_Cjoint_h2));
     xlabel(xlab);
     xlim(x([1 end]));
 
 
 end
 
+%%
+return;
 %% Example of manual extraction of particular hues
 
-h1 = 90;
-h2 = 280;
+h1 = 102;
+h2 = 282;
 
-ih1 = find(hue1_range==h1);
-ih2 = find(hue2_range==h2);
-C = all_Cjoint(ih1,ih2);
-L = all_Cjoint_L(ih1,ih2);
+if h2_isdynamic
 
-Lch_start = [L C h1];
-Lch_end   = [L C h2];
+    ih1 = find(hue1_range==h1);
+    ih2 = find(hue2_range==(h2-h1));
+    
+    C = all_Cjoint(ih1,ih2);
+    L = all_Cjoint_L(ih1,ih2);
+    
+    Lch_start = [L C h1];
+    Lch_end   = [L C h2];
+    
+    fprintf('Chosen h1 start LCh: %s\n',mat2str(Lch_start));
+    fprintf('Chosen h2   end LCh: %s\n',mat2str(Lch_end));
+    
+else
 
+    ih1 = find(hue1_range==h1);
+    ih2 = find(hue2_range==h2);
+    
+    C = all_Cjoint(ih1,ih2);
+    L = all_Cjoint_L(ih1,ih2);
+    
+    Lch_start = [L C h1];
+    Lch_end   = [L C h2];
+    
+    fprintf('Chosen h1 start LCh: %s\n',mat2str(Lch_start));
+    fprintf('Chosen h2   end LCh: %s\n',mat2str(Lch_end));
+    
+end
