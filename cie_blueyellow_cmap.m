@@ -35,19 +35,21 @@ switch attributes
         lch1 = [63.375 56.968  90];
         lch2 = [63.375 56.968 270];
         
-    case 'a0'
-        % CIE  [  L*    a*  b*]
-        lab1 = [  58    0  -65];
-        lab2 = [  89    0   87];
-        
-    case {'a0:lfix','a0:lfix:1'}
-        % NB: The local maxima for joint-chroma is at h=88 (L=59.5, C=63)
-        % So this is pretty much optimal for fixed L
-        % It used to look like a local maxima, but it sure doesn't anymore
-        % CIE  [  L*    a*  b*]
-        lab1 = [  59.5  0  -62];
-        lab2 = [  59.5  0   62];
-        
+% OLD
+%     case 'a0'
+%         % CIE  [  L*    a*  b*]
+%         lab1 = [  58    0  -65];
+%         lab2 = [  89    0   87];
+%         
+%     case {'a0:lfix','a0:lfix:1'}
+%         % NB: The local maxima for joint-chroma is at h=88 (L=59.5, C=63)
+%         % So this is pretty much optimal for fixed L
+%         % It used to look like a local maxima, but it sure doesn't anymore
+%         % CIE  [  L*    a*  b*]
+%         lab1 = [  59.5  0  -62];
+%         lab2 = [  59.5  0   62];
+
+% OLDER
 %     case 'a0:lfix:2'
 %         % CIE  [  L*    a*  b*]
 %         lab1 = [ 57.75  0  -65];
