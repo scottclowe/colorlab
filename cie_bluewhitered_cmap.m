@@ -5,7 +5,7 @@ function cmap = cie_bluewhitered_cmap(n, attributes, dbg)
 if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
 end
-if nargin<2
+if nargin<2 || isempty(attributes)
     attributes = '';
 end
 if nargin<1 || isempty(n)
@@ -14,7 +14,6 @@ end
 
 % -------------------------------------------------------------------------
 % Parameters
-use_uplab = false;
 
 switch attributes
     case ''
@@ -22,12 +21,14 @@ switch attributes
         lchblue   = [ 46.375,  93.9075, 296];
         lchred    = [ 46.375,  93.9075,  40];
         wp        = [ 97.411,   0     ,   0];
+        use_uplab = false;
         
     case 'lfix'
         % CIELCH      [  L*      c    h]
         lchblue   = [ 46.3125, 94.0625, 296];
         lchred    = [ 46.3125, 94.0625,  40];
         wp        = [ 46.3125,  0     ,   0];
+        use_uplab = false;
         
 %     case 'lfixdark'
 % % CIELCH      [  L*      c    h]
@@ -40,7 +41,7 @@ switch attributes
         
     case 'uplab'
         % CIELCH    [  L*      c         h   ]
-        lchblue   = [ 50.25,  95.6875, 309   ];
+        lchblue   = [ 50.25,  95.6875, 309   ]; % should increase from h=309
         lchred    = [ 50.25,  95.6875,  54.75];
         wp        = [ 92.777,  0,        0   ];
         use_uplab = true;
@@ -63,7 +64,7 @@ labblue   = [lchblue(1), lchblue(2)*cosd(lchblue(3)), lchblue(2)*sind(lchblue(3)
 labred    = [lchred(1) ,  lchred(2)*cosd(lchred(3)) ,  lchred(2)*sind(lchred(3)) ];
 labwp     = [wp(1)     ,      wp(2)*cosd(wp(3))     ,      wp(2)*sind(wp(3))     ];
 
-neach = ceil(n/2);
+neach = floor(n/2)+1;
 
 L1 = linspace(labblue(1), labwp(1), neach);
 a1 = linspace(labblue(2), labwp(2), neach);
