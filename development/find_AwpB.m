@@ -1,4 +1,5 @@
 % Find seperation distance for a set of different hues
+% (Blue-white-red style)
 clear all;
 close all;
 
@@ -8,8 +9,8 @@ use_uplab = true;
 
 % CIELab bwr: 296, 40
 % UPLab bwr:  309, 54.75
-handpicked_bwr_hue1 = 309; %[]; % 290; % Blue
-handpicked_bwr_hue2 = 54.75; %[]; % 41;  % Red
+handpicked_hue1 = 309; %[]; % 290; % Blue
+handpicked_hue2 = 54.75; %[]; % 41;  % Red
 
 via_black = 0; % Go via near-white (0) or near-black (1)
 
@@ -451,13 +452,13 @@ fprintf('Best chroma seperation solution, Lab: %s -> %s -> %s\n',...
 
 %% Chosen hues, for its optimal seperation
 
-if isempty(handpicked_bwr_hue1) || isempty(handpicked_bwr_hue2)
+if isempty(handpicked_hue1) || isempty(handpicked_hue2)
     return;
 end
 
 % Handpicked from the matrix of values.
-hue1 = handpicked_bwr_hue1; 
-hue2 = handpicked_bwr_hue2;
+hue1 = handpicked_hue1; 
+hue2 = handpicked_hue2;
 
 ih1 = find(hue1_range==hue1,1);
 ih2 = find(hue2_range==hue2,1);
