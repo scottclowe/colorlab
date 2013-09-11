@@ -28,6 +28,6 @@ if use_uplab;
 %     Lab = tempLab;
 end
 
-rgb = my_colorspace('Lab->RGB',Lab);
+rgb = clab_colorspace('Lab->RGB',Lab);
 
 end

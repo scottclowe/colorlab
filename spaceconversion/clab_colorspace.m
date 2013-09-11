@@ -1,4 +1,4 @@
-function varargout = my_colorspace(Conversion,varargin)
+function varargout = clab_colorspace(Conversion,varargin)
 %COLORSPACE  Transform a color image between color representations.
 %   Same as colorspace, but no clipping of RGB values to [0,1]
 %

@@ -5,7 +5,7 @@ if nargin<2
     use_uplab = false;
 end
 
-Lab = my_colorspace('RGB->Lab',rgb);
+Lab = clab_colorspace('RGB->Lab',rgb);
 
 % Move from CIELab to UPLab
 % UPLab was made by Bruce Lindbloom and provides a color space where the
