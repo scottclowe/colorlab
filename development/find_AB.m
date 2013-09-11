@@ -187,7 +187,7 @@ if length(hue1_range)>1 && length(hue2_range)>1
     imagesc(hue2_range, hue1_range, all_sep);
     axis xy;
     title([{'Best Euclidian'} sprintf('sep(%2$3.2f, %3$3.2f)=%1$3.2f\n', best_sep, best_sep_h1, best_sep_h2 )]);
-    colormap(cie_hot);
+    colormap(clab_hot);
     colorbar;
     ylabel('Hue 1');
     if h2_isdynamic
@@ -200,7 +200,7 @@ if length(hue1_range)>1 && length(hue2_range)>1
     imagesc(hue2_range, hue1_range, all_Csum);
     axis xy;
     title([{'Best chroma sum'} sprintf('sep(%2$3.2f, %3$3.2f)=%1$3.2f\n', best_Csum,  best_Csum_h1,  best_Csum_h2)]);
-    colormap(cie_hot);
+    colormap(clab_hot);
     colorbar;
     ylabel('Hue 1');
     if h2_isdynamic
@@ -213,7 +213,7 @@ if length(hue1_range)>1 && length(hue2_range)>1
     imagesc(hue2_range, hue1_range, all_Cjoint);
     axis xy;
     title([{'Best chroma joint'} sprintf('sep(%2$3.2f, %3$3.2f)=%1$3.2f\n', best_Cjoint,best_Cjoint_h1,best_Cjoint_h2)]);
-    colormap(cie_hot);
+    colormap(clab_hot);
     colorbar;
     ylabel('Hue 1');
     if h2_isdynamic

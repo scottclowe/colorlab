@@ -1,4 +1,4 @@
-function cmap = cie_hot_v1(n)
+function cmap = clab_hot_v1(n)
 
 if nargin<1
     n = size(get(gcf,'colormap'),1);

@@ -1,4 +1,4 @@
-function cmap = cie_bluewhitered_cmap(n, attributes, dbg)
+function cmap = clab_bluewhitered_make(n, attributes, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs

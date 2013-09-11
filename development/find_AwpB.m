@@ -160,7 +160,7 @@ end
 
 %%
 
-CMAP = cie_hot;
+CMAP = clab_hot;
 
 figure;
 subplot(2,2,1);

@@ -1,4 +1,4 @@
-function cmap = cie_rainbow_cmap(n, attr, dbg)
+function cmap = clab_rainbow(n, attr, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs

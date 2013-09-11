@@ -1,4 +1,4 @@
-function cmap = cie_purple(n, dbg)
+function cmap = clab_purple(n, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs

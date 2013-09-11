@@ -1,4 +1,4 @@
-function cmap = cie_bluewhitered_cmap_old(n, verbose)
+function cmap = clab_bluewhitered_old(n, verbose)
 
 % -------------------------------------------------------------------------
 % Default inputs

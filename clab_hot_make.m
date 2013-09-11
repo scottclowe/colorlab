@@ -1,4 +1,4 @@
-function cmap = cie_hot_make(n, attr, dbg)
+function cmap = clab_hot_make(n, attr, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs

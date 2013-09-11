@@ -1,4 +1,4 @@
-function cmap = cie_bw_cmap(n, dbg)
+function cmap = clab_blackwhite_make(n, dbg)
 
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1);

@@ -141,7 +141,7 @@ all_both2 = max(max(max(all_both,[],5),[],4),[],3);
 
 figure;
 imagesc(hue2_range, hue1_range, all_maxc2);
-colormap(cie_hot);
+colormap(clab_hot);
 colorbar;
 ylabel('Start hue');
 xlabel('End hue');
@@ -149,7 +149,7 @@ title('Maximum chroma');
 
 figure;
 imagesc(hue2_range, hue1_range, all_eucl2);
-colormap(cie_hot);
+colormap(clab_hot);
 colorbar;
 ylabel('Start hue');
 xlabel('End hue');
@@ -157,7 +157,7 @@ title('Euclidean curve length');
 
 figure;
 imagesc(hue2_range,hue1_range,all_both2);
-colormap(cie_hot);
+colormap(clab_hot);
 colorbar;
 ylabel('Start hue');
 xlabel('End hue');
@@ -171,7 +171,7 @@ all_eucl2L = max(max(max(all_eucl,[],5),[],1),[],2);
 
 figure;
 imagesc(Lmin_range, Lmax_range,  squeeze(all_maxc2L)');
-colormap(cie_hot);
+colormap(clab_hot);
 colorbar;
 xlabel('Lmin');
 ylabel('Lmax');
@@ -179,7 +179,7 @@ title('Maximum chroma');
 
 figure;
 imagesc(Lmin_range, Lmax_range,  squeeze(all_eucl2L)');
-colormap(cie_hot);
+colormap(clab_hot);
 colorbar;
 xlabel('Lmin');
 ylabel('Lmax');

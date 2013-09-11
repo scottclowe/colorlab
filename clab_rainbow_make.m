@@ -1,4 +1,4 @@
-function cmap = cie_rainbow_cmap_make(n, attributes, dbg)
+function cmap = clab_rainbow_make(n, attributes, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
@@ -25,9 +25,9 @@ end
     
 switch lower(typ)
     case 'smooth'
-        cmap = cie_rainbow_cmap_make_smooth(n, paramset, dbg);
+        cmap = clab_rainbow_make_smooth(n, paramset, dbg);
     case 'greenmid'
-        cmap = cie_rainbow_cmap_make_greenmid(n, paramset, dbg);
+        cmap = clab_rainbow_make_greenmid(n, paramset, dbg);
     otherwise
         error('Unfamiliar colormap attribute: %s',typ);
 end
@@ -105,7 +105,7 @@ btsp_t_end = t(I_srt-1+find(de_end>1,1,'last'));
 end
 
 
-function ciebow_cmap = cie_rainbow_cmap_make_smooth(n_target, paramset, dbg)
+function ciebow_cmap = clab_rainbow_make_smooth(n_target, paramset, dbg)
 
 params = get_rainbow_ellipse_params(paramset);
 rgbgamut = fetch_cielchab_gamut('srgb');
@@ -227,7 +227,7 @@ end
 end
 
 
-function ciebow_cmap = cie_rainbow_cmap_make_greenmid(n_target, paramset, dbg)
+function ciebow_cmap = clab_rainbow_make_greenmid(n_target, paramset, dbg)
 % Option to have same amount of red as blue
 % This is a very simple method used where the curve is split in two and
 % there are different Delta E values between colours in each.

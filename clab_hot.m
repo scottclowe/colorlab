@@ -1,4 +1,4 @@
-function cmap = cie_hot(n, dbg)
+function cmap = clab_hot(n, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs

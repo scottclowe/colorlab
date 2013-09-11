@@ -1,4 +1,4 @@
-function cmap = cie_purplegreen_cmap(n, attributes, dbg)
+function cmap = clab_greenpurple_make(n, attributes, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
