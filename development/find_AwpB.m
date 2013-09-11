@@ -5,7 +5,7 @@ close all;
 
 %% Parameters
 
-use_uplab = true;
+use_uplab = false;
 
 % CIELab bwr: 296, 40
 % UPLab bwr:  309, 54.75
@@ -16,7 +16,6 @@ via_black = 0; % Go via near-white (0) or near-black (1)
 
 hue1_range = 307:.25:312; %200:320; %260:315; %0:359; %260:315;
 hue2_range =  52:.25:56; % 20:90;  % 10:70;  %0:359; % 10:70 ;
-
 
 %% Main body
 
@@ -34,12 +33,19 @@ for ih1=1:length(hue1_range)
         hue1 = hue1_range(ih1);
         hue2 = hue2_range(ih2);
 
-gh1 = g.lch(g.lch(:,3)==hue1,:);
-gh2 = g.lch(g.lch(:,3)==hue2,:);
+% % OLD METHOD: SLOW
+% gh1 = g.lch(g.lch(:,3)==hue1,:);
+% gh2 = g.lch(g.lch(:,3)==hue2,:);
+% jointL = intersect(gh1(:,1),gh2(:,1));
+% gh1 = gh1(ismember(gh1(:,1),jointL),:);
+% gh2 = gh2(ismember(gh1(:,1),jointL),:);
+% NEW METHOD
+jointL = g.lchmesh.Lvec';
+li = g.lchmesh.hvec==hue1;
+gh1 = [jointL g.lchmesh.cgrid(li,:)' g.lchmesh.hgrid(li,:)'];
+li = g.lchmesh.hvec==hue2;
+gh2 = [jointL g.lchmesh.cgrid(li,:)' g.lchmesh.hgrid(li,:)'];
 
-jointL = intersect(gh1(:,1),gh2(:,1));
-gh1 = gh1(ismember(gh1(:,1),jointL),:);
-gh2 = gh2(ismember(gh1(:,1),jointL),:);
 
 jointC = min(gh1(:,2),gh2(:,2));
 [Cmax,I_Cmax] = max(jointC);

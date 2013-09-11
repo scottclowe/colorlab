@@ -32,9 +32,15 @@ hue2_range = 180:308;
 h2_isdynamic = 0;
 L_range = [];
 
+% % Search for yellow primary and blue cyan-to-primary
+% hue1_range = [102:.25:103];
+% hue2_range = 270:307;
+% h2_isdynamic = 0;
+% L_range = [];
 
-hue1_range = [102:.25:103];
-hue2_range = 270:307;
+% Find best separation of two near-opposing hues
+hue1_range = 0:360;
+hue2_range = 0:360;
 h2_isdynamic = 0;
 L_range = [];
 
@@ -47,7 +53,6 @@ if ~isempty(hue2_range); disp(['Hue 2 range: ' num2str(hue2_range(1)) ' - ' num2
 if h2_isdynamic; disp('Hue 2 is defined relative to hue 1'); end;
 disp('------------------------------------------------------------------');
 
-hue1_range = mod(hue1_range,360);
 
 g = fetch_cielchab_gamut('srgb', [], [], use_uplab);
 
@@ -59,66 +64,92 @@ all_Csum_L   = nan(length(hue1_range),min(length(hue2_range),1));
 all_h1       = nan(length(hue1_range),min(length(hue2_range),1));
 all_h2       = nan(length(hue1_range),min(length(hue2_range),1));
 
+my_hue1_range = mod(hue1_range,360);
 % Lab euclidian distance
-for ih1=1:length(hue1_range)
-    hue1 = hue1_range(ih1);
+for ih1=1:length(my_hue1_range)
+    hue1 = my_hue1_range(ih1);
     % If no second hue, we force the second hue to be opposing the first
     if isempty(hue2_range)
-        my_hue2_range = mod(hue1+180,360);
+        my_hue2_range = hue1+180;
     elseif h2_isdynamic
-        my_hue2_range = mod(hue1+hue2_range,360);
+        my_hue2_range = hue1+hue2_range;
     else
         my_hue2_range = hue2_range;
     end
+    my_hue2_range = mod(my_hue2_range,360);
     
     for ih2=1:length(my_hue2_range)
         hue2 = my_hue2_range(ih2);
         
+        % Record the hues used
         all_h1(ih1,ih2) = hue1;
         all_h2(ih1,ih2) = hue2;
         
-        gh1 = g.lch(g.lch(:,3)==hue1,:);
-        gh2 = g.lch(g.lch(:,3)==hue2,:);
+        % Use gamut to go to a list of gamut-boundary colors with this hue
+        % (these hues) at varying lightness
+%         % OLD METHOD
+%         % THIS IS *REALLY* SLOW!!
+%         gh1 = g.lch(g.lch(:,3)==hue1,:);
+%         gh2 = g.lch(g.lch(:,3)==hue2,:);
+        % NEW METHOD - grid based
+        li = g.lchmesh.hvec==hue1;
+        gh1 = [g.lchmesh.Lvec' g.lchmesh.cgrid(li,:)' g.lchmesh.hgrid(li,:)'];
+        li = g.lchmesh.hvec==hue2;
+        gh2 = [g.lchmesh.Lvec' g.lchmesh.cgrid(li,:)' g.lchmesh.hgrid(li,:)'];
         
-        jointL = intersect(gh1(:,1),gh2(:,1));
-        
+        % Restrict to just the Lightness range requested
         if ~isempty(L_range)
-%             jointL = intersect(jointL,L_range);
+            % Restrict to a list of lightnesses measured for both hues
+            jointL = intersect(gh1(:,1),gh2(:,1));
+            
             jointL = jointL(jointL>=min(L_range)&jointL<=max(L_range));
+            
+            % Do the lightness restriction
+            gh1 = gh1(ismember(gh1(:,1),jointL),:);
+            gh2 = gh2(ismember(gh2(:,1),jointL),:);
+        
         end
         
-        gh1 = gh1(ismember(gh1(:,1),jointL),:);
-        gh2 = gh2(ismember(gh2(:,1),jointL),:);
         
+        % --- 2norm ---
+        % This metric is maybe a bit useless actually
+        % Seperation distance of max-chroma points on the two L-curves
         
-        
-        % 2norm
-        
+        % Find max chroma for each hue
         [C1max,I_C1max] = max(gh1(:,2));
         [C2max,I_C2max] = max(gh2(:,2));
         
+        % Find this Lch color
         Lch1 = gh1(I_C1max,:);
         Lch2 = gh2(I_C2max,:);
         
+        % Move to Lab
         Lab1 = [Lch1(1) Lch1(2)*cosd(Lch1(3)) Lch1(2)*sind(Lch1(3))];
         Lab2 = [Lch2(1) Lch2(2)*cosd(Lch2(3)) Lch2(2)*sind(Lch2(3))];
         
+        % Seperation of these two max-chroma points
         sep = sqrt(sum((Lab1-Lab2).^2,2));
         
         all_sep(ih1,ih2) = sep;
         
         
-        % Sum C
+        % --- Sum C ---
+        
+        % Add together the two chromas, find their max
         [C_sum_max,I_Csum_max] = max(gh1(:,2)+gh2(:,2));
+        % Also find the Lightness of this max
         L_Csum = gh2(I_Csum_max,1);
         
         all_Csum(ih1,ih2) = C_sum_max;
         all_Csum_L(ih1,ih2) = L_Csum;
         
         
-        % Joint C
+        % --- Joint C ---
+        % Find the max of the min chroma (min between the two hues, max
+        % over all lightnesses)
         jointC = min(gh1(:,2),gh2(:,2));
         [Cmax,I_Cmax] = max(jointC);
+        % Find the lightness of the max point too
         L_Cmax = gh2(I_Cmax,1);
         
         all_Cjoint(ih1,ih2) = Cmax;
