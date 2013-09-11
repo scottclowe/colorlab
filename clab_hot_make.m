@@ -6,7 +6,7 @@ if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
 end
 if nargin<2
-    attr = []; % Unused
+    attr = ''; % Unused
 end
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1); % Number of colours in the colormap

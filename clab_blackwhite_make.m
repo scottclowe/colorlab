@@ -1,12 +1,18 @@
-function cmap = clab_blackwhite_make(n, dbg)
+function cmap = clab_blackwhite_make(n, attr, dbg)
 
-if nargin<1 || isempty(n)
-    n = size(get(gcf,'colormap'),1);
+% -------------------------------------------------------------------------
+% Default inputs
+if nargin<3 || isempty(dbg)
+    dbg = 0; % Whether to output information and figures
 end
 if nargin<2
-    dbg = 0;
+    attr = ''; % Unused
+end
+if nargin<1 || isempty(n)
+    n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
 end
 
+% -------------------------------------------------------------------------
 use_uplab = false;
 
 L = linspace(0,100,n)';

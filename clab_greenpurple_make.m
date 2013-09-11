@@ -1,12 +1,12 @@
-function cmap = clab_greenpurple_make(n, attributes, dbg)
+function cmap = clab_greenpurple_make(n, attr, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
 if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
 end
-if nargin<2 || isempty(attributes)
-    attributes = 'Lfix'; % Colormap type option
+if nargin<2 || isempty(attr)
+    attr = 'Lfix'; % Colormap type option
 end
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
@@ -15,7 +15,7 @@ end
 % -------------------------------------------------------------------------
 use_uplab = false;
 
-switch lower(attributes)
+switch lower(attr)
     case 'lfix'
         % CIE  [  L*     C      h]
         lch1 = [ 66.25   94.9  328]; % purple
@@ -32,7 +32,7 @@ switch lower(attributes)
         lch1 = [ 30.5   130    302]; % blue
         lch2 = [ 90     100    122]; % green
     otherwise
-        error('Unfamiliar colormap attribute: %s',attributes);
+        error('Unfamiliar colormap attribute: %s',attr);
 end
 
 % -------------------------------------------------------------------------

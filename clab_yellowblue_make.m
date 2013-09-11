@@ -1,12 +1,12 @@
-function cmap = clab_yellowblue_make(n, attributes, dbg)
+function cmap = clab_yellowblue_make(n, attr, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
 if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
 end
-if nargin<2 || isempty(attributes)
-    attributes = ''; % Colormap type option
+if nargin<2 || isempty(attr)
+    attr = ''; % Colormap type option
 end
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
@@ -15,7 +15,7 @@ end
 % -------------------------------------------------------------------------
 use_uplab = false;
 
-switch attributes
+switch attr
     case ''
         % CIE  [  L*     C     h ]
 %         lch1 = [59.375 63.906  98];
@@ -70,7 +70,7 @@ switch attributes
         lch2 = [32.3006  133.8029  306.2845]; % blue
         
     otherwise
-        error('Unfamiliar colormap attribute: %s',attributes);
+        error('Unfamiliar colormap attribute: %s',attr);
 end
 
 % -------------------------------------------------------------------------

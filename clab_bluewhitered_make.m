@@ -1,12 +1,12 @@
-function cmap = clab_bluewhitered_make(n, attributes, dbg)
+function cmap = clab_bluewhitered_make(n, attr, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
 if nargin<3 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
 end
-if nargin<2 || isempty(attributes)
-    attributes = '';
+if nargin<2 || isempty(attr)
+    attr = '';
 end
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1); % Number of colours in the colormap
@@ -15,7 +15,7 @@ end
 % -------------------------------------------------------------------------
 % Parameters
 
-switch attributes
+switch attr
     case ''
         % CIELCH      [  L*      c    h]
         lchblue   = [ 46.375,  93.9075, 296];
@@ -54,7 +54,7 @@ switch attributes
         use_uplab = true;
         
     otherwise
-        error('Unfamiliar colormap attribute: %s',attributes);
+        error('Unfamiliar colormap attribute: %s',attr);
 end
 
 
