@@ -2,58 +2,13 @@ close all;
 
 %%
 
-% handpicked_hue1 = 13;
-% handpicked_hue2 = 87;
-% 
-% handpicked_hue1 = 21;
-% handpicked_hue2 = 75;
-
 % All max one twist maximum euclidian length
 handpicked_hue1 = 252;
 handpicked_hue2 = 564;
 
-% All max one twist maximum chroma
-
-
 % All up to one complete twist
-% hue1_range = 0:359;
-% hue2_range = -360:720;
-
-% % All up to one complete twist, reduced sampling
-% hue1_range =    0:2:359;
-% hue2_range = -360:2:720;
-% 
-% % Hot seach space
-% hue1_range = -45:1:45;
-% hue2_range =  70:1:130;
-
-% % Hot seach space (tighter)
-% hue1_range =  0:1:30;
-% hue2_range = 70:1:110;
-
-% % Hot seach space (tighter)
-% hue1_range =  0:1:30;
-% hue2_range = 70:1:106;
-
-% % Hot seach space (tighter still)
-% hue1_range =  7:1:25;
-% hue2_range = 95:1:102;
-% % Outcome was h1=9;h2=95;Lmin=4;Lmax=96;expnt=2;
-
-% Cold search space
-hue1_range = 300:2:360;
-hue2_range = 210:2:260;
-
-% % Purple
-% hue1_range = 290:2:330;
-% hue2_range = 310:2:350;
-% % Outcome h1=308.5;h2=331;Lmin=4;Lmax=92;expnt=2;
-
-hue1_range = 301:.5:312;
-hue2_range = 328:.5:335;
-
-% hue1_range = 300:2:360;
-% hue2_range = 200:2:300;
+hue1_range = 0:359;
+hue2_range = -360:720;
 
 
 % Curve parameters
@@ -78,24 +33,24 @@ for iXpt=1:length(expnt_range)
     
     for iLmin=1:length(Lmin_range)
         Lmin = Lmin_range(iLmin);
-    
+        
         for iLmax=1:length(Lmax_range)
             Lmax = Lmax_range(iLmax);
-        
+            
             % Computationally defined parameters
             L = linspace(Lmin,Lmax,npoints);
             Lmid = (Lmin+Lmax)/2;
-
+            
             for ih1=1:length(hue1_range)
                 h1 = hue1_range(ih1);
-
+                
                 for ih2=1:length(hue2_range);
                     h2 = hue2_range(ih2);
                     h_per_L = (h2-h1)/(Lmax-Lmin);
-
+                    
                     h = h1 + h_per_L * ((L-Lmin) + L_off - (L-Lmid).^2 * L_off/(Lmax-Lmid)^2);
                     h = mod(h,360);
-
+                    
                     switch typ
                         case 'sin'
                             c = c0 + (1-c0) * sin(pi* (L-Lmin)/(Lmax-Lmin) ).^expnt;
@@ -105,16 +60,16 @@ for iXpt=1:length(expnt_range)
                         otherwise
                             error('Unfamiliar type');
                     end
-
+                    
                     Lch = [L' c' h'];
-
+                    
                     % Check for points out of gamut
                     [TF,P2] = isingamut(Lch,g,'Lch');
-
+                    
                     P2C = P2(:,2);
                     maxc = min(P2C./c');
                     all_maxc(ih1,ih2,iLmin,iLmax,iXpt) = maxc;
-
+                    
                     % Euclidean length
                     c = c * maxc;
                     a = c.*cosd(h);
@@ -123,7 +78,7 @@ for iXpt=1:length(expnt_range)
                     Lab_dif = diff(Lab,1,1);
                     Lab_sep = sqrt(sum(Lab_dif.^2,2));
                     Lab_len = sum(Lab_sep,1);
-
+                    
                     all_eucl(ih1,ih2,iLmin,iLmax,iXpt) = Lab_len;
                 end
             end
