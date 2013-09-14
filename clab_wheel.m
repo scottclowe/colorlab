@@ -7,11 +7,11 @@
 %   
 %   Scott Lowe, April 2013
 
-function [rgb,params] = labwheel(n, L, c, h0, h1, dbg)
+function [rgb,params] = clab_wheel(n, L, c, h0, h1, dbg)
 
 % -------------------------------------------------------------------------
 if nargin<6
-    dbg = false;
+    dbg = true;
 end
 if nargin<4
     h0 = 0;
@@ -24,26 +24,14 @@ if nargin<3
 end
 if nargin<2
     L = 60; % Lightness
+    L = 73.875;
 end
 if nargin>1 && nargin<4
     % Find from srgb gamut the largest chroma which is available for all H
-    gamut = fetch_cielchab_gamut('srgb');
-    g = gamut.lch(gamut.lch(:,1)==L,:);
-    c = min(g(:,2));
+    rgbgamut = fetch_cielchab_gamut('srgb');
+    c = min(rgbgamut.lchmesh.cgrid(:,rgbgamut.lchmesh.Lvec==L));
 end
-% if nargin<=1
-%     L = 50;
-%     c = 55;
-%     h0 = 4.6600-2*pi; % 267 deg = 4.6600 rad
-%     h1 = 2.5656;      % 147 deg = 2.5656 rad
-% end
-if nargin<=1
-    % If no input, use hand picked set with partial circle of hues
-    L = 60;
-    c = 60;
-    h0 = -1.67; % 264/180*pi-2*pi; % -96 deg = -1.6755 rad
-    h1 =  2.61; % 150/180*pi;      % 150 deg =  2.6180 rad
-end
+
 % Default with same number of colors as in use for current colormap
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1);
@@ -56,13 +44,13 @@ use_uplab = false;
 h = linspace(h0, h1, (n+1)).';
 h = h(1:end-1);
 
-a = c*cos(h);
-b = c*sin(h);
-Ls = repmat(L,n,1);
+a = c*cosd(h);
+b = c*sind(h);
+LL = repmat(L,n,1);
 
-Lab = [Ls, a, b];
+Lab = [LL a b];
 
-rgb = soft_lab2rgb(Lab, use_uplab);
+rgb = hard_lab2rgb(Lab, use_uplab);
 
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap
