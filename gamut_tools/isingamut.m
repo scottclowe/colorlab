@@ -4,7 +4,8 @@ function [TF,P2] = isingamut(P,g,space)
 % Parse inputs
 switch lower(space)
     case 'lch'
-        % Do nothing
+        % Convert h so it is between [0,360)
+        P(:,3) = mod(P(:,3),360);
         
     case 'lab'
         % Need to convert to Lch
