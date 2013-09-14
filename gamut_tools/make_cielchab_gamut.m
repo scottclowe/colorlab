@@ -1,5 +1,6 @@
 function [gamut] = make_cielchab_gamut(space, N, point_method, use_uplab)
 
+% -------------------------------------------------------------------------
 % - INPUT HANDLING -
 if nargin<1
     space = 'srgb';
@@ -16,6 +17,7 @@ if nargin<4
     use_uplab = false;
 end
 
+% -------------------------------------------------------------------------
 % - INPUT SWITCHING -
 switch lower(space)
     case {'srgb','rgb'}
@@ -54,6 +56,7 @@ end
 % Have to go CMYK->RGB->LAB
 % kform = makecform('cmyk2srgb', 'RenderingIntent', 'RelativeColorimetric');
 
+% -------------------------------------------------------------------------
 % Make the main gamut object
 switch point_method
     case {'cube','face','face-plus'}
@@ -68,6 +71,12 @@ switch point_method
 end
 gamut.point_method  = point_method;
  
+if use_uplab
+    gamut.pcs = 'uplab';
+else
+    gamut.pcs = 'cielab';
+end
+
 % % Have to compute again to find a format for the gamut which lets us browse
 % % by chroma
 % gamut.lch_chr = parse_gamut_chr(gamut, use_uplab);
@@ -76,6 +85,7 @@ end
 
 
 
+% =========================================================================
 % Make a gamut indexed by lightness and hue
 % Made by generating lots of points in source space and converting them to
 % the destination (PCS) space. Have to round and max to make this in nice
@@ -273,6 +283,7 @@ end
 
 
 
+% =========================================================================
 % Make a gamut indexed by lightness and hue
 % Generate points in representation (PCS) space, then transform into source
 % space and see if is in known gamut.
@@ -389,6 +400,7 @@ end
 
 
 
+% =========================================================================
 % Make a gamut indexed by chroma
 function [lch_chr] = parse_gamut_chr(g, use_uplab)
 
