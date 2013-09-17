@@ -1,30 +1,21 @@
-%LABWHEEL A set of colors from a circle in CIELAB color space
-%   RGB = LABWHEEL(N,L,C,H0) finds a set of N colors equally spaced in
-%   CIELAB space in a circle using CIELCHab co-ordinates. The circle is
-%   taken anti-clockwise with constant lightness, L and contant chroma, C,
-%   and an initial Hue of H0. Returns RGB, an n-by-3 vector of these colors
-%   represented in sRGB space.
-%   
-%   Scott Lowe, April 2013
-
-function [rgb,params] = clab_Larc(n, use_uplab, L, dbg)
+function [rgb,params] = clab_Larc(n, L, use_uplab, dbg)
 
 % -------------------------------------------------------------------------
-if nargin<4
-    dbg = true;
-end
-if nargin<3 || isempty(L)
-    L = 60; % Lightness
-end
-if nargin<2
-    use_uplab = false;
-end
 % Default with same number of colors as in use for current colormap
 if nargin<1 || isempty(n)
     n = size(get(gcf,'colormap'),1);
 end
+if nargin<2 || isempty(L)
+    L = 60; % Lightness
+end
+if nargin<3
+    use_uplab = false;
+end
+if nargin<4
+    dbg = true;
+end
 
-use_cmax = true;
+use_cmax = false;
 
 % -------------------------------------------------------------------------
 rgbgamut = fetch_cielchab_gamut('srgb',[],[],use_uplab);
@@ -33,8 +24,6 @@ rgbgamut = fetch_cielchab_gamut('srgb',[],[],use_uplab);
 % % Manually pick value for c
 % h0 = rgbgamut.lchmesh.hvec(find(~(cc>=c),1,'last')+1)-360
 % h1 = rgbgamut.lchmesh.hvec(find(~(cc>=c),1,'first')-1)
-
-fullcirc = false;
 
 if use_uplab
     % UPLab
@@ -80,7 +69,6 @@ if use_uplab
             c = 40.1;
             h0 = -140;
             h1 =  220;
-            fullcirc = true;
         otherwise
             h0 = -54;
             h1 =  57.5;
@@ -131,7 +119,6 @@ else
             c = 38.4;
             h0 = -145;
             h1 =  215;
-            fullcirc = true;
         otherwise
             h0 = -82.5;
             h1 = 149.5;
@@ -146,7 +133,7 @@ else
 end
 
 % -------------------------------------------------------------------------
-if fullcirc
+if h1-h0==360
     h = linspace(h0, h1, (n+1)).';
     h = h(1:end-1);
 else
