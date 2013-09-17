@@ -1,4 +1,4 @@
-function varargout = clab_Lfix_disting(n, LL, pickL, use_uplab, dbg)
+function varargout = clab_Lfix_disting(n, LL, func, use_uplab, dbg)
 
 % -------------------------------------------------------------------------
 % Default with same number of colors as in use for current colormap
@@ -8,8 +8,8 @@ end
 if nargin<2 || isempty(LL)
     LL = 50; % Lightness
 end
-if nargin<3 || isempty(pickL)
-    pickL = LL(1); % Lightness
+if nargin<3 || isempty(func)
+    func = 'min'; % 'min' | 'mean' | 'max'
 end
 if nargin<4
     use_uplab = false;
@@ -19,34 +19,54 @@ if nargin<5
 end
 
 % -------------------------------------------------------------------------
+LL = LL(:)';
+if ischar(func)
+    hfunc = str2func(func);
+end
+
+% -------------------------------------------------------------------------
 % Find the optimally spaced hues at given L
 g = fetch_cielchab_gamut('srgb',[],[],use_uplab);
 
-c = g.lchmesh.cgrid(:,g.lchmesh.Lvec==pickL);
-h = g.lchmesh.hvec';
-L = repmat(pickL,size(h));
-a = c.*cosd(h);
-b = c.*sind(h);
-pickLab = [L a b];
+cc = g.lchmesh.cgrid(:, ismember(g.lchmesh.Lvec,LL));
+hh = repmat(g.lchmesh.hvec', [1 length(LL)]);
+aa = cc.*cosd(hh);
+bb = cc.*sind(hh);
 
 pickedI = nan(n,1);
-[c1,I] = max(c);
-pickedI(1) = I;
-lastpickedLab = pickLab(I,:);
+switch func
+    case {'min','max'}
+        xcc = hfunc(cc,[],2);
+    case 'mean'
+        xcc = hfunc(cc,2);
+    otherwise
+        xcc = hfunc(cc);
+end
+[C, pickedI(1)] = max(xcc);
 
 if n>1
-    minpickLab_dE2 = nan(size(h));
+    min_dE = nan(size(hh,1),1);
 end
 
 for i=2:n
-    % Don't bother to sqrt as it is a monotonic function
-    lastpickLab_dE2 = sum(bsxfun(@minus, pickLab, lastpickedLab).^2, 2);
-    minpickLab_dE2 = min(minpickLab_dE2, lastpickLab_dE2);
     
-    [C,I] = max(minpickLab_dE2);
+    dE = sqrt(...
+        bsxfun(@minus, aa, aa(pickedI(i-1),:)) .^2 ...
+        + bsxfun(@minus, bb, bb(pickedI(i-1),:)) .^2 ...
+    );
     
-    pickedI(i) = I;
-    lastpickedLab = pickLab(I,:);
+    switch func
+        case {'min','max'}
+            xdE = hfunc(dE,[],2);
+        case 'mean'
+            xdE = hfunc(dE,2);
+        otherwise
+            xdE = hfunc(dE);
+    end
+    min_dE = min(min_dE, xdE);
+    
+    [C, pickedI(i)] = max(min_dE);
+    
 end
 % Should maximise the minimum of distances for each LL
 
@@ -82,14 +102,32 @@ end
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap
 if dbg;
+    
     rgb = cell2mat(varargout);
-    img = repmat(rgb,[1 1 20]);
-    img = permute(img,[1 3 2]);
+%     img = repmat(rgb,[1 1 20]);
+    img = permute(rgb,[1 3 2]);
     figure;
     imagesc(img);
     axis xy;
     title('Output colormap');
+    
     plot_labcurve_rgbgamut(cell2mat(LL_Lab), use_uplab);
+    
+    figure;
+    for j=1:length(LL)
+        subplot(1,length(LL),j);
+        set(gca,'Color',[.4663 .4663 .4663]);
+        hold on;
+        plot(aa(:,j), bb(:,j), 'k-');
+        plot(LL_Lab{j}(:,2), LL_Lab{j}(:,3), 'w-');
+        scatter(LL_Lab{j}(:,2), LL_Lab{j}(:,3), [], LL_rgb{j}, 'filled');
+        xlim([-150 150]);
+        ylim([-150 150]);
+        xlabel('a*');
+        ylabel('b*');
+        title(['L = ' num2str(LL(j))]);
+    end
+    
 end
 
 end
