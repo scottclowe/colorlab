@@ -3,7 +3,7 @@ function varargout = clab_Lfix_disting(n, LL, pickL, use_uplab, dbg)
 % -------------------------------------------------------------------------
 % Default with same number of colors as in use for current colormap
 if nargin<1 || isempty(n)
-    n = 12; %size(get(gcf,'colormap'),1);
+    n = 8; %size(get(gcf,'colormap'),1);
 end
 if nargin<2 || isempty(LL)
     LL = 50; % Lightness
@@ -30,15 +30,12 @@ b = c.*sind(h);
 pickLab = [L a b];
 
 pickedI = nan(n,1);
-pickedH = nan(n,1);
 [c1,I] = max(c);
 pickedI(1) = I;
-pickedH(1) = h(I);
 lastpickedLab = pickLab(I,:);
 
 if n>1
-    lastpickLab_dE2 = sum(bsxfun(@minus, pickLab, lastpickedLab).^2, 2);
-    minpickLab_dE2 = lastpickLab_dE2;
+    minpickLab_dE2 = nan(size(h));
 end
 
 for i=2:n
@@ -49,7 +46,6 @@ for i=2:n
     [C,I] = max(minpickLab_dE2);
     
     pickedI(i) = I;
-    pickedH(i) = h(I);
     lastpickedLab = pickLab(I,:);
 end
 % Should maximise the minimum of distances for each LL
