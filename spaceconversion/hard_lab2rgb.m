@@ -10,22 +10,8 @@ if nargin<2
     use_uplab = false;
 end
 
-% Move from UPLab to CIELab
-% UPLab was made by Bruce Lindbloom and provides a color space where the
-% Munsell colors are uniformly spaced.
-% http://www.brucelindbloom.com/index.html?UPLab.html
-% Turns out, the mapping is the opposite way around to what Bruce says, and
-% the original (CIELab_to_UPLab.icc) is and the second version
-% (CIELab_to_UPLab2.icc) is not compliant with the standard directions.
-% http://argyllcms.com/doc/iccgamutmapping.html
 if use_uplab;
-    P = iccread('CIELab_to_UPLab.icc');
-    % AToB0: UPLab to CIELab
-    Lab = applycform(Lab, makecform('CLUT', P, 'AToB0'));
-%     tempLab = nan(size(Lab));
-%     li = ~(isnan(Lab(:,1)) | isnan(Lab(:,2)) | isnan(Lab(:,3)));
-%     tempLab(li,:) = applycform(Lab(li,:), cform);
-%     Lab = tempLab;
+    Lab = uplab2cielab(Lab);
 end
 
 rgb = clab_colorspace('Lab->RGB',Lab);
