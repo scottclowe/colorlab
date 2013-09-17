@@ -1,4 +1,4 @@
-function varargout = clab_Lfix_disting(n, LL, func, use_uplab, dbg)
+function varargout = clab_Lfix_disting(n, LL, igrey, use_uplab, func, dbg)
 
 % -------------------------------------------------------------------------
 % Default with same number of colors as in use for current colormap
@@ -8,13 +8,16 @@ end
 if nargin<2 || isempty(LL)
     LL = 50; % Lightness
 end
-if nargin<3 || isempty(func)
-    func = 'min'; % 'min' | 'mean' | 'max'
+if nargin<3 || isempty(igrey)
+    igrey = 1;
 end
 if nargin<4
     use_uplab = false;
 end
-if nargin<5
+if nargin<5 || isempty(func)
+    func = 'min'; % 'min' | 'mean' | 'max'
+end
+if nargin<6
     dbg = true;
 end
 
@@ -33,7 +36,6 @@ hh = repmat(g.lchmesh.hvec', [1 length(LL)]);
 aa = cc.*cosd(hh);
 bb = cc.*sind(hh);
 
-pickedI = nan(n,1);
 switch func
     case {'min','max'}
         xcc = hfunc(cc,[],2);
@@ -42,13 +44,25 @@ switch func
     otherwise
         xcc = hfunc(cc);
 end
-[C, pickedI(1)] = max(xcc);
 
 if n>1
-    min_dE = nan(size(hh,1),1);
+    if igrey>=0
+        min_dE = xcc;
+    else
+        min_dE = nan(size(hh,1),1);
+    end
 end
 
-for i=2:n
+if igrey<1 || igrey>n
+    iend = n;
+else
+    iend = n-1;
+end
+
+pickedI = nan(iend,1);
+[C, pickedI(1)] = max(xcc);
+
+for i=2:iend
     
     dE = sqrt(...
         bsxfun(@minus, aa, aa(pickedI(i-1),:)) .^2 ...
@@ -76,6 +90,8 @@ end
 LL_Lab = cell(length(LL),1);
 LL_rgb = cell(length(LL),1);
 
+pickedI
+
 for j=1:length(LL)
     c = g.lchmesh.cgrid(pickedI, g.lchmesh.Lvec==LL(j));
     h = g.lchmesh.hvec(pickedI)';
@@ -83,6 +99,9 @@ for j=1:length(LL)
     a = c.*cosd(h);
     b = c.*sind(h);
     Lab = [L a b];
+    if igrey>=1 && igrey<=n
+        Lab = [Lab(1:(igrey-1),:); LL(j) 0 0; Lab(igrey:end,:)];
+    end
     rgb = hard_lab2rgb(Lab, use_uplab);
     LL_Lab{j} = Lab;
     LL_rgb{j} = rgb;
