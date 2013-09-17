@@ -47,6 +47,7 @@ end
 
 set(gca,'Color',[0.4663 0.4663 0.4663]);
 set(gca,'XLim',[-150 150],'YLim',[-150 150],'ZLim',[0 100]);
+set(gca,'XTick',-150:50:150,'YTick',-150:50:150);
 xlabel('a*')
 ylabel('b*')
 zlabel('L*')
