@@ -1,4 +1,4 @@
-function [varargout] = clab_Larc(n, LL, use_uplab, dbg)
+function [varargout] = clab_Larc(n, LL, use_uplab, use_cmax, dbg)
 
 % -------------------------------------------------------------------------
 % Default with same number of colors as in use for current colormap
@@ -12,10 +12,11 @@ if nargin<3
     use_uplab = false;
 end
 if nargin<4
+    use_cmax = false;
+end
+if nargin<5
     dbg = true;
 end
-
-use_cmax = false;
 
 % -------------------------------------------------------------------------
 rgbgamut = fetch_cielchab_gamut('srgb',[],[],use_uplab);
