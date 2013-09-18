@@ -19,121 +19,25 @@ use_cmax = false;
 
 % -------------------------------------------------------------------------
 rgbgamut = fetch_cielchab_gamut('srgb',[],[],use_uplab);
-% cc = rgbgamut.lchmesh.cgrid(:,rgbgamut.lchmesh.Lvec==L);
-% figure; plot(rgbgamut.lchmesh.hvec, cc);
-% % Manually pick value for c
-% h0 = rgbgamut.lchmesh.hvec(find(~(cc>=c),1,'last')+1)-360
-% h1 = rgbgamut.lchmesh.hvec(find(~(cc>=c),1,'first')-1)
 
-if use_uplab
-    % UPLab
-    switch L
-        case 40
-            c = 72.5;
-            h0 = -54;
-            h1 =  57.75;
-        case 45
-            c = 80;
-            h0 = -54;
-            h1 =  57.5;
-        case 50
-%             c = 38.1;
-%             h0 = -80;
-%             h1 = 195;
-            c = 87;
-            h0 = -53;
-            h1 =  56.75;
-        case 55
-%             c = 70;
-%             h0 = -57;
-%             h1 =  68.25;
-            c = 90;
-            h0 = -46.75;
-            h1 =  57;
-        case 60
-%             c = 44.4;
-%             h0 = -79.75;
-%             h1 = 193;
-            c = 75;
-            h0 = -55.75;
-            h1 =  67.50;
-        case 65
-            c = 62.9;
-            h0 = -63;
-            h1 =  86.5;
-        case 70
-            c = 50;
-            h0 = -77.5;
-            h1 = 193.75;
-        case 75
-            c = 40.1;
-            h0 = -140;
-            h1 =  220;
-        otherwise
-            h0 = -54;
-            h1 =  57.5;
-            if h0>=0
-                hli = rgbgamut.lchmesh.hvec >= h0 & rgbgamut.lchmesh.hvec <= h1;
-            else
-                hli = rgbgamut.lchmesh.hvec <= h1 | rgbgamut.lchmesh.hvec >= (h0+360);
-            end
-            Lli = rgbgamut.lchmesh.Lvec==L;
-            c = min(rgbgamut.lchmesh.cgrid(hli,Lli));
-    end
+if ~use_uplab
+%     edgL  = [ 15     20    25    30    35    40    45    50    55    60    65     70      75  ];
+%     edgh0 = [-90.75 -85.5 -83.5 -82.5 -82.5 -82.5 -82.5 -82.5 -82.5 -83.5 -66.0 -108.75 -145  ];
+%     edgh1 = [158.75 153.0 150.5 149.5 149.5 149.5 149.5 149.5 149.5 150.5 156.75 178     215  ];
+%     edgc  = [ 21.9   28.3  33.9  38.8  43.1  47.3  51.5  55.8  60.0  62.8  59.2  46.4     38.4];
+    
+    [h0,h1,c] = arcparams_cielab(L, rgbgamut);
+    
 else
-    % CIELab
-    switch L
-        case 35
-            c = 43.1;
-            h0 = -82.5;
-            h1 = 149.5;
-        case 40
-            c = 47.3;
-            h0 = -82.5;
-            h1 = 149.5;
-        case 45
-            c = 51.5;
-            h0 = -82.5;
-            h1 = 149.5;
-        case 50
-            c = 55.8;
-            h0 = -82.5;
-            h1 = 149.5;
-        case 55
-            c = 60.0;
-            h0 = -82.5;
-            h1 = 149.5;
-        case 60
-            c = 62.8;
-            h0 = -83.5; % 276.5-360
-            h1 = 150.5;
-        case 65
-            c = 59.2;
-            h0 = -66.00;
-            h1 = 156.75;
-        case 70
-            c = 46.4; % c = 38.4;
-            h0 = -108.75;
-            h1 =  178.00;
-        case 75
-            c = 38.4;
-            h0 = -145;
-            h1 =  215;
-        otherwise
-            h0 = -82.5;
-            h1 = 149.5;
-            if h0>=0
-                hli = rgbgamut.lchmesh.hvec >= h0 & rgbgamut.lchmesh.hvec <= h1;
-            else
-                hli = rgbgamut.lchmesh.hvec <= h1 | rgbgamut.lchmesh.hvec >= (h0+360);
-            end
-            Lli = rgbgamut.lchmesh.Lvec==L;
-            c = min(rgbgamut.lchmesh.cgrid(hli,Lli));
-    end
+    % Stuff here
+%     edgL  = [ 40     45    50     55     60     65    70     75   ];
+%     edgh0 = [-54    -54   -53    -46.75 -55.75 -63   -77.5  -140  ];
+%     edgh1 = [ 57.75  57.5  56.75  57     67.50  86.5 193.75  220  ];
+%     edgc  = [ 72.5   80    87     90     75     62.9  50      40.1];
 end
 
 % -------------------------------------------------------------------------
-if h1-h0==360
+if h1-h0>359
     h = linspace(h0, h1, (n+1)).';
     h = h(1:end-1);
 else
@@ -149,7 +53,6 @@ if use_cmax
 end
 a = c.*cosd(h);
 b = c.*sind(h);
-
 
 Lab = [LL a b];
 
@@ -176,3 +79,56 @@ params.h0 = h0;
 params.h1 = h1;
 
 end
+
+% =========================================================================
+function [h0,h1,c] = arcparams_cielab(L, rgbgamut)
+    % ---------------------------------------------------------------------
+    if nargin<2
+        rgbgamut = fetch_cielchab_gamut('srgb',[],[],use_uplab);
+    end
+    % ---------------------------------------------------------------------
+    %  0<L<61:  Min1 at h=214, Min2 at h=93
+    % 61<L<65:  Min1 at h=214, Min2 at h=14
+    % At L=65:  Min1 splits at h=55
+    % 75<L<100: Min1 and Min2 level (h=22, h=273)
+    
+    % Define our seach space for second minima
+    if L<65
+        h_srt =   0;
+        h_end = 135;
+    elseif L<71
+        h_srt = -106;
+        h_end =  135;
+    else
+        h0 = -145;
+        h1 =  215;
+        c  = min(rgbgamut.lchmesh.cgrid(:, rgbgamut.lchmesh.Lvec==L));
+        return;
+    end
+    if h_srt>=0
+        hli = rgbgamut.lchmesh.hvec >= h_srt & rgbgamut.lchmesh.hvec <= h_end;
+    else
+        hli = rgbgamut.lchmesh.hvec <= h_end | rgbgamut.lchmesh.hvec >= (h_srt+360);
+    end
+    % Look up chroma
+    cc = rgbgamut.lchmesh.cgrid(:, rgbgamut.lchmesh.Lvec==L);
+    c  = 0.99*min(cc(hli,:));
+    h0 = rgbgamut.lchmesh.hvec(find(~(cc>=c),1,'last' )+1)-360;
+    h1 = rgbgamut.lchmesh.hvec(find(~(cc>=c),1,'first')-1);
+end
+
+% =========================================================================
+% Search code
+
+% cc = rgbgamut.lchmesh.cgrid(:,rgbgamut.lchmesh.Lvec==30);
+% figure; plot(rgbgamut.lchmesh.hvec, cc);
+% % Manually pick value for c
+% h0 = rgbgamut.lchmesh.hvec(find(~(cc>=c),1,'last')+1)-360
+% h1 = rgbgamut.lchmesh.hvec(find(~(cc>=c),1,'first')-1)
+% 
+% figure;
+% imagesc(rgbgamut.lchmesh.Lvec, rgbgamut.lchmesh.hvec, bsxfun(@rdivide, rgbgamut.lchmesh.cgrid, max(rgbgamut.lchmesh.cgrid)))
+% colormap(clab_hot); colorbar; xlabel('L'); ylabel('h');
+% figure;
+% imagesc(rgbgamut.lchmesh.Lvec, rgbgamut.lchmesh.hvec, bsxfun(@rdivide, 1./rgbgamut.lchmesh.cgrid, max(1./rgbgamut.lchmesh.cgrid)))
+% colormap(clab_hot); colorbar; xlabel('L'); ylabel('h');
