@@ -122,14 +122,15 @@ end
 if dbg;
     
     rgb = cell2mat(varargout);
-%     img = repmat(rgb,[1 1 20]);
-    img = permute(rgb,[1 3 2]);
     figure;
-    imagesc(img);
+    imagesc(permute(rgb,[1 3 2]));
     axis xy;
     title('Output colormap');
     
-    plot_labcurve_rgbgamut(cell2mat(LL_Lab), use_uplab);
+    LL_Lab2 = nan(n*length(LL),3);
+    I = setdiff(1:((n+1)*length(LL)),(n+1)*(1:length(LL)));
+    LL_Lab2(I,:) = cell2mat(LL_Lab);
+    plot_labcurve_rgbgamut(LL_Lab2, use_uplab);
     
     figure;
     for j=1:length(LL)
