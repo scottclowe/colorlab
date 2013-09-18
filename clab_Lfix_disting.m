@@ -1,4 +1,4 @@
-function varargout = clab_Lfix_disting(n, LL, igrey, use_uplab, func, dbg)
+function varargout = clab_Lfix_disting(n, LL, greyindex, use_uplab, func, dbg)
 
 % -------------------------------------------------------------------------
 % Default with same number of colors as in use for current colormap
@@ -6,10 +6,10 @@ if nargin<1 || isempty(n)
     n = 8; %size(get(gcf,'colormap'),1);
 end
 if nargin<2 || isempty(LL)
-    LL = 50; % Lightness
+    LL = 55; % Lightness
 end
-if nargin<3 || isempty(igrey)
-    igrey = 1;
+if nargin<3 || isempty(greyindex)
+    greyindex = 1;
 end
 if nargin<4
     use_uplab = false;
@@ -46,14 +46,15 @@ switch func
 end
 
 if n>1
-    if igrey>=0
+    % greyindex=0 treated like greyindex>n
+    if greyindex>=0
         min_dE = xcc;
     else
         min_dE = nan(size(hh,1),1);
     end
 end
 
-if igrey<1 || igrey>n
+if greyindex<1 || greyindex>n
     iend = n;
 else
     iend = n-1;
@@ -90,8 +91,6 @@ end
 LL_Lab = cell(length(LL),1);
 LL_rgb = cell(length(LL),1);
 
-pickedI
-
 for j=1:length(LL)
     c = g.lchmesh.cgrid(pickedI, g.lchmesh.Lvec==LL(j));
     h = g.lchmesh.hvec(pickedI)';
@@ -99,8 +98,8 @@ for j=1:length(LL)
     a = c.*cosd(h);
     b = c.*sind(h);
     Lab = [L a b];
-    if igrey>=1 && igrey<=n
-        Lab = [Lab(1:(igrey-1),:); LL(j) 0 0; Lab(igrey:end,:)];
+    if greyindex>=1 && greyindex<=n
+        Lab = [Lab(1:(greyindex-1),:); LL(j) 0 0; Lab(greyindex:end,:)];
     end
     rgb = hard_lab2rgb(Lab, use_uplab);
     LL_Lab{j} = Lab;
