@@ -8,14 +8,19 @@ end
 if nargin<2 || isempty(LL)
     LL = 55; % Lightness
 end
-if nargin<3
+if nargin<3 || isempty(use_uplab)
     use_uplab = false;
 end
-if nargin<4
+if nargin<4 || isempty(use_cmax)
     use_cmax = false;
 end
 if nargin<5
     dbg = true;
+end
+
+% -------------------------------------------------------------------------
+if use_cmax && n>10
+    warning('Using maximum chroma for each colour with lots of colours is a bad idea');
 end
 
 % -------------------------------------------------------------------------
