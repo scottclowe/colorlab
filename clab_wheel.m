@@ -24,17 +24,22 @@ if nargin<2 || isempty(L)
     L = [];
 end
 if nargin<3 || isempty(h0)
-    h0 = 15;
+    h0 = 15; % Default start hue with CIELab
     if use_uplab
-        h0 = h0+15;
+        h0 = h0+15; % Hues in UPLab are rotated by about 15 degrees, compared with CIELab
     end
 end
 if nargin<4 || isempty(h1)
-    h1 = h0+360;
+    h1 = h0+360; % Default with a full circle
 end
 if nargin<5
     dbg = true;
 end
+
+% -------------------------------------------------------------------------
+% Input parsing
+if ischar(h0); h0 = colorstr2h(h0); end
+if ischar(h1); h1 = colorstr2h(h1); end
 
 % -------------------------------------------------------------------------
 rgbgamut = fetch_cielchab_gamut('srgb');
@@ -73,8 +78,12 @@ end
 
 % -------------------------------------------------------------------------
 
-h = linspace(h0, h1, (n+1)).';
-h = h(1:end-1);
+if mod(h1-h0,360)>359 || mod(h1-h0,360)<1
+    h = linspace(h0, h1, (n+1)).';
+    h = h(1:end-1);
+else
+    h = linspace(h0, h1, n).';
+end
 
 a = c*cosd(h);
 b = c*sind(h);
