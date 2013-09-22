@@ -39,12 +39,8 @@ clrstr = false;
 if ischar(h0); h0=colorstr2h(h0); clrstr=true; end
 if ischar(h1); h1=colorstr2h(h1); clrstr=true; end
 
-if clrstr && abs(h0-h1)>180
-    if h1>h0;
-        h1 = h1-360;
-    else
-        h0 = h0-360;
-    end
+if clrstr && (h1<h0 || h0==h1)
+    h1 = h1+360;
 end
 
 % -------------------------------------------------------------------------
