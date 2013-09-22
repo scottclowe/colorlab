@@ -1,5 +1,5 @@
 % CIEDE Color difference
-function dE = ciede(Lab1,Lab2)
+function dE = ciede2000(Lab1,Lab2)
 
 % Taken from
 % https://en.wikipedia.org/wiki/Color_difference#CIEDE2000
