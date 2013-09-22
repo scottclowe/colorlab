@@ -86,10 +86,6 @@ end
 aa = bsxfun(@times, cc, cosd(h));
 bb = bsxfun(@times, cc, sind(h));
 
-% Lab = [LL a b];
-% 
-% rgb = hard_lab2rgb(Lab, use_uplab);
-
 % -------------------------------------------------------------------------
 % Now pick out these colours
 
