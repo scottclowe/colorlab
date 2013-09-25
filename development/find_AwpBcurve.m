@@ -1,7 +1,7 @@
 % Find seperation distance for a set of different hues
 % (Blue-white-red style)
 clear all;
-close all;
+% close all;
 
 %% Parameters
 
@@ -12,43 +12,64 @@ use_uplab = false;
 handpicked_hue1 = 309; %[]; % 290; % Blue
 handpicked_hue2 = 54.75; %[]; % 41;  % Red
 
-via_black = 0; % Go via near-white (0) or near-black (1)
-
 hue1_range = 307:.25:312; %200:320; %260:315; %0:359; %260:315;
 hue2_range =  52:.25:56; % 20:90;  % 10:70;  %0:359; % 10:70 ;
 
-hue1_range =  40;
-hue2_range = 296;
+% hue1_range =  40;
+% hue2_range = 296;
+
+% bwr
+hue1_range = 285:307;
+hue2_range =  30:50;
+via_black = false;
+
+% bwr tight
+hue1_range = 291:.5:306;
+hue2_range =  33:.5:50;
+via_black = false;
 
 
 % Curve parameters
 use_uplab = false;
 npoints = 100;     % number of points to use in test series
-expnt = 1;
 typ = 'sin';       % 'pow' or 'sin'
 c0 = 0;
-Lmin     =  0;
-Lmax     = 95;
-spotLmin = 20;
-spotLmax = Lmax;
+% Lmin     =  0; % curve shape
+Lmax     = 94; % curve shape
+spotLmin = 15; % displayed colour limit
+spotLmax = Lmax; % displayed colour limit
+ncurve   = 401;
 
+switch typ
+    case 'sin'
+        expnt = 1;
+    case 'pow'
+        expnt = 2;
+end
 
 %% Main body
 
 g = fetch_cielchab_gamut('srgb', [], [], use_uplab);
 
 
-all_maxc = nan( length(hue1_range), length(hue2_range) );
+all_maxc = nan( length(hue1_range), length(hue2_range), ncurve );
 
 % Computationally defined parameters
 % L = linspace(Lmin,Lmax,npoints);
-Lmid = (Lmin+Lmax)/2;
 
+if via_black
+    % Sets Lmax
+    Lcurve = linspace(spotLmax, spotLmax-Lmin, ncurve);
+else
+    % Sets Lmin
+    Lcurve = linspace(spotLmin, spotLmin-Lmax, ncurve);
+end
 
 li_L   = g.lchmesh.Lvec>=spotLmin & g.lchmesh.Lvec<=spotLmax;
 jointL = g.lchmesh.Lvec(li_L)';
 L = jointL;
 
+% Go through all hue
 for ih1=1:length(hue1_range)
     
     hue1 = hue1_range(ih1);
@@ -63,23 +84,37 @@ for ih1=1:length(hue1_range)
         
         jointC = min(gh1(:,2),gh2(:,2));
         
-        switch typ
-            case 'sin'
-                c = c0 + (1-c0) * sin(pi* (L-Lmin)/(Lmax-Lmin) ).^expnt;
-            case 'pow'
-                c = 1 - (1-c0) * abs(((L-Lmid)*(min(Lmid-0,100-Lmid)/min(Lmax-Lmid,Lmid-Lmin))).^expnt) / abs(Lmid.^expnt);
-                c = max(0,c);
-            otherwise
-                error('Unfamiliar type');
+        % Try different curve steepness to see how well we can do
+        for icurve=1:ncurve
+            
+            if via_black
+                Lmax = Lcurve(icurve);
+            else
+                Lmin = Lcurve(icurve);
+            end
+            Lmid = (Lmin+Lmax)/2;
+            
+            switch typ
+                case 'sin'
+                    c = c0 + (1-c0) * sin(pi* (L-Lmin)/(Lmax-Lmin) ).^expnt;
+                case 'pow'
+                    c = 1 - (1-c0) * abs(((L-Lmid)*(min(Lmid-0,100-Lmid)/min(Lmax-Lmid,Lmid-Lmin))).^expnt) / abs(Lmid.^expnt);
+                    c = max(0,c);
+                otherwise
+                    error('Unfamiliar type');
+            end
+            
+            % Check for points out of gamut
+            maxc = min(jointC./c);
+            all_maxc(ih1,ih2,icurve) = maxc;
+            
         end
-        
-        % Check for points out of gamut
-        maxc = min(jointC./c);
-        
-        all_maxc(ih1,ih2) = maxc;
         
     end
 end
+
+[all_maxc,Icurvemax] = max(all_maxc,[],3);
+
 
 %%
 
@@ -94,6 +129,14 @@ title('Maximum chroma');
 %%
 
 [mm,mIh] = max(all_maxc(:));
+
+if via_black
+    Lmax = Lcurve(Icurvemax(mIh));
+else
+    Lmin = Lcurve(Icurvemax(mIh));
+end
+Lmid = (Lmin+Lmax)/2;
+
 casediscr = sprintf('Max Chroma = %.2f',mm);
 [mih1,mih2] = ind2sub(size(all_maxc),mIh);
 
@@ -143,9 +186,9 @@ plot_labcurve_rgbgamut(lab, use_uplab);
 
 % Debug
 jointL = g.lchmesh.Lvec(li_L)';
-li_h = g.lchmesh.hvec==hue1;
+li_h = g.lchmesh.hvec==h1;
 gh1  = [jointL g.lchmesh.cgrid(li_h,li_L)' g.lchmesh.hgrid(li_h,li_L)'];
-li_h = g.lchmesh.hvec==hue2;
+li_h = g.lchmesh.hvec==h2;
 gh2  = [jointL g.lchmesh.cgrid(li_h,li_L)' g.lchmesh.hgrid(li_h,li_L)'];
 jointC = min(gh1(:,2),gh2(:,2));
 
