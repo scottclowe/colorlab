@@ -21,7 +21,8 @@ b = zeros(n,1);
 
 Lab = [L a b];
 
-cmap = soft_lab2rgb(Lab, use_uplab); % Needs to be soft as white is outside by 3.8011e-05
+% Needs to be soft conversion because white is outside by 3.8011e-05
+cmap = soft_lab2rgb(Lab, use_uplab);
 
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap
@@ -33,7 +34,7 @@ if dbg;
     axis xy;
     title('Output colormap');
     
-    plot_labcurve_rgbgamut(Lab);
+    plot_labcurve_rgbgamut(Lab, use_uplab);
 end
 
 end

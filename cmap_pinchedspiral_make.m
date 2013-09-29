@@ -1,9 +1,37 @@
-function cmap = cmap_pinchedspiral_make(params, dbg)
+function rgb = cmap_pinchedspiral_make(params, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
 if nargin<2 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
+end
+
+% -------------------------------------------------------------------------
+% Check input is okay
+neces_fields = {'n','h1','h_per_L','Lmin','Lmax','typ','maxc'};
+li = isfield(params,neces_fields);
+if any(~li)
+    error('Field %s is blank. ',neces_fields{~li});
+end
+
+% -------------------------------------------------------------------------
+% Fill in non-essential fields
+if ~isfield(params,'use_uplab')
+    params.use_uplab = false;
+end
+if ~isfield(params,'L_off')
+    params.L_off = 0;
+end
+if ~isfield(params,'c0')
+    params.c0 = 0;
+end
+if ~isfield(params,'expnt')
+    switch params.typ
+        case 'sin'
+            params.expnt = 1;
+        case 'pow'
+            params.expnt = 2;
+    end
 end
 
 % -------------------------------------------------------------------------
@@ -30,12 +58,12 @@ b = c.*sind(h);
 Lab = [L' a' b'];
 
 % Turn Lab into sRGB values
-cmap = hard_lab2rgb(Lab, params.use_uplab);
+rgb = hard_lab2rgb(Lab, params.use_uplab);
 
 % -------------------------------------------------------------------------
 if dbg
     % Plot the colormap
-    img = repmat(cmap,[1 1 20]);
+    img = repmat(rgb,[1 1 20]);
     img = permute(img,[1 3 2]);
     figure;
     imagesc(img);
@@ -67,7 +95,7 @@ if dbg
     xlabel('chroma');
     ylabel('Lightness');
     
-    
+    % Colormap in 3d gamut
     plot_labcurve_rgbgamut(Lab, params.use_uplab);
 end
 
