@@ -40,7 +40,7 @@ end
 
 % -------------------------------------------------------------------------
 % Build the colormap
-cmap = cmap_ABlin_make(params, dbg);
+cmap = makecmap_ABlin(params, dbg);
 
 end
 

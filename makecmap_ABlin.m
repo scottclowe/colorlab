@@ -1,4 +1,4 @@
-function cmap = cmap_ABlin_make(params, dbg)
+function cmap = makecmap_ABlin(params, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs

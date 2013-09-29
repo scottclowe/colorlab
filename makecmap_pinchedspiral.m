@@ -1,4 +1,4 @@
-function rgb = cmap_pinchedspiral_make(params, dbg)
+function rgb = makecmap_pinchedspiral(params, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs

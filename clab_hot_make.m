@@ -18,7 +18,7 @@ params = get_params();
 params.n = n;
 
 % -------------------------------------------------------------------------
-cmap = cmap_pinchedspiral_make(params, dbg);
+cmap = makecmap_pinchedspiral(params, dbg);
 
 end
 

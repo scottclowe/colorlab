@@ -1,4 +1,4 @@
-function rgb = cmap_AwpBcurve_make(params, dbg)
+function rgb = makecmap_AwpBcurve(params, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs

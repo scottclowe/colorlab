@@ -1,4 +1,4 @@
-function rgb = cmap_AwpBlin_make(params, dbg)
+function rgb = makecmap_AwpBlin(params, dbg)
 
 % -------------------------------------------------------------------------
 % Default inputs
@@ -19,9 +19,9 @@ end
 if ~isfield(params,'use_uplab')
     params.use_uplab = false;
 end
-if ~isfield(params,'via_black')
-    params.via_black = false;
-end
+% if ~isfield(params,'via_black')
+%     params.via_black = params.Ledg > params.Lmid;
+% end
 
 % -------------------------------------------------------------------------
 % Parse input

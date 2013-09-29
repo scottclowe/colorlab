@@ -64,6 +64,6 @@ end
 
 % -------------------------------------------------------------------------
 % Build the colormap
-rgb = cmap_AwpBlin_make(params, dbg);
+rgb = makecmap_AwpBlin(params, dbg);
 
 end
