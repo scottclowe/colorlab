@@ -9,7 +9,7 @@ end
 % -------------------------------------------------------------------------
 % Check input is okay
 neces_fields = {'n','h1edg','h1mid','h2edg','h2mid','typ','maxc',...
-    'curveLmin','curveLmax','spotLmin','spotLmax'};
+    'Ledg','Lmid','Lmaxc'};
 li = isfield(params,neces_fields);
 if any(~li)
     error('Field %s is blank. ',neces_fields{~li});
@@ -39,18 +39,17 @@ end
 % Parse input
 use_uplab = params.use_uplab;
 n = params.n;
+Lmaxc = params.Lmaxc;
+Ledg  = params.Ledg;
+Lmid  = params.Lmid;
+maxc  = params.maxc;
+c0    = params.c0;
 h1edg = params.h1edg;
 h1mid = params.h1mid;
 h2edg = params.h2edg;
 h2mid = params.h2mid;
-curveLmin = params.curveLmin;
-curveLmax = params.curveLmax;
-spotLmin  = params.spotLmin;
-spotLmax  = params.spotLmax;
-c0    = params.c0;
-expnt = params.expnt;
 typ   = params.typ;
-maxc  = params.maxc;
+expnt = params.expnt;
 
 % -------------------------------------------------------------------------
 % Build the colormap
@@ -60,15 +59,16 @@ neach = floor(n/2)+1;
 % => if n=odd  then neach+(neach-1)=n
 %    if n=even then neach+(neach-1)=n+1
 
-L = linspace(spotLmin, spotLmax, neach);
+L = linspace(Ledg, Lmid, neach);
 
 % Chroma
-curveLmid = (curveLmin+curveLmax)/2;
+% Lmaxc = (curveLmin+curveLmax)/2;
+% Lmaxc = params.Lmaxc;
 switch typ
     case 'sin'
-        c = c0 + (1-c0) * sin(pi* (L-curveLmin)/(curveLmax-curveLmin) ).^expnt;
+        c = c0 + (1-c0) * cos(pi* (L-Lmaxc)/(2*abs(Lmid-Lmaxc)) ).^expnt;
     case 'pow'
-        c = 1 - (1-c0) * abs(((L-curveLmid)*(min(curveLmid-0,100-curveLmid)/min(curveLmax-curveLmid,curveLmid-curveLmin))).^expnt) / abs(curveLmid.^expnt);
+        c = 1 - (1-c0) * ((L-Lmaxc)/(abs(Lmid-Lmaxc))).^expnt;
         c = max(0,c);
     otherwise
         error('Unfamiliar type');
@@ -94,7 +94,7 @@ lab = [lch(:,1) lch(:,2).*cosd(lch(:,3)) lch(:,2).*sind(lch(:,3))];
 % lch = [lab(1) sqrt(lab(2)^2+lab(3)^2) mod(atan2(lab(3),lab(2))/pi*180,360)];
 
 % Convert to rgb
-rgb = soft_lab2rgb(lab, use_uplab);
+rgb = soft_lab2rgb(lab, use_uplab); warning('Soft conversion to rgb');
 
 
 % -------------------------------------------------------------------------
@@ -110,10 +110,10 @@ if dbg;
     plot_labcurve_rgbgamut(lab, use_uplab);
     
     % Construction figure
-    g = fetch_cielchab_gamut('srgb', [], [], use_uplab);
-    li_L   = g.lchmesh.Lvec>=spotLmin & g.lchmesh.Lvec<=spotLmax;
-    jointL = g.lchmesh.Lvec(li_L)';
-    % jointC = min(g.lchmesh.cgrid(ismember(g.lchmesh.hvec,[h1 h2]),li_L), 1)';
+%     g = fetch_cielchab_gamut('srgb', [], [], use_uplab);
+%     li_L   = g.lchmesh.Lvec>=spotLmin & g.lchmesh.Lvec<=spotLmax;
+%     jointL = g.lchmesh.Lvec(li_L)';
+%     % jointC = min(g.lchmesh.cgrid(ismember(g.lchmesh.hvec,[h1 h2]),li_L), 1)';
     
 %     figure; set(gca,'Color',[.4663 .4663 .4663]); hold on; box on;
 %     plot(g.lchmesh.cgrid(g.lchmesh.hvec==h1,li_L),jointL,'b-');
