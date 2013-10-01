@@ -55,13 +55,7 @@ maxc  = params.maxc;
 % -------------------------------------------------------------------------
 % Build the colormap
 
-g = fetch_cielchab_gamut('srgb', [], [], use_uplab);
-
 curveLmid = (curveLmin+curveLmax)/2;
-
-li_L   = g.lchmesh.Lvec>=spotLmin & g.lchmesh.Lvec<=spotLmax;
-jointL = g.lchmesh.Lvec(li_L)';
-% jointC = min(g.lchmesh.cgrid(ismember(g.lchmesh.hvec,[h1 h2]),li_L), 1)';
 
 L = linspace(spotLmin,spotLmax,floor(n/2)+1);
 
@@ -115,7 +109,14 @@ if dbg;
     
     % Colormap in 3d gamut
     plot_labcurve_rgbgamut(lab, use_uplab);
-
+    
+    
+    % Construction figure
+    g = fetch_cielchab_gamut('srgb', [], [], use_uplab);
+    li_L   = g.lchmesh.Lvec>=spotLmin & g.lchmesh.Lvec<=spotLmax;
+    jointL = g.lchmesh.Lvec(li_L)';
+    % jointC = min(g.lchmesh.cgrid(ismember(g.lchmesh.hvec,[h1 h2]),li_L), 1)';
+    
     figure; set(gca,'Color',[.4663 .4663 .4663]); hold on; box on;
     plot(g.lchmesh.cgrid(g.lchmesh.hvec==h1,li_L),jointL,'b-');
     plot(g.lchmesh.cgrid(g.lchmesh.hvec==h2,li_L),jointL,'r-');
