@@ -30,7 +30,7 @@ if nargin<4 || isempty(h1)
     h1 = h0+360; % Default with a full circle
 end
 if nargin<5
-    dbg = true;
+    dbg = false;
 end
 
 % -------------------------------------------------------------------------

@@ -15,7 +15,7 @@ if nargin<4 || isempty(use_cmax)
     use_cmax = false;
 end
 if nargin<5
-    dbg = true;
+    dbg = false;
 end
 
 % -------------------------------------------------------------------------

@@ -18,7 +18,7 @@ if nargin<5 || isempty(func)
     func = 'min'; % 'min' | 'mean' | 'max'
 end
 if nargin<6
-    dbg = true;
+    dbg = false;
 end
 
 % -------------------------------------------------------------------------
