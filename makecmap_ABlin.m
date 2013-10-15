@@ -8,10 +8,16 @@ end
 
 % -------------------------------------------------------------------------
 % Check input is okay
-neces_fields = {'n','use_uplab','lch1','lch2'};
+neces_fields = {'n','lch1','lch2'};
 li = isfield(params,neces_fields);
 if any(~li)
     error('Field %s is blank. ',neces_fields{~li});
+end
+
+% -------------------------------------------------------------------------
+% Fill in non-essential fields
+if ~isfield(params,'use_uplab')
+    params.use_uplab = false;
 end
 
 % -------------------------------------------------------------------------
@@ -24,8 +30,8 @@ lch2      = params.lch2;
 % -------------------------------------------------------------------------
 % Check lch1 and lch2 are in gamut
 gamut = fetch_cielchab_gamut('srgb',[],[],use_uplab);
-li = isingamut([lch1;lch2], gamut, 'lch');
-if any(~li)
+li = ~isingamut([lch1;lch2], gamut, 'lch');
+if any(li)
     erstr = '';
     if li(1);   erstr = mat2str(lch1); end
     if all(li); erstr = [erstr ' and ']; end
