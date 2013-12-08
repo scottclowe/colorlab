@@ -15,3 +15,6 @@ TO DO
 [ ] - Name suite. Rename functions. (colorlab? cmaplab? colab? clab?)
 [ ] - Write up
 [ ] - CMYK - ISO Coated v2 300% (ECI)
+[ ] - Make it possible to pick out a high-L section of a curve, etc
+[ ] - Check code is consistent throughout
+[ ] - Find curves which match cbrewer paletes
