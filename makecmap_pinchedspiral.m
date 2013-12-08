@@ -8,7 +8,7 @@ end
 
 % -------------------------------------------------------------------------
 % Check input is okay
-neces_fields = {'n','h1','h_per_L','Lmin','Lmax','typ','maxc'};
+neces_fields = {'n','h1','h2','Lmin','Lmax','typ','maxc'};
 li = isfield(params,neces_fields);
 if any(~li)
     error('Field %s is blank. ',neces_fields{~li});
