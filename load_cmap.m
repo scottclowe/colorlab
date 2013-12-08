@@ -62,11 +62,11 @@ cmap = interp1(x,raw_cmap,xi,interp_method);
 % -------------------------------------------------------------------------
 % If dbg mode, display a figure of the outputted colormap
 if dbg;
-    img = repmat(cmap,[1 1 20]);
-    img = permute(img,[1 3 2]);
+    img = permute(cmap,[1 3 2]);
     figure;
     imagesc(img);
     axis xy;
+    set(gca,'XTick',[]);
     title('Output colormap');
 end
 
