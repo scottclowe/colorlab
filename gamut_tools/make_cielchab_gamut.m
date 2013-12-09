@@ -11,7 +11,7 @@ if nargin<2
     N = []; 
 end
 if nargin<3
-    point_method = 'face-plus';
+    point_method = 'inv';
 end
 if nargin<4
     use_uplab = false;
