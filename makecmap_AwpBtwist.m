@@ -1,9 +1,12 @@
-function rgb = makecmap_AwpBtwist(params, dbg)
+function colors = makecmap_AwpBtwist(params, dbg, outspc)
 
 % -------------------------------------------------------------------------
 % Default inputs
 if nargin<2 || isempty(dbg)
     dbg = 0; % Whether to output information and figures
+end
+if nargin<3 || isempty(outspc)
+    outspc = 'rgb';
 end
 
 % -------------------------------------------------------------------------
@@ -43,13 +46,16 @@ Lmaxc = params.Lmaxc;
 Ledg  = params.Ledg;
 Lmid  = params.Lmid;
 maxc  = params.maxc;
-c0    = params.c0;
+c0rel = params.c0 / params.maxc;
 h1edg = params.h1edg;
 h1mid = params.h1mid;
 h2edg = params.h2edg;
 h2mid = params.h2mid;
 typ   = params.typ;
 expnt = params.expnt;
+
+% Show parameters when in debug mode
+if dbg; disp(params); end;
 
 % -------------------------------------------------------------------------
 % Build the colormap
@@ -66,9 +72,9 @@ L = linspace(Ledg, Lmid, neach);
 % Lmaxc = params.Lmaxc;
 switch typ
     case 'sin'
-        c = c0 + (1-c0) * cos(pi* (L-Lmaxc)/(2*abs(Lmid-Lmaxc)) ).^expnt;
+        c = c0rel + (1-c0rel) * cos(pi* (L-Lmaxc)/(2*abs(Lmid-Lmaxc)) ).^expnt;
     case 'pow'
-        c = 1 - (1-c0) * ((L-Lmaxc)/(abs(Lmid-Lmaxc))).^expnt;
+        c = 1 - (1-c0rel) * ((L-Lmaxc)/(abs(Lmid-Lmaxc))).^expnt;
         c = max(0,c);
     otherwise
         error('Unfamiliar type');
@@ -84,7 +90,7 @@ Lch1 = [L' c' h1'];
 Lch2 = [L' c' h2']; Lch2 = flipud(Lch2);
 
 % If min chroma is 0, then cut off the duplicated point
-if c0==0
+if c0rel==0
     Lch1 = Lch1(1:end-1,:);
 end
 lch = [Lch1; Lch2];
@@ -94,7 +100,21 @@ lab = [lch(:,1) lch(:,2).*cosd(lch(:,3)) lch(:,2).*sind(lch(:,3))];
 % lch = [lab(1) sqrt(lab(2)^2+lab(3)^2) mod(atan2(lab(3),lab(2))/pi*180,360)];
 
 % Convert to rgb
-rgb = soft_lab2rgb(lab, use_uplab); warning('Soft conversion to rgb');
+if strcmp(outspc,'rgb') || dbg
+%     rgb = soft_lab2rgb(lab, use_uplab); warning('Soft conversion to rgb');
+    rgb = hard_lab2rgb(lab, use_uplab);
+end
+
+switch outspc
+    case 'lch'
+        colors = lch;
+    case 'lab'
+        colors = lab;
+    case 'rgb'
+        colors = rgb;
+    otherwise
+        error('Unfamiliar output space');
+end
 
 
 % -------------------------------------------------------------------------
