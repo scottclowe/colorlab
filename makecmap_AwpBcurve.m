@@ -8,7 +8,7 @@ end
 
 % -------------------------------------------------------------------------
 % Check input is okay
-neces_fields = {'n','h1','h2','curveLmin','curveLmax','spotLmin','spotLmax'};
+neces_fields = {'n','h1','h2','typ','maxc','Ledg','Lmid','Lmaxc'};
 li = isfield(params,neces_fields);
 if any(~li)
     error('Field %s is blank. ',neces_fields{~li});
@@ -33,38 +33,37 @@ if ~isfield(params,'expnt')
             params.expnt = 2;
     end
 end
-if ~isfield(params,'maxc')
-    params.maxc = [];
-end
 
 % -------------------------------------------------------------------------
 % Parse input
 use_uplab = params.use_uplab;
-n  = params.n;
-h1 = params.h1;
-h2 = params.h2;
-curveLmin = params.curveLmin;
-curveLmax = params.curveLmax;
-spotLmin  = params.spotLmin;
-spotLmax  = params.spotLmax;
-c0    = params.c0;
-expnt = params.expnt;
-typ   = params.typ;
+n = params.n;
+Lmaxc = params.Lmaxc;
+Ledg  = params.Ledg;
+Lmid  = params.Lmid;
 maxc  = params.maxc;
+c0rel = params.c0 / params.maxc;
+h1    = params.h1;
+h2    = params.h2;
+typ   = params.typ;
+expnt = params.expnt;
 
 % -------------------------------------------------------------------------
 % Build the colormap
 
-curveLmid = (curveLmin+curveLmax)/2;
+% Need an odd number of colours so that grey is in the middle
+neach = floor(n/2)+1;
+% => if n=odd  then neach+(neach-1)=n
+%    if n=even then neach+(neach-1)=n+1
 
-L = linspace(spotLmin,spotLmax,floor(n/2)+1);
+L = linspace(Ledg, Lmid, neach);
 
 switch typ
     case 'sin'
-        c = c0 + (1-c0) * sin(pi* (L-curveLmin)/(curveLmax-curveLmin) ).^expnt;
+        C = c0rel + (1-c0rel) * cos(pi* (L-Lmaxc)/(2*abs(Lmid-Lmaxc)) ).^expnt;
     case 'pow'
-        c = 1 - (1-c0) * abs(((L-curveLmid)*(min(curveLmid-0,100-curveLmid)/min(curveLmax-curveLmid,curveLmid-curveLmin))).^expnt) / abs(curveLmid.^expnt);
-        c = max(0,c);
+        C = 1 - (1-c0rel) * ((L-Lmaxc)/(abs(Lmid-Lmaxc))).^expnt;
+        C = max(0,C);
     otherwise
         error('Unfamiliar type');
 end
@@ -72,20 +71,14 @@ end
 % Check for points out of gamut or restrict to gamut
 % ... can't do this because we would need to generate a C point for all the
 % ... L values in the gamut, which we haven't done
-% maxc_comp = min(jointC./c);
-% if isempty(maxc)
-%     maxc = maxc_comp;
-% elseif maxc>maxc_comp
-%     error('Max chroma setting %f > %f is too high',maxc,maxc_comp);
-% end
 
-c = c*maxc;
+C = C*maxc;
 
-Lch1 = [L' c' repmat(h1,size(L))'];
-Lch2 = [flipud(L') flipud(c') repmat(h2,size(L))'];
+Lch1 = [L' C' repmat(h1,neach,1)];
+Lch2 = [flipud(L') flipud(C') repmat(h2,neach,1)];
 
 % If min chroma is 0, then cut off the duplicated point
-if c0==0
+if c0rel==0
     Lch1 = Lch1(1:end-1,:);
 end
 lch = [Lch1; Lch2];
@@ -113,14 +106,14 @@ if dbg;
     
     % Construction figure
     g = fetch_cielchab_gamut('srgb', [], [], use_uplab);
-    li_L   = g.lchmesh.Lvec>=spotLmin & g.lchmesh.Lvec<=spotLmax;
+    li_L   = g.lchmesh.Lvec>=min(Ledg,Lmid) & g.lchmesh.Lvec<=max(Ledg,Lmid);
     jointL = g.lchmesh.Lvec(li_L)';
     % jointC = min(g.lchmesh.cgrid(ismember(g.lchmesh.hvec,[h1 h2]),li_L), 1)';
     
     figure; set(gca,'Color',[.4663 .4663 .4663]); hold on; box on;
-    plot(g.lchmesh.cgrid(g.lchmesh.hvec==h1,li_L),jointL,'b-');
-    plot(g.lchmesh.cgrid(g.lchmesh.hvec==h2,li_L),jointL,'r-');
-    plot(c,L,'ks-');
+    plot(g.lchmesh.cgrid(g.lchmesh.hvec==params.h1,li_L),jointL,'b-');
+    plot(g.lchmesh.cgrid(g.lchmesh.hvec==params.h2,li_L),jointL,'r-');
+    plot(C,L,'ks-');
 end
 
 end
