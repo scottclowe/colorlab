@@ -32,38 +32,38 @@ params = struct('n',n);
 % params.Lmid  = 94;
 % params.Lmaxc = 43.5208;
 % params.c0    = 0;
-% params.maxc  = 70.2095;
+% params.maxc  = 70.2; %70.2095;
 % params.typ   = 'sin';
 % params.expnt = 1;
 % params.use_uplab = false;
 
 % Parameter Set #2: More diverse colours
-% params.h1edg = 318;
-% params.h1mid = 270;
-% params.h2edg = 27;
-% params.h2mid = 92;
-% params.Ledg  = 17;
-% params.Lmid  = 92;
-% params.Lmaxc = 44.8764;
-% params.c0    = 0;
-% params.maxc  = 71.2675;
-% params.typ   = 'sin';
-% params.expnt = 1;
-% params.use_uplab = false;
-
-% Parameter Set #3: Best yet
 params.h1edg = 318;
 params.h1mid = 270;
-params.h2edg = 23;
-params.h2mid = 90;
-params.Ledg  = 19;
-params.Lmid  = 88;
-params.Lmaxc = 45.5438;
-params.maxc  = 75; %75.0389;
+params.h2edg = 27;
+params.h2mid = 92;
+params.Ledg  = 17;
+params.Lmid  = 92;
+params.Lmaxc = 44.8764;
 params.c0    = 0;
+params.maxc  = 71.25; %71.2675;
 params.typ   = 'sin';
 params.expnt = 1;
 params.use_uplab = false;
+
+% Parameter Set #3: Better shades, but with paler mid-colour
+% params.h1edg = 318;
+% params.h1mid = 270;
+% params.h2edg = 23;
+% params.h2mid = 90;
+% params.Ledg  = 19;
+% params.Lmid  = 88;
+% params.Lmaxc = 45.5438;
+% params.maxc  = 75; %75.0389;
+% params.c0    = 0;
+% params.typ   = 'sin';
+% params.expnt = 1;
+% params.use_uplab = false;
 
 % -------------------------------------------------------------------------
 cmap = makecmap_AwpBtwist(params, dbg);

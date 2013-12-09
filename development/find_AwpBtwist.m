@@ -87,7 +87,8 @@ mp_names = { 'h1edg'  , 'h1mid'  , 'h2edg', 'h2mid' , 'Ledg' , 'Lmid' };
 % mp_inpts = { 318, 270, 22, 92, 19, 88};
 % mp_inpts = { 318, 270, 22, 92, 19, 88};
 % mp_inpts = { 318, 270, 25, 90, 19, 89};
-mp_inpts = { 318, 270, 23, 90, 19, 88};
+% mp_inpts = { 318, 270, 23, 90, 19, 88};
+mp_inpts = { 318, 270, 24:30, 88:94, 17, 92};
 
 mp_sizes = cellfun('prodofsize',mp_inpts);
 % mp_indxs = ones(size(mp_names)); % ones(1,numel(mp_names));
