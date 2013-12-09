@@ -58,6 +58,13 @@ if ~isfield(g,'lchmesh')
     g.lchmesh = make_gamut_mesh(g);
 end
 
+% Add a 360 hue to this
+if ~ismember(360,g.lchmesh.hvec) && ismember(0,g.lchmesh.hvec)
+    g.lchmesh.Lgrid(end+1,:) = g.lchmesh.Lgrid(1,:);
+    g.lchmesh.hgrid(end+1,:) = 360;
+    g.lchmesh.cgrid(end+1,:) = g.lchmesh.cgrid(1,:);
+end
+
 % We can then linearly interpolate on this fine mesh
 Cedge = interp2(g.lchmesh.Lgrid, g.lchmesh.hgrid, g.lchmesh.cgrid, P(:,1), P(:,3));
 
