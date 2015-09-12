@@ -122,7 +122,8 @@ if dbg
     axis xy;
     title('Output colormap');
     
-    LL_Lab2 = nan(n*length(LL),3);
+    % Read the Lab values but leave a NaN between each LL
+    LL_Lab2 = nan((n+1)*length(LL),3);
     I = setdiff(1:((n+1)*length(LL)),(n+1)*(1:length(LL)));
     LL_Lab2(I,:) = cell2mat(LL_Lab);
     plot_labcurve_rgbgamut(LL_Lab2, use_uplab);
