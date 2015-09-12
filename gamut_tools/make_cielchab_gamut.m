@@ -372,14 +372,17 @@ while c_intv>target_c_intv
     cc_max( li) = cc_try( li);
 end
 
-LCh = [LL(:) cc_min(:) hh(:)];
-Lab = [LCh(:,1) LCh(:,2).*cosd(LCh(:,3)) LCh(:,2).*sind(LCh(:,3))];
-rgb = hard_lab2rgb(Lab, use_uplab);
+% Don't save these things as we don't need them anymore
 
-gamut.lch           = LCh;
-gamut.lch_max       = [LL(:) cc_max(:) hh(:)];
-gamut.lab           = Lab;
-gamut.rgb           = rgb;
+% LCh = [LL(:) cc_min(:) hh(:)];
+% Lab = [LCh(:,1) LCh(:,2).*cosd(LCh(:,3)) LCh(:,2).*sind(LCh(:,3))];
+% rgb = hard_lab2rgb(Lab, use_uplab);
+
+% gamut.lch           = LCh;
+% gamut.lch_max       = [LL(:) cc_max(:) hh(:)];
+% gamut.lab           = Lab;
+% gamut.rgb           = rgb;
+
 gamut.space         = space;
 gamut.N             = N;
 gamut.Ntot          = Ntot;
