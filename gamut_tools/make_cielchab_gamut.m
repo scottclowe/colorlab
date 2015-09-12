@@ -391,6 +391,7 @@ gamut.Lintv         = Lintv;
 gamut.hprec         = 0;
 gamut.hintv         = hintv;
 gamut.cintv         = c_intv;
+gamut.cprec         = c_intv;
 
 gamut.lchmesh.Lvec  = L;
 gamut.lchmesh.hvec  = h;
