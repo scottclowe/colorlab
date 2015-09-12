@@ -47,7 +47,7 @@ if isempty(N)
         case 'face-plus'
             N = 1024;
         case 'inv'
-            N = 200;
+            N = 400; % I increased this from 200. Speed and size no longer an issue
         otherwise
             error('Unknown point method');
     end
