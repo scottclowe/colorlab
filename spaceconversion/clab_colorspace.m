@@ -1,6 +1,14 @@
 function varargout = clab_colorspace(Conversion,varargin)
 %COLORSPACE  Transform a color image between color representations.
-%   Same as colorspace, but no clipping of RGB values to [0,1]
+%   
+%   **This function is a modified version of Pascal Getreuer's original**
+%   MODIFICATIONS:
+%       No clipping of RGB values to [0,1]. This means CIELAB inputs can be
+%       mapped outside of the RGB gamut. This is used to find the edges of
+%       the RGB gamut.
+%   
+%   What follows is the description of the original COLORSPACE function.
+%   
 %
 %   B = COLORSPACE(S,A) transforms the color representation of image A
 %   where S is a string specifying the conversion.  The input array A 
@@ -82,8 +90,11 @@ function varargout = clab_colorspace(Conversion,varargin)
 %  response of the three types of cones in the human eye, where L, M, S,
 %  correspond respectively to red ("long"), green ("medium"), and blue
 %  ("short").
+%  
+%  See also colorspace!
 
-% Pascal Getreuer 2005-2010
+% Original by Pascal Getreuer, 2005
+% Amended by  Scott Lowe, 2013
 
 
 %%% Input parsing %%%
