@@ -1,4 +1,11 @@
-% CIEDE Color difference
+% CIEDE2000 Color difference metric, as per CIELAB2000 specification
+%    DE = CIEDE2000(LAB1,LAB2) where LAB1 and LAB2 are 1x3 colour vectors
+%    in CIELAB colour space computes the colour difference (the perceptual
+%    distance) between the them. Then DE is a scalar.
+%    LAB1 and LAB2 can also be nx3 matrices each of n colours in CIELAB
+%    space, and the result is an nx1 vector of distances for each of the n
+%    pairs of colours.
+
 function dE = ciede2000(Lab1,Lab2)
 
 % Taken from
