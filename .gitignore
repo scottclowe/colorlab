@@ -3,3 +3,6 @@
 *.asv
 # Compiled MEX binaries (all platforms)
 *.mex*
+
+# Output raster images
+demo/figs/
