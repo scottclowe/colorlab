@@ -1,7 +1,13 @@
 function x = mmean(x,dims,flag)
 
 % -------------------------------------------------------------------------
-if nargin<3;
+% Input handling
+if nargin<2
+    % User specifies no dims and no flag -> max over everything
+    dims = [];
+    flag = 'x';
+elseif nargin<3;
+    % User specifies dims but no flag -> max over dims
     flag = '';
 end
 
